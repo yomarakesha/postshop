@@ -1,0 +1,47 @@
+from datetime import datetime
+from decimal import Decimal
+from typing import Optional
+
+from pydantic import BaseModel, Field
+
+from app.models.return_request import ReturnStatus
+from app.schemas.common import Comment1000
+
+
+class ReturnCreateRequest(BaseModel):
+    order_item_id: int
+    # Больше, чем куплено, вернуть нельзя — проверка в методе, там известна
+    # сама покупка.
+    quantity: Decimal = Field(gt=0)
+    reason: Comment1000
+
+
+class ReturnResolveRequest(BaseModel):
+    resolution_comment: Optional[Comment1000] = None
+
+
+class ReturnRejectRequest(BaseModel):
+    # При отказе причина обязательна: иначе заявка закрывается молча.
+    resolution_comment: Comment1000
+
+
+class ReturnResponse(BaseModel):
+    id: int
+    user_id: int
+    # Кто именно просит возврат. В списке заявок админки был только номер
+    # заказа: чтобы понять, с кем разговаривать, приходилось идти в другой
+    # раздел и искать заказ там.
+    buyer_name: Optional[str] = None
+    buyer_phone: Optional[str] = None
+    order_item_id: int
+    order_id: Optional[int] = None
+    product_id: Optional[int] = None
+    product_name: Optional[str] = None
+    quantity: Decimal
+    reason: str
+    status: ReturnStatus
+    resolution_comment: Optional[str] = None
+    created_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True

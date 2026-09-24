@@ -1,0 +1,101 @@
+{
+  "name": "postshop_client",
+  "private": true,
+  "type": "module",
+  "imports": {
+    "#/*": "./src/*"
+  },
+  "scripts": {
+    "dev": "vite dev --port 3010",
+    "build": "vite build",
+    "start": "vite dev --host 0.0.0.0 --port 7001 --strictPort",
+    "preview": "vite preview",
+    "serve": "vite preview --host 127.0.0.1 --port 7001 --strictPort",
+    "lint": "eslint . --fix --no-warn-ignored --max-warnings=0",
+    "format": "prettier --write .",
+    "prepare": "husky",
+    "codegen": "dotenv -e .env.local -e .env -- sh -c 'test -n \"$VITE_OPEN_API_URL\" || { echo \"VITE_OPEN_API_URL не задан\"; exit 1; }; del-cli --force ./src/shared/openapi && openapi-rq -i \"$VITE_OPEN_API_URL\" -o ./src/shared/openapi -c @hey-api/client-fetch --useDateType --enums typescript'",
+    "test": "vitest run",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "@fontsource-variable/geist": "^5.2.8",
+    "@tailwindcss/vite": "^4.1.18",
+    "@tanstack/react-devtools": "latest",
+    "@tanstack/react-form": "latest",
+    "@tanstack/react-query": "latest",
+    "@tanstack/react-query-devtools": "latest",
+    "@tanstack/react-router": "latest",
+    "@tanstack/react-router-devtools": "latest",
+    "@tanstack/react-router-ssr-query": "latest",
+    "@tanstack/react-start": "latest",
+    "@tanstack/router-plugin": "^1.132.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "embla-carousel-react": "^8.6.0",
+    "i18next": "^26.0.4",
+    "lottie-react": "^2.4.1",
+    "lucide-react": "^0.545.0",
+    "maplibre-gl": "^5.24.0",
+    "motion": "^12.38.0",
+    "radix-ui": "^1.4.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-i18next": "^17.0.2",
+    "recharts": "^3.8.1",
+    "shadcn": "^4.4.0",
+    "sonner": "^2.0.7",
+    "tailwind-merge": "^3.5.0",
+    "tailwindcss": "^4.1.18",
+    "tw-animate-css": "^1.4.0",
+    "zod": "^4.3.6",
+    "zustand": "^5.0.12"
+  },
+  "devDependencies": {
+    "@7nohe/openapi-react-query-codegen": "^2.1.0",
+    "@commitlint/cli": "^20.5.0",
+    "@commitlint/config-conventional": "^20.5.0",
+    "@tailwindcss/typography": "^0.5.16",
+    "@tanstack/devtools-vite": "latest",
+    "@tanstack/eslint-config": "^0.4.0",
+    "@testing-library/dom": "^10.4.1",
+    "@testing-library/react": "^16.3.0",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.2.0",
+    "@types/react-dom": "^19.2.0",
+    "@vitejs/plugin-react": "^5.1.4",
+    "commitlint": "^20.5.0",
+    "cross-var": "^1.1.0",
+    "del-cli": "^7.0.0",
+    "dotenv": "^17.4.1",
+    "dotenv-cli": "^11.0.0",
+    "eslint": "^9.39.4",
+    "husky": "^9.1.7",
+    "jsdom": "^28.1.0",
+    "lint-staged": "^16.4.0",
+    "prettier": "^3.8.1",
+    "typescript": "^5.7.2",
+    "vite": "^7.3.1",
+    "vite-plugin-svgr": "^5.2.0",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.0.5"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "lightningcss"
+    ]
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --max-warnings=0 --no-warn-ignored",
+      "prettier --check"
+    ],
+    "*.{json,css,md}": "prettier --check"
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  }
+}

@@ -1,0 +1,599 @@
+{
+  "key": "tr",
+  "value": "Türkçe",
+  "shop": "Mağaza",
+  "brand": "Marka",
+  "products": "Ürünler",
+  "brands": "Markalar",
+  "shops": "Mağazalar",
+  "order": "Sipariş",
+  "category": "Kategori",
+  "measurementUnit": "Ölçü birimi",
+  "noRegistration": "Kayıtlı değil",
+  "postshopSeller": "PostShop satıcısı",
+  "currency": "Para birimi",
+  "buyer": "Alıcı",
+  "error": "Hata",
+  "inputs": {
+    "name": "Ad",
+    "address": "Adres",
+    "surname": "Soyad",
+    "phoneNumber": "Telefon numarası",
+    "title": "Başlık",
+    "description": "Açıklama",
+    "note": "Not",
+    "notRequired": "İsteğe bağlı",
+    "notePlaceholder": "Siparişe not"
+  },
+  "nav": {
+    "home": "Ana sayfa",
+    "categories": "Kategoriler",
+    "cart": "Sepet",
+    "orders": "Siparişler",
+    "profile": "Profil",
+    "myProducts": "Ürünler"
+  },
+  "networkError": {
+    "toast": "Ağ hatası",
+    "title": "Bir şeyler ters gitti",
+    "description": "İnternet bağlantınızı kontrol edin ve yeniden bağlanmayı deneyin"
+  },
+  "confirmCancelOrder": {
+    "title": "Sipariş iptal edilsin mi?",
+    "description": "Bu siparişi iptal etmek istediğinizden emin misiniz?",
+    "cancel": "Evet, iptal et"
+  },
+  "paymentMethod": {
+    "title": "Ödeme yöntemi",
+    "card": "Kart",
+    "cash": "Nakit",
+    "cashAndCard": "Nakit ve kart"
+  },
+  "deliveryMethod": {
+    "title": "Teslimat yöntemi",
+    "pickup": "Teslim alma noktasından teslim al",
+    "delivery": "Adrese teslimat",
+    "addressPlaceholder": "Magtymguly Bulvarı, 1 numaralı bina",
+    "selectPickupPoint": "Teslim alma noktası seçin"
+  },
+  "common": {
+    "next": "İleri",
+    "confirm": "Onayla",
+    "search": "Ara",
+    "viewAll": "Tümünü gör",
+    "save": "Kaydet",
+    "sort": "Sırala",
+    "clear": "Temizle",
+    "start": "Başla",
+    "close": "Kapat",
+    "logIn": "Giriş yap",
+    "delete": "Sil",
+    "yes": "Evet",
+    "no": "Hayır",
+    "retry": "Tekrar dene",
+    "pieces": "adet",
+    "approve": "Onayla",
+    "reject": "Reddet",
+    "add": "Ekle",
+    "select": "Seç",
+    "authAgreement": {
+      "prefix": "Devam ederek ",
+      "terms": "Kullanım Koşulları",
+      "and": " ve ",
+      "privacy": "Gizlilik Politikası",
+      "suffix": "'nı kabul etmiş olursunuz."
+    },
+    "comingSoon": "Yakında",
+    "back": "Geri"
+  },
+  "months": {
+    "1": "Ocak",
+    "2": "Şubat",
+    "3": "Mart",
+    "4": "Nisan",
+    "5": "Mayıs",
+    "6": "Haziran",
+    "7": "Temmuz",
+    "8": "Ağustos",
+    "9": "Eylül",
+    "10": "Ekim",
+    "11": "Kasım",
+    "12": "Aralık"
+  },
+  "emptyState": {
+    "products": {
+      "title": "Henüz ürün yok",
+      "description": "Bu bölümde henüz hiçbir şey yayınlanmadı"
+    },
+    "search": {
+      "title": "Sonuç bulunamadı",
+      "description": "Aradığınız yerin adını doğru yazdığınızdan emin olun veya başka bir isim girin"
+    },
+    "favorites": {
+      "title": "Favori ürününüz yok",
+      "description": "Ürünleri favorilere ekleyin, daha sonra hızlıca ulaşın"
+    },
+    "cart": {
+      "title": "Sepetiniz şu an boş",
+      "description": "Doldurma zamanı!"
+    },
+    "orders": {
+      "title": "Sipariş yok",
+      "description": "Sipariş listeniz burada görünecek"
+    },
+    "cities": {
+      "title": "Bölge listesi boş"
+    }
+  },
+  "product": {
+    "title": "Ürün",
+    "notFound": "Ürün bulunamadı",
+    "outOfStock": "Stokta yok",
+    "favorite": {
+      "add": "Favorilere ekle",
+      "remove": "Favorilerden çıkar"
+    },
+    "button": "Sepete ekle",
+    "similarProducts": "Benzer ürünler",
+    "status": {
+      "declined": "Reddedildi",
+      "pending": "İncelemede"
+    }
+  },
+  "auth": {
+    "login": {
+      "headline": "Giriş yapmak için \n telefon numaranızı girin",
+      "tryAgain": "Bir şeyler ters gitti. \nLütfen daha sonra tekrar deneyin."
+    },
+    "verify": {
+      "headline": "Telefon numaranıza \n bir doğrulama kodu gönderildi",
+      "resend": "Kodu yeniden gönder"
+    }
+  },
+  "profile": {
+    "headerTitle": "Profil",
+    "logIn": "Hesabınıza giriş yapın",
+    "sections": {
+      "settings": "Ayarlar",
+      "others": "Diğer"
+    },
+    "links": {
+      "favorites": "Favoriler",
+      "language": "Dil",
+      "termsOfUse": "Kullanım koşulları",
+      "privacyPolicy": "Gizlilik politikası",
+      "server": "Sunucu",
+      "notifications": "Bildirimler",
+      "becomeSeller": "Satıcı ol",
+      "logout": "Çıkış yap",
+      "deleteAccount": "Hesabı sil"
+    },
+    "logoutConfirm": {
+      "title": "Çıkış yap",
+      "description": "Çıkış yapmak istediğinizden emin misiniz?"
+    },
+    "termsOfUse": {
+      "headerTitle": "Kullanım Koşulları",
+      "sections": [
+        {
+          "title": "1. Genel Hükümler",
+          "body": "Bu Kullanım Koşulları, PostShop mobil uygulamasına erişiminizi ve uygulamayı kullanımınızı düzenler. Uygulamayı kullanarak bu Koşulları tamamen kabul etmiş olursunuz."
+        },
+        {
+          "title": "2. Hizmetin Tanımı",
+          "body": "PostShop; alıcıların ürünlere göz atmasına, ürünleri sepete eklemesine ve adrese teslimat ya da belirlenen teslim alma noktalarından teslim alma seçenekleriyle sipariş vermesine olanak tanıyan bir mobil pazaryeridir. Satıcılar, satıcı platformu üzerinden mağaza kaydı oluşturabilir, ürün listeleyebilir ve siparişleri yönetebilir."
+        },
+        {
+          "title": "3. Kayıt ve Hesap",
+          "body": "Belirli özelliklere erişim, telefon numaranız üzerinden kayıt olmayı gerektirir. Doğrulama kodunuzu gizli tutmaktan siz sorumlusunuz. Doğru ve gerçek bilgiler vermeniz gerekmektedir. Her telefon numarası için yalnızca bir hesaba izin verilir. Hesabınızı istediğiniz zaman Profil bölümünden silebilirsiniz."
+        },
+        {
+          "title": "4. Satıcı Kaydı",
+          "body": "Satıcı olmak için gerekli iş belgelerini doğrulama amacıyla göndermeniz gerekir. Satıcı erişimi yalnızca belgeler PostShop ekibi tarafından incelenip onaylandıktan sonra verilir. Belgelerin geçersiz olduğu tespit edilirse veya Koşullar ihlal edilirse PostShop, satıcı statüsünü reddetme veya iptal etme hakkını saklı tutar."
+        },
+        {
+          "title": "5. Siparişler ve Ödemeler",
+          "body": "Sipariş vererek teslimat bilgilerinizin doğruluğunu onaylamış olursunuz. Kullanılabilir ödeme yöntemleri: nakit, kart veya nakit ve kart. Kullanılabilir teslimat yöntemleri: adrese teslimat veya bir teslim alma noktasından teslim alma. Sipariş, satıcı tarafından işleme alınmadan önce iptal edilebilir."
+        },
+        {
+          "title": "6. Kullanıcı Davranışı",
+          "body": "Uygulamayı herhangi bir dolandırıcılık veya yasa dışı faaliyet için kullanmamayı, yanlış veya yanıltıcı içerik paylaşmamayı, başka hesaplara veya sistemlere yetkisiz erişim sağlamaya çalışmamayı ve uygulamayla etkileşim için otomatik araçlar kullanmamayı kabul edersiniz."
+        },
+        {
+          "title": "7. Fikri Mülkiyet",
+          "body": "Uygulamadaki tüm içerik — logolar, tasarım, metinler ve ürün listeleri dahil — PostShop'a veya ilgili satıcılarına aittir. Bu içeriği yazılı izin olmadan kopyalayamaz, çoğaltamaz veya dağıtamazsınız."
+        },
+        {
+          "title": "8. Sorumluluğun Sınırlandırılması",
+          "body": "PostShop, bir platform aracısı olarak hareket eder ve satıcılar tarafından listelenen ürünlerin kalitesinden veya yasallığından, alıcılar ile satıcılar arasındaki anlaşmazlıklardan veya teknik arızalar, internet bağlantısının kesilmesi ya da mücbir sebepler nedeniyle oluşan zararlardan sorumlu değildir."
+        },
+        {
+          "title": "9. Gizlilik",
+          "body": "Kişisel verilerinizi (ad, telefon numarası, adres) yalnızca bu Koşullarda açıklanan hizmetleri sağlamak amacıyla topluyor ve işliyoruz. Verileriniz, siparişlerinizin yerine getirilmesi için gerekli olanlar dışında üçüncü taraflarla paylaşılmaz."
+        },
+        {
+          "title": "10. Koşullardaki Değişiklikler",
+          "body": "PostShop, bu Koşulları herhangi bir zamanda güncelleme hakkını saklı tutar. Değişikliklerden sonra uygulamayı kullanmaya devam etmeniz, güncellenmiş Koşulları kabul ettiğiniz anlamına gelir."
+        }
+      ],
+      "contacts": {
+        "title": "İletişim",
+        "address": {
+          "label": "Adres",
+          "value": "Turkmenpost Genel Müdürlüğü, Aşkabat, Türkmenistan, 744000"
+        },
+        "phone": {
+          "label": "Telefon",
+          "value": "075 (Ana hat)"
+        },
+        "email": {
+          "label": "E-posta",
+          "value": "contact@post.tm"
+        }
+      }
+    },
+    "privacyPolicy": {
+      "headerTitle": "Gizlilik Politikası",
+      "sections": [
+        {
+          "title": "1. Genel Bilgiler",
+          "body": "Pazaryeri hizmetlerini sunabilmek için kişisel verilerinizi topluyor ve işliyoruz. Uygulamamızı kullanarak, verilerinizin burada açıklandığı şekilde toplanmasını ve işlenmesini kabul etmiş olursunuz."
+        },
+        {
+          "title": "2. Toplanan Veriler",
+          "body": "Kayıt olmanız ve hizmetlerimizi kullanmanız için telefon numaranızı, adınızı, soyadınızı, teslimat adresinizi ve sipariş geçmişinizi topluyoruz."
+        },
+        {
+          "title": "3. Veri Kullanım Amacı",
+          "body": "Verileriniz; siparişlerin işlenmesi, adrese teslimatların gerçekleştirilmesi, sipariş durumu hakkında bildirim gönderilmesi ve müşteri desteğiyle ilgili sorunların çözülmesi amacıyla kullanılır."
+        },
+        {
+          "title": "4. Verilerin Üçüncü Taraflarla Paylaşılması",
+          "body": "Teslimat adresinizi ve iletişim bilgilerinizi yalnızca siparişlerinizin teslim edilmesi amacıyla kuryeler ve satıcılarla paylaşıyoruz. Kişisel verilerinizi üçüncü taraflara satmıyoruz."
+        },
+        {
+          "title": "5. Güvenlik Önlemleri",
+          "body": "Kişisel verilerinizi yetkisiz erişime, değişikliğe veya ifşaya karşı korumak için modern şifreleme protokolleri ve teknik güvenlik önlemleri kullanıyoruz."
+        },
+        {
+          "title": "6. Kullanıcı Hakları",
+          "body": "Kişisel verilerinize erişim, düzeltme veya silme talebinde bulunma hakkına sahipsiniz. Hesap ayarları üzerinden profilinizi istediğiniz zaman silebilirsiniz."
+        }
+      ],
+      "contacts": {
+        "title": "İletişim",
+        "address": {
+          "label": "Adres",
+          "value": "Turkmenpost Genel Müdürlüğü, Aşkabat, Türkmenistan, 744000"
+        },
+        "phone": {
+          "label": "Telefon",
+          "value": "075 (Ana hat)"
+        },
+        "email": {
+          "label": "E-posta",
+          "value": "contact@post.tm"
+        }
+      }
+    }
+  },
+  "sheets": {
+    "selectRegion": {
+      "title": "Bir bölge seçin"
+    },
+    "chooseLanguage": {
+      "title": "Dil seçin"
+    },
+    "selectMyShop": {
+      "title": "Mağazalarım"
+    },
+    "aboutShop": {
+      "title": "Mağaza hakkında",
+      "phoneNumber": "Telefon numarası",
+      "description": "Açıklama"
+    },
+    "filter": {
+      "title": "Filtre",
+      "priceRange": "Fiyat aralığı",
+      "priceFrom": "En az",
+      "priceTo": "En çok"
+    },
+    "sort": {
+      "title": "Sırala",
+      "priceHighToLow": "Fiyat: yüksekten düşüğe",
+      "priceLowToHigh": "Fiyat: düşükten yükseğe",
+      "newArrivals": "Yeni gelenler",
+      "onSale": "İndirimde",
+      "bestSelling": "Çok satanlar"
+    },
+    "measurementUnit": {
+      "title": "Ölçü Birimi"
+    },
+    "pickupPoint": {
+      "title": "Teslim alma noktası"
+    }
+  },
+  "client": {
+    "deliveryDetail": {
+      "aboutDelivery": "Teslimat hakkında",
+      "empty": "Teslimat bilgisi henüz eklenmedi"
+    },
+    "selectRegion": {
+      "headerTitle": "Bir bölge seçin",
+      "description": "Seçilen bölgedeki ürünleri ve mağazaları göstereceğiz"
+    },
+    "home": {
+      "homeNav": {
+        "categories": "Kategoriler",
+        "shops": "Mağazalar",
+        "brands": "Markalar",
+        "myFavorites": "Favoriler",
+        "becomeSeller": "Satıcı ol"
+      }
+    },
+    "shops": {
+      "headerTitle": "Mağazalar"
+    },
+    "shop": {
+      "searchPlaceholder": "Mağazada ara"
+    },
+    "brands": {
+      "headerTitle": "Markalar"
+    },
+    "favorites": {
+      "headerTitle": "Favoriler",
+      "loginRequired": {
+        "title": "Giriş gerekli",
+        "description": "Bir ürünü favorilere eklemek için önce hesabınıza giriş yapmalısınız"
+      }
+    },
+    "becomeSellerOnboarding": {
+      "title": "Postshop platformunda kendi işinizi kurun",
+      "subtitle": "İlk ay — ÜCRETSİZ!",
+      "description": "Ürünlerinizin etkin lojistiğini ve kapsamlı tanıtımını sağlıyoruz; böylece piyasaya hızlıca girip satışlarınızı artırabilirsiniz",
+      "button": "Satıcı platformunu aç",
+      "loginRequired": {
+        "title": "Giriş gerekli",
+        "description": "Satıcı statüsü için başvurmak üzere önce hesabınıza giriş yapmalısınız"
+      }
+    },
+    "sellerType": {
+      "headerTitle": "Ticaret türünüzü seçin",
+      "individual": "Şahıs işletmeleri için",
+      "legalEntity": "Tüzel kişilikler için"
+    },
+    "sellerDocs": {
+      "headline": "Satıcı platformuna erişim için gereken belgelerin elektronik kopyalarını yükleyin",
+      "progress": "{{total}} belgeden {{uploaded}} tanesi yüklendi",
+      "docs": {
+        "individual": [
+          "Şahıs işletmesi kayıt belgesi",
+          "Patent (geçerli)",
+          "Kayıt sertifikası",
+          "Pasaport fotokopisi"
+        ],
+        "legal": [
+          "Şirket ana sözleşmesi (tüm sayfalar mühürle onaylı)",
+          "Devlet siciline kayıt yazısı",
+          "Kayıt sertifikası",
+          "İstatistik belgesi (OKED kodlarıyla)",
+          "Vekaletname veya müdür atama kararı"
+        ]
+      },
+      "submittedModal": {
+        "title": "Başarıyla gönderildi",
+        "description": "Talebiniz alındı. En kısa sürede sizinle iletişime geçeceğiz."
+      }
+    },
+    "editProfile": {
+      "headerTitle": "Profil bilgileri"
+    },
+    "createProfile": {
+      "headerTitle": "Aşağıdaki bilgileri girin"
+    },
+    "categories": {
+      "headerTitle": "Kategoriler",
+      "empty": "Henüz kategori yok",
+      "emptySubCategories": "Bu kategoride henüz alt kategori yok"
+    },
+    "cart": {
+      "headerTitle": "Sepetim",
+      "aboutDelivery": "Teslimat hakkında",
+      "clearConfirm": {
+        "title": "Sepet temizlensin mi?",
+        "description": "Bu işlem geri alınamaz — sepetinizdeki ürünler geri getirilemez"
+      },
+      "loginRequired": {
+        "title": "Giriş gerekli",
+        "description": "Sipariş verebilmek için önce giriş yapmanız gerekir"
+      },
+      "footer": {
+        "totalPrice": "Toplam fiyat:",
+        "discount": "İndirim:",
+        "delivery": "Teslimat:",
+        "total": "Toplam:",
+        "submit": "Sepeti onayla"
+      },
+      "restore": "Geri al"
+    },
+    "checkout": {
+      "headerTitle": "Ödeme",
+      "success": {
+        "title": "Sipariş başarıyla oluşturuldu!",
+        "description": "Siparişiniz alındı. En kısa sürede işleme başlayacağız.",
+        "showOrder": "Siparişi göster"
+      }
+    },
+    "selectCity": {
+      "headline": "Bölgenizi seçin"
+    },
+    "orders": {
+      "headerTitle": "Siparişlerim",
+      "status": {
+        "done": "Tamamlandı",
+        "cancelled": "İptal edildi",
+        "pending": "Beklemede",
+        "in_progress": "İşleniyor",
+        "attention": "Dikkat"
+      },
+      "partiallyRejected": "Siparişin bir kısmı mağaza tarafından reddedildi"
+    },
+    "order": {
+      "actions": {
+        "cancel": "Siparişi iptal et",
+        "reorder": "Siparişi tekrarla"
+      },
+      "rejectionReasonLabel": "Red sebebi",
+      "footer": {
+        "title": "Sipariş özeti",
+        "goodsPrice": "Ürün fiyatı",
+        "discount": "İndirim",
+        "grandTotal": "Genel toplam"
+      }
+    },
+    "selectLanguage": {
+      "title": "Dilinizi seçin",
+      "subtitle": "Daha sonra profilinizden değiştirebilirsiniz"
+    }
+  },
+  "store": {
+    "add": "Ürün ekle",
+    "home": {
+      "headerTitle": "Ana sayfa",
+      "bestSelling": "Çok satanlar",
+      "incomeReport": {
+        "title": "Gelir raporu",
+        "subtitle": "Haftalık gelir özeti",
+        "ordersCount": "Sipariş: {{value}}",
+        "empty": "Bu hafta henüz sipariş yok"
+      },
+      "bestSellingEmpty": "Henüz satış yok"
+    },
+    "orders": {
+      "headerTitle": "Siparişler",
+      "status": {
+        "pending": "Beklemede",
+        "approved": "Onaylandı",
+        "rejected": "Reddedildi",
+        "ready_to_take": "Teslim almaya hazır",
+        "ready_to_deliver": "Teslimata hazır",
+        "completed": "Tamamlandı"
+      }
+    },
+    "order": {
+      "noApproved": "Sipariş işlemleri, bir operatör siparişi kabul ettikten sonra kullanılabilir olacaktır.",
+      "readyToPickup": "Teslim almaya hazır"
+    },
+    "shopAdditional": {
+      "onboarding": {
+        "headerTitle": "Mağazanızı aktifleştirin",
+        "headline": "Mağazanızı açmak için aşağıdaki tüm adımları tamamlayın",
+        "description": "Lütfen gerekli bilgileri eksiksiz ve doğru bir şekilde girin. Veriler veya gerekli belgeler yanlış girilirse mağazanızı aktifleştiremezsiniz",
+        "button": "Aktifleştir"
+      },
+      "city": "Bölge seçin",
+      "addresses": "Adresler",
+      "warehouseType": {
+        "headerTitle": "Depo türü",
+        "fbs": {
+          "title": "FBS (Satıcı Tarafından Karşılama)",
+          "description": "Ürünler satıcının deposunda saklanır ve oradan gönderilir"
+        },
+        "fbo": {
+          "title": "FBO (Operatör Tarafından Karşılama)",
+          "description": "Ürünler pazaryeri deposunda saklanır ve oradan gönderilir"
+        }
+      },
+      "nameAndDescription": "Ad ve açıklama",
+      "storeColor": "Mağaza rengi",
+      "storeLogo": "Mağaza logosu",
+      "phoneNumbers": "Telefon numaraları",
+      "storeName": "Mağaza Adı",
+      "addAddress": "Adres ekle",
+      "addPhoneNumber": "Telefon numarası ekle",
+      "addressPlaceholder": "Adres {{index}}",
+      "logo": {
+        "upload": "Logo yüklemek için tıklayın",
+        "remove": "Logoyu kaldır",
+        "notice": "Mağaza logonuz .webp formatına dönüştürülecek"
+      },
+      "colorInvalid": "Geçersiz HEX renk kodu (örn. #A855F7)"
+    },
+    "editShopAdditional": {
+      "headerTitle": "Mağaza ayarları",
+      "address": "Adres",
+      "color": "Renk",
+      "logo": "Logo",
+      "phoneNumbers": "Telefon numaraları",
+      "baseInfo": "Temel bilgiler"
+    },
+    "myProducts": {
+      "headerTitle": "Ürünlerim",
+      "empty": {
+        "title": "Henüz ürün yok",
+        "description": "İlk ürününüzü ekleyin, mağazanızda hemen görünecek"
+      }
+    },
+    "addEditProduct": {
+      "createHeaderTitle": "Ürün ekle",
+      "editHeaderTitle": "Ürünü düzenle",
+      "price": "Fiyat",
+      "discount": {
+        "title": "İndirim",
+        "percentage": "Yüzde",
+        "fixed": "Sabit"
+      },
+      "hashtag": "Etiket",
+      "inputs": {
+        "titlePlaceholder": "örn. Beyaz pamuklu tişört",
+        "images": {
+          "label": "Ürün görselleri",
+          "placeholder": "Görsel eklemek için tıklayın",
+          "notice": "En fazla 5 görsel",
+          "cover": "Kapak"
+        },
+        "descriptionPlaceholder": "Ürünü tanımlayın: malzeme, ölçüler, içerik"
+      }
+    }
+  },
+  "serverSetup": {
+    "title": "Sunucu adresi",
+    "subtitle": "Hangi sunucuya bağlanılacağını belirtin. İstediğiniz zaman değiştirebilirsiniz.",
+    "placeholder": "192.168.1.50:7002",
+    "example": "Örnek: 192.168.1.50:7002 — protokol yazılmazsa http:// eklenir",
+    "invalid": "Adres hatalı görünüyor",
+    "save": "Kaydet"
+  },
+  "validation": {
+    "required": "Bu alan zorunludur",
+    "minLength": "En az {{min}} karakter",
+    "maxLength": "En fazla {{max}} karakter"
+  },
+  "notifications": {
+    "title": "Bildirimler",
+    "empty": "Henüz bildirim yok",
+    "markAll": "Tümünü okundu işaretle",
+    "seeAll": "Tümünü gör",
+    "dismiss": "Bildirimi kaldır",
+    "loadMore": "Daha fazla göster",
+    "kind": {
+      "order_cancelled": "Müşteri siparişi iptal etti",
+      "order_created": "Mağazanızda yeni sipariş",
+      "order_shop_rejected": "Bir mağaza siparişinizin bir kısmını reddetti",
+      "order_status": "Sipariş durumu değişti",
+      "product_approved": "Ürün kontrolü geçti",
+      "product_declined": "Ürün kontrolü geçemedi",
+      "product_out_of_stock": "Ürün tükendi — stoğu doldurun ya da satıştan kaldırın",
+      "receipt_confirmed": "Kabul onaylandı, stok güncellendi",
+      "return_approved": "İade onaylandı",
+      "return_received": "Ürününüz için iade onaylandı",
+      "return_rejected": "İade reddedildi",
+      "review_approved": "Yorumunuz yayınlandı",
+      "review_received": "Ürününüze yeni yorum",
+      "review_rejected": "Yorumunuz reddedildi",
+      "shop_approved": "Mağaza başvurusu onaylandı",
+      "shop_blocked": "Mağaza platform tarafından kapatıldı",
+      "shop_rejected": "Mağaza başvurusu reddedildi"
+    }
+  }
+}

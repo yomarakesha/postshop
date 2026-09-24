@@ -1,0 +1,43 @@
+{
+  "expo-fn": {
+    "scope": "typescriptreact",
+    "prefix": "exfn",
+    "body": [
+      "import React from 'react';",
+      "import Typography from \"@/ui/Typography\";",
+      "import { View } from 'react-native';",
+      "import { StyleSheet } from 'react-native-unistyles';",
+      "",
+      "const $1 = () => {",
+      "  return <View style={styles.container}></View>;",
+      "};",
+      "",
+      "export default $1;",
+      "",
+      "const styles = StyleSheet.create((theme) => ({",
+      "  container: {},",
+      "}));",
+    ],
+    "description": "Default Expo Screen",
+  },
+
+  "expo-stack": {
+    "scope": "typescriptreact",
+    "prefix": "exstack",
+    "body": [
+      "import React from \"react\";",
+      "import { Stack } from \"expo-router\";",
+      "",
+      "const $1Stack = () => {",
+      "  return (",
+      "    <Stack>",
+      "      <Stack.Screen name=\"index\" />",
+      "    </Stack>",
+      "  );",
+      "};",
+      "",
+      "export default $1Stack;",
+    ],
+    "description": "Default Expo Stack",
+  },
+}

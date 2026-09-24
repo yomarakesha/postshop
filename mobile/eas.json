@@ -1,0 +1,16 @@
+{
+  "cli": {
+    "version": ">= 16.0.0",
+    "appVersionSource": "local"
+  },
+  "build": {
+    "local": {
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_MAP_KEY": "cxmap_ext_b7419e2fa8c30d651e94f7a2d0c8b365"
+      }
+    }
+  }
+}

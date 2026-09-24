@@ -1,0 +1,4 @@
+.claude
+pnpm-lock.yaml
+src/shared/openapi/
+src/app/routeTree.gen.ts

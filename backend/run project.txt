@@ -1,0 +1,21 @@
+Запуск проекта
+=====================================================================
+
+НОВЫЙ сервер / пустая БД
+-----------------------------------------------------------------------------------
+# 1. Создать саму базу (один раз, в MySQL):
+#    CREATE DATABASE marketplace CHARACTER SET utf8mb4;
+
+alembic upgrade head                    # строит всю схему + сидит статусы заказов
+python scripts/seed_permissions.py      # права ACL
+python scripts/seed_order_statuses.py   # статусы (идемпотентно, на всякий случай)
+python scripts/create_superuser.py      # создать админа
+uvicorn app.main:app --reload
+
+
+СУЩЕСТВУЮЩИЙ сервер (после git pull)
+-----------------------------------------------------------------------------------
+alembic upgrade head
+python scripts/seed_permissions.py
+python scripts/seed_order_statuses.py
+uvicorn app.main:app --reload

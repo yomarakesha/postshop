@@ -1,0 +1,293 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+@plugin "@tailwindcss/typography";
+
+/* Скрывает системную полосу прокрутки, оставляя саму прокрутку.
+   Класс уже использовался в разметке (выбор города, фильтр магазинов),
+   но нигде не был определён и потому не работал. */
+@utility no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Подпись под карточкой всегда занимает место двух строк.
+   Без этого длинное название переносилось на вторую строку, забирало высоту
+   у картинки — и в одном ряду картинки получались разного размера.
+   Запасное значение в пикселях посчитано из .t1 (14px × 130%) для браузеров
+   без поддержки единицы lh. */
+@utility caption-2-lines {
+  min-height: 36.4px;
+  min-height: 2lh;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-VariableFont_opsz,wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Italic-VariableFont_opsz,wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+
+:root {
+  --page-vertical-padding: 16px;
+  --page-horizontal-padding: 12px;
+  --page-max-width: 1548px;
+  --page-content-top-padding: calc(var(--header-height) + var(--page-vertical-padding));
+  --header-height: 56px;
+}
+
+@media (min-width: 1024px) {
+  :root {
+    --page-vertical-padding: 24px;
+    --page-horizontal-padding: 24px;
+    /* Единый ряд вместо двух: высота прежней шапки целиком отдана
+       основному ряду, чтобы вертикальные отступы стали одинаковыми. */
+    --header-height: 84px;
+  }
+}
+
+@theme {
+  --font-sans: 'Inter', sans-serif;
+  --breakpoint-sidebar: 81.25rem;
+  --breakpoint-wide: 90.625rem;
+
+  --color-passive1: #b6bcc7;
+  --color-passive2: #838895;
+  --color-stroke: #e7eaee;
+  --color-text: #1c2026;
+
+  /* blue */
+  --color-blue1: #f6faff;
+  --color-blue2: #dceaff;
+  --color-blue3: #9ec1fe;
+  --color-blue4: #0038ad;
+  --color-blue5: #152f60;
+  --color-blue-main: #0750d5;
+
+  /* gray */
+  --color-gray1: #fcfcfd;
+  --color-gray2: #f5f7fa;
+  --color-gray3: #e6eaef;
+  --color-gray4: #98a2b3;
+
+  /* accent colors */
+  --color-success: #17b26a;
+  --color-warning: #f79009;
+  --color-failure: #f04438;
+
+  --color-border: #ddd;
+
+  --shadow-base: 0px 1px 2px 0px #1018280d;
+  --radius-base: 12px;
+}
+
+/* Typography */
+
+h1,
+.h1 {
+  font-size: clamp(24px, 4vw, 36px);
+  line-height: 140%;
+}
+
+h2,
+.h2 {
+  font-size: clamp(18px, 5vw, 30px);
+  line-height: 140%;
+}
+
+h3,
+.h3 {
+  font-size: clamp(18px, 2.5vw, 24px);
+  line-height: 140%;
+}
+
+.p1 {
+  font-size: clamp(17px, 2vw, 20px);
+  line-height: 150%;
+}
+
+.p2 {
+  font-size: clamp(16px, 1.8vw, 18px);
+  line-height: 150%;
+}
+
+.p3 {
+  font-size: 16px;
+  line-height: 150%;
+}
+
+.t1 {
+  font-size: 14px;
+  line-height: 130%;
+}
+
+.t2 {
+  font-size: 12px;
+  line-height: 130%;
+}
+
+.r {
+  font-size: 12px;
+  line-height: 120%;
+}
+/* Overrides */
+button {
+  cursor: pointer;
+}
+
+/*
+ * Отклик карточки товара на наведение: подъём и тень глубже.
+ *
+ * Правилом в стилях, а не классами tailwind: hover:shadow-* в этом проекте не
+ * генерировался вовсе (переменная темы --shadow-base перекрывает шкалу теней),
+ * и класс молча не попадал в стили. Одно именованное правило надёжнее длинной
+ * строки классов, у которой часть работает, а часть нет.
+ *
+ * Подъём через translate: он не трогает поток, поэтому соседние карточки не
+ * сдвигаются. @media(hover:hover) — чтобы на тач-экране состояние не залипало
+ * после касания.
+ */
+.product-card {
+  transition:
+    translate 200ms ease-out,
+    box-shadow 200ms ease-out;
+}
+
+@media (hover: hover) {
+  .product-card:hover {
+    translate: 0 -2px;
+    box-shadow: 0 10px 24px -6px #1018282e;
+  }
+}
+
+/*
+ * Плавающая кнопка действия (например «Добавить товар» в списке товаров
+ * магазина).
+ *
+ * Тень правилом, а не классом: shadow-* в этом проекте не генерируется —
+ * причина та же, что у .product-card выше. Кнопка висит над содержимым, и без
+ * заметной тени она читается как приклеенная к карточкам под ней.
+ */
+.fab {
+  box-shadow: 0 8px 24px -4px #10182838;
+  transition:
+    translate 200ms ease-out,
+    box-shadow 200ms ease-out;
+}
+
+@media (hover: hover) {
+  .fab:hover {
+    translate: 0 -2px;
+    box-shadow: 0 12px 28px -4px #1018284d;
+  }
+}
+
+a {
+  text-decoration: none;
+  /*
+   * Цвет ссылки менялся рывком. Переход задан здесь, а не в каждом компоненте:
+   * ссылок в витрине сотни, и договориться о единой длительности через классы
+   * не вышло бы — часть уже имеет свои, часть не имеет никаких.
+   */
+  transition: color 150ms ease-out;
+}
+
+/*
+ * Рамка поля при фокусе тоже переключалась рывком, и на быстром переходе между
+ * полями это читалось как мигание. Переход только по цветам: анимировать
+ * размеры у полей нельзя — текст внутри поедет.
+ */
+input,
+textarea,
+select {
+  transition:
+    border-color 150ms ease-out,
+    background-color 150ms ease-out;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: var(--color-gray2);
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  padding: 0 var(--page-horizontal-padding);
+  padding-bottom: 72px;
+  color: #1c2026;
+}
+
+@media (min-width: 1024px) {
+  /*
+   * Место под полосу прокрутки зарезервировано постоянно.
+   *
+   * Без этого страница дёргалась на ширину полосы всякий раз, когда прокрутка
+   * пропадала: при открытии модального окна, при переходе на короткую
+   * страницу. В браузерах с наложенной полосой (Chrome по умолчанию) этого не
+   * видно вовсе, а в Safari с постоянными полосами видно каждый раз — отсюда
+   * ощущение, что интерфейс «слегка ездит».
+   */
+  html {
+    scrollbar-gutter: stable;
+  }
+
+  body {
+    padding-bottom: 32px;
+  }
+}
+
+/*
+ * Товар, на который привело уведомление.
+ *
+ * Прокрутки мало: экран встаёт посреди одинаковых карточек, и какая из них
+ * та самая — непонятно. Подсветка проигрывается один раз и гаснет, чтобы не
+ * осталась висеть меткой на весь сеанс.
+ */
+@keyframes highlight-once {
+  0% {
+    box-shadow: 0 0 0 0 var(--color-blue3);
+  }
+  15% {
+    box-shadow: 0 0 0 4px var(--color-blue3);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgb(0 0 0 / 0);
+  }
+}
+
+.highlight-once {
+  border-radius: var(--radius-base);
+  animation: highlight-once 2s ease-out 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .highlight-once {
+    animation-duration: 3s;
+    animation-timing-function: steps(1, end);
+  }
+}
+
+.main_content {
+  padding-top: var(--page-vertical-padding);
+  padding-bottom: 24px;
+  /*
+   * Высота — по содержимому, без нижней границы.
+   *
+   * Сначала было 100vh, потом «экран минус шапка». И то и другое растягивало
+   * короткую страницу до целого экрана: под содержимым оставалась дыра, а
+   * подвал уезжал за нижний край, и до него приходилось прокручивать пустоту.
+   * Теперь подвал идёт сразу за содержимым, а остаток экрана закрашивает фон
+   * страницы — он и так того же цвета.
+   */
+}

@@ -1,0 +1,113 @@
+import { useParams } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
+import { PackageX } from 'lucide-react'
+import { useListShopReturnsReturnsShopShopIdGet } from '#/shared/openapi/queries'
+import { ReturnStatus } from '#/shared/openapi/requests'
+import { EmptyState } from '#/shared/ui/EmptyState'
+import { ListSkeleton } from '#/shared/ui/ListSkeleton'
+import { cn } from '#/shared/utils/cn'
+
+const statusClass = {
+  [ReturnStatus.PENDING]: 'bg-gray2 text-passive2',
+  [ReturnStatus.APPROVED]: 'bg-blue1 text-blue-main',
+  [ReturnStatus.REJECTED]: 'bg-red-50 text-failure',
+} as const
+
+/**
+ * Возвраты по товарам магазина — глазами продавца.
+ *
+ * Об оформленном возврате продавцу приходило уведомление, а посмотреть его было
+ * негде: список заявок доступен только платформе, и экрана в кабинете не
+ * существовало. Продавец узнавал, что возврат случился, и не мог узнать ни по
+ * какому товару, ни по какой причине. На панели показателей при этом висел
+ * счётчик «Возвращали» — число без единой подробности.
+ *
+ * Экран только для чтения: решение по заявке принимает платформа, и кнопок,
+ * которые продавцу ничего не дадут, здесь нет.
+ */
+export const MyStoreReturnsPage = () => {
+  const { t, i18n } = useTranslation()
+  const { storeId } = useParams({ from: '/my-store/$storeId' })
+
+  const { data: requests, isLoading } = useListShopReturnsReturnsShopShopIdGet({
+    path: { shop_id: Number(storeId) },
+  })
+
+  const dateFormat = new Intl.DateTimeFormat(i18n.language, { dateStyle: 'medium' })
+  const items = requests ?? []
+
+  return (
+    <div className="flex w-full flex-col gap-4">
+      <div className="rounded-base bg-white p-4 shadow-base">
+        <h1 className="p1 font-bold">{t('storeReturns.title')}</h1>
+        <p className="t1 mt-1 text-passive2">{t('storeReturns.subtitle')}</p>
+      </div>
+
+      {isLoading && <ListSkeleton rows={3} rowClassName="h-28" />}
+
+      {!isLoading && items.length === 0 && (
+        <EmptyState icon={<PackageX size={40} strokeWidth={1.5} />} title={t('returns.empty')} />
+      )}
+
+      <ul className="flex flex-col gap-2">
+        {items.map((request) => (
+          <li key={request.id} className="rounded-base bg-white p-4 shadow-base">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="flex min-w-0 items-start gap-3">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-xl bg-gray2">
+                  <PackageX width={18} height={18} className="text-passive2" />
+                </div>
+                <div className="min-w-0">
+                  <p className="p3 font-medium">
+                    {request.product_name || t('returns.unknownProduct')}
+                  </p>
+                  <p className="t1 text-passive2">
+                    {t('returns.quantityShort', { count: Number(request.quantity) })}
+                    {request.order_id
+                      ? ` · ${t('returns.fromOrder', { id: request.order_id })}`
+                      : ''}
+                  </p>
+                </div>
+              </div>
+              <span
+                className={cn(
+                  't2 rounded-full px-2.5 py-1 font-medium',
+                  statusClass[request.status],
+                )}
+              >
+                {t(`returns.status.${request.status}`)}
+              </span>
+            </div>
+
+            {/* Кто вернул: без этого продавец видит «вернули товар» и не может
+                ни связаться с человеком, ни сопоставить с заказом. */}
+            {(request.buyer_name || request.buyer_phone) && (
+              <p className="t1 mt-3 text-passive2">
+                {[request.buyer_name, request.buyer_phone].filter(Boolean).join(' · ')}
+              </p>
+            )}
+
+            <p className="t1 mt-2 whitespace-pre-line">{request.reason}</p>
+
+            {request.resolution_comment && (
+              <p
+                className={cn(
+                  't1 mt-2 whitespace-pre-line',
+                  request.status === ReturnStatus.REJECTED ? 'text-failure' : 'text-passive2',
+                )}
+              >
+                {request.resolution_comment}
+              </p>
+            )}
+
+            {request.created_at && (
+              <p className="t2 mt-3 text-passive1">
+                {dateFormat.format(new Date(request.created_at))}
+              </p>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}

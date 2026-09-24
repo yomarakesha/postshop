@@ -1,0 +1,599 @@
+{
+  "key": "en",
+  "value": "English",
+  "shop": "Shop",
+  "brand": "Brand",
+  "products": "Products",
+  "brands": "Brands",
+  "shops": "Shops",
+  "order": "Order",
+  "category": "Category",
+  "measurementUnit": "Measurement unit",
+  "noRegistration": "Not registered",
+  "postshopSeller": "PostShop seller",
+  "currency": "Currency",
+  "buyer": "Buyer",
+  "error": "Error",
+  "inputs": {
+    "name": "Name",
+    "address": "Address",
+    "surname": "Surname",
+    "phoneNumber": "Phone number",
+    "title": "Title",
+    "description": "Description",
+    "note": "Note",
+    "notRequired": "Optional",
+    "notePlaceholder": "Comment on the order"
+  },
+  "nav": {
+    "home": "Home",
+    "categories": "Categories",
+    "cart": "Cart",
+    "orders": "Orders",
+    "profile": "Profile",
+    "myProducts": "Products"
+  },
+  "networkError": {
+    "toast": "Network Error",
+    "title": "Something went wrong",
+    "description": "Check your internet connection and try to reconnect"
+  },
+  "confirmCancelOrder": {
+    "title": "Cancel order?",
+    "description": "Are you sure you want to cancel this order?",
+    "cancel": "Yes, cancel"
+  },
+  "paymentMethod": {
+    "title": "Payment method",
+    "card": "Card",
+    "cash": "Cash",
+    "cashAndCard": "Cash and card"
+  },
+  "deliveryMethod": {
+    "title": "Delivery method",
+    "pickup": "Pick up from pickup point",
+    "delivery": "Home delivery",
+    "addressPlaceholder": "Magtymguly Avenue, house 1",
+    "selectPickupPoint": "Select pickup point"
+  },
+  "common": {
+    "next": "Next",
+    "confirm": "Confirm",
+    "search": "Search",
+    "viewAll": "View all",
+    "save": "Save",
+    "sort": "Sort by",
+    "clear": "Clear",
+    "start": "Start",
+    "close": "Close",
+    "logIn": "Log in",
+    "delete": "Delete",
+    "yes": "Yes",
+    "no": "No",
+    "retry": "Retry",
+    "pieces": "pieces",
+    "approve": "Approve",
+    "reject": "Reject",
+    "add": "Add",
+    "select": "Select",
+    "authAgreement": {
+      "prefix": "By continuing, you agree to the ",
+      "terms": "Terms of Use",
+      "and": " and ",
+      "privacy": "Privacy Policy",
+      "suffix": "."
+    },
+    "comingSoon": "Coming soon",
+    "back": "Back"
+  },
+  "months": {
+    "1": "January",
+    "2": "February",
+    "3": "March",
+    "4": "April",
+    "5": "May",
+    "6": "June",
+    "7": "July",
+    "8": "August",
+    "9": "September",
+    "10": "October",
+    "11": "November",
+    "12": "December"
+  },
+  "emptyState": {
+    "products": {
+      "title": "No products yet",
+      "description": "Nothing has been published in this section yet"
+    },
+    "search": {
+      "title": "No results found",
+      "description": "Check that the name of the place you're looking for is spelled correctly, or enter a different one"
+    },
+    "favorites": {
+      "title": "You have no favorite items",
+      "description": "Add products to favorites to quickly get back to them"
+    },
+    "cart": {
+      "title": "Your cart is empty for now",
+      "description": "Time to fill it up!"
+    },
+    "orders": {
+      "title": "No orders",
+      "description": "Your list of orders will appear here"
+    },
+    "cities": {
+      "title": "No regions available"
+    }
+  },
+  "product": {
+    "title": "Product",
+    "notFound": "Product not found",
+    "outOfStock": "Out of stock",
+    "favorite": {
+      "add": "Add to favorites",
+      "remove": "Remove from favorites"
+    },
+    "button": "Add to cart",
+    "similarProducts": "Similar products",
+    "status": {
+      "declined": "Declined",
+      "pending": "In review"
+    }
+  },
+  "auth": {
+    "login": {
+      "headline": "Enter your phone number \n to sign in",
+      "tryAgain": "Something went wrong. \nPlease try again later."
+    },
+    "verify": {
+      "headline": "A verification code has been sent to \n your phone number",
+      "resend": "Resend code"
+    }
+  },
+  "profile": {
+    "headerTitle": "Profile",
+    "logIn": "Log in to your account",
+    "sections": {
+      "settings": "Settings",
+      "others": "Other"
+    },
+    "links": {
+      "favorites": "Favorites",
+      "language": "Language",
+      "termsOfUse": "Terms of use",
+      "privacyPolicy": "Privacy policy",
+      "server": "Server",
+      "notifications": "Notifications",
+      "becomeSeller": "Become a seller",
+      "logout": "Log out",
+      "deleteAccount": "Delete account"
+    },
+    "logoutConfirm": {
+      "title": "Log out",
+      "description": "Are you sure you want to log out?"
+    },
+    "termsOfUse": {
+      "headerTitle": "Terms of Use",
+      "sections": [
+        {
+          "title": "1. General Provisions",
+          "body": "These Terms of Use govern your access to and use of the PostShop mobile application. By using the App, you agree to these Terms in full."
+        },
+        {
+          "title": "2. Description of the Service",
+          "body": "PostShop is a mobile marketplace that allows buyers to browse products, add them to a cart, and place orders with home delivery or pickup from designated pickup points. Sellers can register shops, list products, and manage orders through the seller platform."
+        },
+        {
+          "title": "3. Registration and Account",
+          "body": "Access to certain features requires registration via your phone number. You are responsible for keeping your verification code confidential. You must provide accurate and truthful information. One account is permitted per phone number. You may delete your account at any time via the Profile section."
+        },
+        {
+          "title": "4. Seller Registration",
+          "body": "To become a seller, you must submit the required business documents for verification. Seller access is granted only after documents are reviewed and approved by the PostShop team. PostShop reserves the right to reject or revoke seller status if documents are found to be invalid or if the Terms are violated."
+        },
+        {
+          "title": "5. Orders and Payments",
+          "body": "By placing an order, you confirm the accuracy of your delivery details. Available payment methods: cash, card, or cash and card. Available delivery methods: home delivery or pickup from a pickup point. You may cancel an order before it has been processed by the seller."
+        },
+        {
+          "title": "6. User Conduct",
+          "body": "You agree not to use the App for any fraudulent or illegal activity, post false or misleading content, attempt to gain unauthorized access to other accounts or systems, or use automated tools to interact with the App."
+        },
+        {
+          "title": "7. Intellectual Property",
+          "body": "All content in the App — including logos, design, text, and product listings — is the property of PostShop or its respective sellers. You may not copy, reproduce, or distribute this content without written permission."
+        },
+        {
+          "title": "8. Limitation of Liability",
+          "body": "PostShop acts as a platform intermediary and is not responsible for the quality or legality of products listed by sellers, disputes between buyers and sellers, or losses caused by technical failures, loss of internet connection, or force majeure."
+        },
+        {
+          "title": "9. Privacy",
+          "body": "We collect and process your personal data (name, phone number, address) solely to provide the services described in these Terms. Your data is not shared with third parties except as required to fulfill your orders."
+        },
+        {
+          "title": "10. Changes to the Terms",
+          "body": "PostShop reserves the right to update these Terms at any time. Continued use of the App after changes constitutes acceptance of the updated Terms."
+        }
+      ],
+      "contacts": {
+        "title": "Contacts",
+        "address": {
+          "label": "Address",
+          "value": "Turkmenpost Head Office, Ashgabat, Turkmenistan, 744000"
+        },
+        "phone": {
+          "label": "Phone",
+          "value": "075 (Main)"
+        },
+        "email": {
+          "label": "Email",
+          "value": "contact@post.tm"
+        }
+      }
+    },
+    "privacyPolicy": {
+      "headerTitle": "Privacy Policy",
+      "sections": [
+        {
+          "title": "1. General Information",
+          "body": "We collect and process your personal data in order to provide the marketplace services. By using our application, you consent to the collection and processing of your data as described here."
+        },
+        {
+          "title": "2. Collected Data",
+          "body": "To register and use the services, we collect your phone number, first name, last name, delivery address, and order history."
+        },
+        {
+          "title": "3. Purpose of Data Use",
+          "body": "Your data is used to process orders, execute home deliveries, send notifications about order status, and resolve issues related to customer support."
+        },
+        {
+          "title": "4. Data Sharing with Third Parties",
+          "body": "We only share your delivery address and contact information with couriers and sellers strictly for the purpose of delivering your orders. We do not sell your personal data to third parties."
+        },
+        {
+          "title": "5. Security Measures",
+          "body": "We use modern encryption protocols and technical security measures to protect your personal data from unauthorized access, modification, or disclosure."
+        },
+        {
+          "title": "6. User Rights",
+          "body": "You have the right to request access, correction, or deletion of your personal data. You can delete your profile at any time through the Account settings."
+        }
+      ],
+      "contacts": {
+        "title": "Contacts",
+        "address": {
+          "label": "Address",
+          "value": "Turkmenpost Head Office, Ashgabat, Turkmenistan, 744000"
+        },
+        "phone": {
+          "label": "Phone",
+          "value": "075 (Main)"
+        },
+        "email": {
+          "label": "Email",
+          "value": "contact@post.tm"
+        }
+      }
+    }
+  },
+  "sheets": {
+    "selectRegion": {
+      "title": "Select a region"
+    },
+    "chooseLanguage": {
+      "title": "Choose language"
+    },
+    "selectMyShop": {
+      "title": "My shops"
+    },
+    "aboutShop": {
+      "title": "About the shop",
+      "phoneNumber": "Phone number",
+      "description": "Description"
+    },
+    "filter": {
+      "title": "Filter",
+      "priceRange": "Price range",
+      "priceFrom": "From",
+      "priceTo": "To"
+    },
+    "sort": {
+      "title": "Sort by",
+      "priceHighToLow": "Price: high to low",
+      "priceLowToHigh": "Price: low to high",
+      "newArrivals": "New arrivals",
+      "onSale": "On sale",
+      "bestSelling": "Best selling"
+    },
+    "measurementUnit": {
+      "title": "Measurement Unit"
+    },
+    "pickupPoint": {
+      "title": "Pickup point"
+    }
+  },
+  "client": {
+    "deliveryDetail": {
+      "aboutDelivery": "About delivery",
+      "empty": "Delivery information has not been added yet"
+    },
+    "selectRegion": {
+      "headerTitle": "Select a region",
+      "description": "We will show products and shops from the selected region"
+    },
+    "home": {
+      "homeNav": {
+        "categories": "Categories",
+        "shops": "Shops",
+        "brands": "Brands",
+        "myFavorites": "Favorites",
+        "becomeSeller": "Become a seller"
+      }
+    },
+    "shops": {
+      "headerTitle": "Shops"
+    },
+    "shop": {
+      "searchPlaceholder": "Search in store"
+    },
+    "brands": {
+      "headerTitle": "Brands"
+    },
+    "favorites": {
+      "headerTitle": "Favorites",
+      "loginRequired": {
+        "title": "Login required",
+        "description": "To add an item to favorites, please sign in to your account first"
+      }
+    },
+    "becomeSellerOnboarding": {
+      "title": "Start your own business on the Postshop platform",
+      "subtitle": "First month — FREE!",
+      "description": "We provide efficient logistics and comprehensive promotion of your products, helping you enter the market quickly and grow your sales",
+      "button": "Open seller platform",
+      "loginRequired": {
+        "title": "Login required",
+        "description": "To apply for seller status, please sign in to your account first"
+      }
+    },
+    "sellerType": {
+      "headerTitle": "Select your trade type",
+      "individual": "For individual entrepreneurs",
+      "legalEntity": "For legal entities"
+    },
+    "sellerDocs": {
+      "headline": "Please upload electronic copies of the documents required to access the seller platform",
+      "progress": "{{uploaded}} of {{total}} uploaded",
+      "docs": {
+        "individual": [
+          "Individual entrepreneur registration certificate",
+          "Patent (valid)",
+          "Registration certificate",
+          "Passport copy"
+        ],
+        "legal": [
+          "Company charter (all pages certified with seal)",
+          "Extract from state register",
+          "Registration certificate",
+          "Statistics certificate (with OKED codes)",
+          "Power of attorney or director appointment order"
+        ]
+      },
+      "submittedModal": {
+        "title": "Successfully submitted",
+        "description": "Your request has been received. We'll get in touch with you shortly."
+      }
+    },
+    "editProfile": {
+      "headerTitle": "Profile details"
+    },
+    "createProfile": {
+      "headerTitle": "Enter the details below"
+    },
+    "categories": {
+      "headerTitle": "Categories",
+      "empty": "No categories yet",
+      "emptySubCategories": "This category has no subcategories yet"
+    },
+    "cart": {
+      "headerTitle": "My cart",
+      "aboutDelivery": "About delivery",
+      "clearConfirm": {
+        "title": "Clear cart?",
+        "description": "This action can't be undone — the items in your cart cannot be restored"
+      },
+      "loginRequired": {
+        "title": "Login required",
+        "description": "To place an order, you need to log in first"
+      },
+      "footer": {
+        "totalPrice": "Total price:",
+        "discount": "Discount:",
+        "delivery": "Delivery:",
+        "total": "Total:",
+        "submit": "Confirm cart"
+      },
+      "restore": "Undo"
+    },
+    "checkout": {
+      "headerTitle": "Checkout",
+      "success": {
+        "title": "Order placed successfully!",
+        "description": "Your order has been accepted. We will start processing it shortly.",
+        "showOrder": "Show order"
+      }
+    },
+    "selectCity": {
+      "headline": "Select your region"
+    },
+    "orders": {
+      "headerTitle": "My orders",
+      "status": {
+        "done": "Completed",
+        "cancelled": "Cancelled",
+        "pending": "Pending",
+        "in_progress": "In progress",
+        "attention": "Attention"
+      },
+      "partiallyRejected": "Part of the order was rejected by the store"
+    },
+    "order": {
+      "actions": {
+        "cancel": "Cancel order",
+        "reorder": "Retry order"
+      },
+      "rejectionReasonLabel": "Rejection reason",
+      "footer": {
+        "title": "Order summary",
+        "goodsPrice": "Goods price",
+        "discount": "Discount",
+        "grandTotal": "Grand total"
+      }
+    },
+    "selectLanguage": {
+      "title": "Choose your language",
+      "subtitle": "You can change it later in your profile"
+    }
+  },
+  "store": {
+    "add": "Add product",
+    "home": {
+      "headerTitle": "Home",
+      "bestSelling": "Best selling",
+      "incomeReport": {
+        "title": "Income report",
+        "subtitle": "Weekly income overview",
+        "ordersCount": "Orders: {{value}}",
+        "empty": "No orders this week yet"
+      },
+      "bestSellingEmpty": "No sales yet"
+    },
+    "orders": {
+      "headerTitle": "Orders",
+      "status": {
+        "pending": "Pending",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "ready_to_take": "Ready to take",
+        "ready_to_deliver": "Ready to deliver",
+        "completed": "Completed"
+      }
+    },
+    "order": {
+      "noApproved": "Order actions will be available once an operator accepts the order.",
+      "readyToPickup": "Ready to pickup"
+    },
+    "shopAdditional": {
+      "onboarding": {
+        "headerTitle": "Activate your store",
+        "headline": "Complete all of the following steps to open your store",
+        "description": "Please enter the required information completely and correctly. If the data or necessary documents are entered incorrectly, you will not be able to activate your store",
+        "button": "Activate"
+      },
+      "city": "Select region",
+      "addresses": "Addresses",
+      "warehouseType": {
+        "headerTitle": "Warehouse type",
+        "fbs": {
+          "title": "FBS (Fulfilment by Seller)",
+          "description": "Products are stored and shipped from the seller's warehouse"
+        },
+        "fbo": {
+          "title": "FBO (Fulfilment by Operator)",
+          "description": "Products are stored and shipped from the marketplace warehouse"
+        }
+      },
+      "nameAndDescription": "Name and description",
+      "storeColor": "Store color",
+      "storeLogo": "Store logo",
+      "phoneNumbers": "Phone numbers",
+      "storeName": "Store Name",
+      "addAddress": "Add address",
+      "addPhoneNumber": "Add phone number",
+      "addressPlaceholder": "Address {{index}}",
+      "logo": {
+        "upload": "Click to upload logo",
+        "remove": "Remove logo",
+        "notice": "Your store logo will be converted to .webp"
+      },
+      "colorInvalid": "Invalid HEX color (e.g. #A855F7)"
+    },
+    "editShopAdditional": {
+      "headerTitle": "Store settings",
+      "address": "Address",
+      "color": "Color",
+      "logo": "Logo",
+      "phoneNumbers": "Phone numbers",
+      "baseInfo": "Basic info"
+    },
+    "myProducts": {
+      "headerTitle": "My products",
+      "empty": {
+        "title": "No products yet",
+        "description": "Add your first product and it will show up in your store right away"
+      }
+    },
+    "addEditProduct": {
+      "createHeaderTitle": "Add product",
+      "editHeaderTitle": "Edit product",
+      "price": "Price",
+      "discount": {
+        "title": "Discount",
+        "percentage": "Percentage",
+        "fixed": "Fixed"
+      },
+      "hashtag": "Hashtag",
+      "inputs": {
+        "titlePlaceholder": "e.g. White cotton t-shirt",
+        "images": {
+          "label": "Images of product",
+          "placeholder": "Click to add image",
+          "notice": "Maximum 5 images",
+          "cover": "Cover"
+        },
+        "descriptionPlaceholder": "Describe the product: material, size, what is included"
+      }
+    }
+  },
+  "serverSetup": {
+    "title": "Server address",
+    "subtitle": "Choose which server to connect to. You can change it at any time.",
+    "placeholder": "192.168.1.50:7002",
+    "example": "For example: 192.168.1.50:7002 — http:// is added if no protocol is given",
+    "invalid": "That address doesn't look right",
+    "save": "Save"
+  },
+  "validation": {
+    "required": "This field is required",
+    "minLength": "At least {{min}} characters",
+    "maxLength": "At most {{max}} characters"
+  },
+  "notifications": {
+    "title": "Notifications",
+    "empty": "No notifications yet",
+    "markAll": "Mark all read",
+    "seeAll": "See all",
+    "dismiss": "Dismiss notification",
+    "loadMore": "Show more",
+    "kind": {
+      "order_cancelled": "The customer cancelled an order",
+      "order_created": "New order in your shop",
+      "order_shop_rejected": "A store rejected part of your order",
+      "order_status": "Order status changed",
+      "product_approved": "Product passed the review",
+      "product_declined": "Product did not pass the review",
+      "product_out_of_stock": "The product is out of stock — top it up or take it off sale",
+      "receipt_confirmed": "Receipt confirmed, stock updated",
+      "return_approved": "Return approved",
+      "return_received": "A return of your product was approved",
+      "return_rejected": "Return declined",
+      "review_approved": "Your review is published",
+      "review_received": "New review of your product",
+      "review_rejected": "Your review was rejected",
+      "shop_approved": "Shop application approved",
+      "shop_blocked": "The shop was closed by the platform",
+      "shop_rejected": "Shop application rejected"
+    }
+  }
+}

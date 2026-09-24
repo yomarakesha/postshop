@@ -1,0 +1,599 @@
+{
+  "key": "tk",
+  "value": "Türkmençe",
+  "shop": "Dükan",
+  "brand": "Brend",
+  "products": "Önümler",
+  "brands": "Brendler",
+  "shops": "Dükanlar",
+  "order": "Sargyt",
+  "category": "Bölüm",
+  "currency": "Walýuta",
+  "measurementUnit": "Ölçeg birligi",
+  "noRegistration": "Hasaba alynmadyk",
+  "postshopSeller": "PostShop satyjy",
+  "buyer": "Alyjy",
+  "error": "Ýalňyşlyk",
+  "inputs": {
+    "name": "Ady",
+    "address": "Salgy",
+    "surname": "Familiýasy",
+    "phoneNumber": "Telefon belgisi",
+    "description": "Beýany",
+    "title": "Ady",
+    "note": "Bellik",
+    "notRequired": "Hökman däl",
+    "notePlaceholder": "Sargyda bellik"
+  },
+  "confirmCancelOrder": {
+    "title": "Sargydy ýatyrmak",
+    "description": "Bu sargydy ýatyrmagy isleýärsiňizmi?",
+    "cancel": "Hawa, ýatyr"
+  },
+  "nav": {
+    "home": "Baş sahypa",
+    "categories": "Bölümler",
+    "cart": "Sebedim",
+    "orders": "Sargytlarym",
+    "profile": "Profil",
+    "myProducts": "Harytlarym"
+  },
+  "networkError": {
+    "toast": "Tor ýalňyşlygy",
+    "title": "Näsazlyk döredi",
+    "description": "Internetiňizi barlaň we täzeden baglanmagy synanyşyň"
+  },
+  "paymentMethod": {
+    "title": "Töleg usuly",
+    "card": "Kart",
+    "cash": "Nagyt",
+    "cashAndCard": "Nagyt we kart"
+  },
+  "deliveryMethod": {
+    "title": "Almak usuly",
+    "pickup": "Sargyt alyş nokadyndan al",
+    "delivery": "Eltip bermek",
+    "addressPlaceholder": "Magtymguly şaýoly, jaý 1",
+    "selectPickupPoint": "Sargyt alyş nokadyny saýla"
+  },
+  "common": {
+    "next": "Indiki",
+    "confirm": "Tassyklamak",
+    "search": "Gözleg",
+    "viewAll": "Hemmesini görmek",
+    "save": "Ýatda saklamak",
+    "sort": "Sortlamak",
+    "clear": "Arassalamak",
+    "start": "Başlat",
+    "close": "Ýapmak",
+    "logIn": "Girmek",
+    "delete": "Pozmak",
+    "yes": "Hawa",
+    "no": "Ýok",
+    "retry": "Täzeden synanş",
+    "pieces": "Sany",
+    "approve": "Kabul etmek",
+    "reject": "Ret etmek",
+    "add": "Goş",
+    "select": "Saýlaň",
+    "authAgreement": {
+      "prefix": "Maglumatlary dolduryp dowam etmek bilen, ",
+      "terms": "Ulanyş düzgünlerini",
+      "and": " we ",
+      "privacy": "Maglumat goralmagyny",
+      "suffix": " kabul edýärsiňiz."
+    },
+    "comingSoon": "Ýakynda",
+    "back": "Yza"
+  },
+  "months": {
+    "1": "Ýanwar",
+    "2": "Fewral",
+    "3": "Mart",
+    "4": "Aprel",
+    "5": "Maý",
+    "6": "Iýun",
+    "7": "Iýul",
+    "8": "Awgust",
+    "9": "Sentýabr",
+    "10": "Oktýabr",
+    "11": "Noýabr",
+    "12": "Dekabr"
+  },
+  "emptyState": {
+    "products": {
+      "title": "Häzirlikçe haryt ýok",
+      "description": "Bu bölümde entek hiç zat ýerleşdirilmedi"
+    },
+    "search": {
+      "title": "Hiç zat tapylmady",
+      "description": "Gözleýän ýeriňiziň adynyň dogry ýazylandygyny barlaň ýa-da başga at giriziň"
+    },
+    "favorites": {
+      "title": "Saýlanan harytlaryňyz ýok",
+      "description": "Harytlary halanlaryňyza goşuň, olara soňra çalt dolanyp bilersiňiz"
+    },
+    "cart": {
+      "title": "Sebediňizde entek hiç zat ýok",
+      "description": "Ony doldurmagyň wagty geldi!"
+    },
+    "orders": {
+      "title": "Sargyt ýok",
+      "description": "Sargytlaryňyzyň sanawy şu ýerde görüner"
+    },
+    "cities": {
+      "title": "Sebitleriň sanawy boş"
+    }
+  },
+  "product": {
+    "title": "Haryt",
+    "notFound": "Haryt tapylmady",
+    "outOfStock": "Ätiýaçda ýok",
+    "favorite": {
+      "add": "Halanlaryma goşmak",
+      "remove": "Halanlarymdan aýyrmak"
+    },
+    "button": "Sebede goş",
+    "similarProducts": "Meňzeş harytlar",
+    "status": {
+      "declined": "Ret edildi",
+      "pending": "Barlanýar"
+    }
+  },
+  "auth": {
+    "login": {
+      "headline": "Girmek üçin telefon \n belgiňizi giriziň",
+      "tryAgain": "Bir näsazlyk ýüze çykdy. \nBiraz soňra täzeden synanyşyň."
+    },
+    "verify": {
+      "headline": "Tassyklaýyş kody telefon \n belgiňize iberildi",
+      "resend": "Kody täzeden ibermek"
+    }
+  },
+  "profile": {
+    "headerTitle": "Profil",
+    "logIn": "Ulgama girmek",
+    "sections": {
+      "settings": "Sazlamalar",
+      "others": "Başgalar"
+    },
+    "links": {
+      "favorites": "Halanlarym",
+      "language": "Dil",
+      "termsOfUse": "Ulanyş kadalary",
+      "privacyPolicy": "Maglumat goralmagy",
+      "server": "Server",
+      "notifications": "Ýatlatmalar",
+      "becomeSeller": "Satyjy bolmak",
+      "logout": "Ulgamdan çykmak",
+      "deleteAccount": "Hasaby pozmak"
+    },
+    "logoutConfirm": {
+      "title": "Ulgamdan çykmak",
+      "description": "Hakykatdan hem ulgamdan çykmak isleýärsiňizmi?"
+    },
+    "termsOfUse": {
+      "headerTitle": "Ulanyş kadalary",
+      "sections": [
+        {
+          "title": "1. Umumy düzgünler",
+          "body": "Bu Ulanyjylyk şertleri PostShop mobil goşundysyny ulanmagyňyzy düzgünleşdirýär. Goşundyny ulanyp, siz bu Şertleri doly kabul edýärsiňiz."
+        },
+        {
+          "title": "2. Hyzmadyň beýany",
+          "body": "PostShop — alyjylara harytlary görmek, sebede goşmak we sargyt bermek mümkinçiligini berýän mobil söwda meýdançasy. Satyjylar dükanlary hasaba alyp, harytlary ýerleşdirip we sargytlary dolandyryp bilerler."
+        },
+        {
+          "title": "3. Hasaba alyş we hasap",
+          "body": "Käbir aýratynlyklara girişmek üçin telefon belgiňiz arkaly hasaba durmak talap edilýär. Tassyklama kodyny gizlin saklamak siziň jogapkärçiligiňizdedir. Dogry maglumat bermek zerurdyr. Her bir belgä diňe bir hasap rugsat berilýär."
+        },
+        {
+          "title": "4. Satyjy hasaba alyşy",
+          "body": "Satyjy derejesini almak üçin zerur resminamalary barlag üçin ýüklemek gerek. Giriş diňe PostShop topary tassyklandan soň berilýär. PostShop satyjy derejesini bermegi ret etmek ýa-da yzyna almak hukugyny özünde saklaýar."
+        },
+        {
+          "title": "5. Sargytlar we töleg",
+          "body": "Sargyt berip, siz eltip beriş maglumatlarynyň dogrulygyny tassyklaýarsyňyz. Töleg usullary: nagt, kart ýa-da nagt we kart. Eltip beriş usullary: öýe eltip bermek ýa-da alyş nokadyndan özüň almak."
+        },
+        {
+          "title": "6. Ulanyjy hereketleri",
+          "body": "Siz Goşundyny galp ýa-da kanunsyz maksatlar üçin ulanmazlyga, ýalan maglumatlary ýerleşdirmezlige, başga hasaplara rugsatsyz girişmezlige we awtomatlaşdyrylan gurallary ulanmazlyga razy bolýarsyňyz."
+        },
+        {
+          "title": "7. Intellektual eýeçilik",
+          "body": "Goşundydaky ähli mazmun — logotiplar, dizaýn, tekstler we haryt beýanlary — PostShop-a ýa-da degişli satyjylara degişlidir. Ýazmaça rugsatsyz mazmuny göçürmek ýa-da ýaýratmak gadagandyr."
+        },
+        {
+          "title": "8. Jogapkärçiligiň çäklenmesi",
+          "body": "PostShop araçy platforma hökmünde hereket edýär we satyjylaryň harytlarynyň hili, alyjylar bilen satyjylaryň arasyndaky jedeller ýa-da tehniki näsazlyklar sebäpli ýitgiler üçin jogapkär däldir."
+        },
+        {
+          "title": "9. Gizlinlik",
+          "body": "Biz siziň şahsy maglumatlaryňyzy diňe hyzmatlary üpjün etmek maksady bilen ýygnaýarys we işleýäris. Maglumatlaryňyz sargydyňyzy ýerine ýetirmek üçin zerur bolan ýagdaýdan başga üçünji taraplara berilmeýär."
+        },
+        {
+          "title": "10. Şertlere üýtgetmeler",
+          "body": "PostShop bu Şertlere islendik wagt üýtgetme girizmek hukugyny özünde saklaýar. Üýtgetmelerden soň Goşundyny ulanmagyňyzy dowam etdirmegiňiz täzelenen Şertleri kabul edendigiňizi aňladýar."
+        }
+      ],
+      "contacts": {
+        "title": "Habarlaşmak",
+        "address": {
+          "label": "Salgy",
+          "value": "Türkmenpoçta baş edarasy, Aşgabat, Türkmenistan, 744000"
+        },
+        "phone": {
+          "label": "Telefon",
+          "value": "075 (Esasy)"
+        },
+        "email": {
+          "label": "Email",
+          "value": "contact@post.tm"
+        }
+      }
+    },
+    "privacyPolicy": {
+      "headerTitle": "Maglumat goralmagy",
+      "sections": [
+        {
+          "title": "1. Umumy maglumat",
+          "body": "Marketpleýs hyzmatlaryny hödürlemek üçin şahsy maglumatlaryňyzy ýygnaýarys we işleýäris. Goşundyny ulanmak bilen, bu ýerde görkezilişi ýaly şahsy maglumatlaryňyzyň ýygnanylmagyna we işlenilmegine razylyk berýärsiňiz."
+        },
+        {
+          "title": "2. Ýygnanylýan maglumatlar",
+          "body": "Hyzmatlary hasaba almak we ulanmak üçin telefon belgiňizi, adyňyzy, familiýanyňyzy, eltip beriş salgyňyzy we sargyt taryhyňyzy ýygnaýarys."
+        },
+        {
+          "title": "3. Maglumatlary ulanmagyň maksady",
+          "body": "Maglumatlaryňyz sargytlary işlemek, öýe eltip bermek, sargyt ýagdaýy barada bildiriş ibermek we müşderi goldawy bilen baglanyşykly soraglary çözmek üçin ulanylýar."
+        },
+        {
+          "title": "4. Maglumatlaryň üçünji taraplara berilmegi",
+          "body": "Sargytlaryňyzy eltip bermek maksady bilen, eltip beriş salgyňyzy we habarlaşmak üçin telefon belgiňizi diňe kurýerlere we satyjylara berýäris. Şahsy maglumatlaryňyzy üçünji taraplara satmaýarys."
+        },
+        {
+          "title": "5. Howpsuzlyk çäreleri",
+          "body": "Şahsy maglumatlaryňyzy rugsatsyz girmekden, üýtgetmekden ýa-da aýan etmekden goramak üçin döwrebap şifrlemek protokollaryny we tehniki howpsuzlyk çärelerini ulanýarys."
+        },
+        {
+          "title": "6. Ulanyjylaryň hukuklary",
+          "body": "Şahsy maglumatlaryňyza girmek, olary düzetmek ýa-da pozmak barada haýyş etmäge hukugyňyz bar. Profil sazlamalary arkaly islän wagtyňyz profiliňizi pozup bilersiňiz."
+        }
+      ],
+      "contacts": {
+        "title": "Habarlaşmak",
+        "address": {
+          "label": "Salgy",
+          "value": "Türkmenpoçta baş edarasy, Aşgabat, Türkmenistan, 744000"
+        },
+        "phone": {
+          "label": "Telefon",
+          "value": "075 (Esasy)"
+        },
+        "email": {
+          "label": "Email",
+          "value": "contact@post.tm"
+        }
+      }
+    }
+  },
+  "sheets": {
+    "selectRegion": {
+      "title": "Regiony saýlaň"
+    },
+    "chooseLanguage": {
+      "title": "Dili saýlaň"
+    },
+    "selectMyShop": {
+      "title": "Dükanlarym"
+    },
+    "aboutShop": {
+      "title": "Dükan barada",
+      "phoneNumber": "Telefon belgisi",
+      "description": "Düşündiriş"
+    },
+    "filter": {
+      "title": "Filtrlamak",
+      "priceRange": "Baha aralygy",
+      "priceFrom": "Iň az",
+      "priceTo": "Iň köp"
+    },
+    "sort": {
+      "title": "Sortlamak",
+      "priceHighToLow": "Gymmatdan arzana",
+      "priceLowToHigh": "Arzandan gymmada",
+      "newArrivals": "Täze harytlar",
+      "onSale": "Arzanlaşyk",
+      "bestSelling": "Iň köp satylýan"
+    },
+    "measurementUnit": {
+      "title": "Ölçeg birligi"
+    },
+    "pickupPoint": {
+      "title": "Sargyt alyş nokady"
+    }
+  },
+  "client": {
+    "deliveryDetail": {
+      "aboutDelivery": "Eltip bermek barada",
+      "empty": "Eltip bermek barada maglumat entek goşulmady"
+    },
+    "selectRegion": {
+      "headerTitle": "Regiony saýlaň",
+      "description": "Saýlanan sebitiň harytlaryny we dükanlaryny görkezeris"
+    },
+    "home": {
+      "homeNav": {
+        "categories": "Bölümler",
+        "shops": "Dükanlar",
+        "brands": "Brendler",
+        "myFavorites": "Saýlananlar",
+        "becomeSeller": "Satyjy bolmak"
+      }
+    },
+    "shops": {
+      "headerTitle": "Dükanlar"
+    },
+    "shop": {
+      "searchPlaceholder": "Dükanda gözleg"
+    },
+    "brands": {
+      "headerTitle": "Brendler"
+    },
+    "favorites": {
+      "headerTitle": "Halanlarym",
+      "loginRequired": {
+        "title": "Ulgama girmeli",
+        "description": "Harydy halanlaryma goşmak üçin agza bolmaly"
+      }
+    },
+    "becomeSellerOnboarding": {
+      "title": "Postshop platformasynda öz işiňize başlaň",
+      "subtitle": "Birinji aý — MUGT!",
+      "description": "Biz harytlaryňyzyň netijeli logistikasyny we toplumlaýyn mahabatlandyrylmagyny üpjün edip, bazara çalt çykmaga we söwdaňyzy artdyrmaga kömek edýäris",
+      "button": "Satyjy platformasyny açmak",
+      "loginRequired": {
+        "title": "Ulgama girmeli",
+        "description": "Satyjy bolmak üçin arza tabşyrmazdan ozal, ilki ulgama giriň"
+      }
+    },
+    "sellerType": {
+      "headerTitle": "Söwdäňiziň görnüşini saýlaň",
+      "individual": "Şahsy telekeçiler üçin",
+      "legalEntity": "Ýuridiki şahslar üçin"
+    },
+    "sellerDocs": {
+      "headline": "Satyjy platformasyna girmek üçin gerekli resminamalaryň elektron görnüşini ýüklemegiňizi Sizden haýyş edýäris",
+      "progress": "{{total}} resminamadan {{uploaded}} sanysy ýüklendi",
+      "docs": {
+        "individual": [
+          "Şahsy telekeçini hasaba alyş şahadatnamasy",
+          "Patent (hereket edýän)",
+          "Hasaba alyş şahadatnamasy",
+          "Pasportyň nusgasy"
+        ],
+        "legal": [
+          "Kärhananyň düzgünnamasy (ähli sahypalary möhür bilen tassyklanan)",
+          "ÝGÝHR-dan göçürme",
+          "Hasaba alyş şahadatnamasy",
+          "Statistika baradaky kepilnama (OKED kodlary bilen)",
+          "Ynanç haty ýa-da direktor bellemek barada buýruk"
+        ]
+      },
+      "submittedModal": {
+        "title": "Üstünlikli iberildi",
+        "description": "Siziň ýüzlenmäňiz kabul edildi. Biz siz bilen gysga wagtda habarlaşarys."
+      }
+    },
+    "editProfile": {
+      "headerTitle": "Profil maglumatlary"
+    },
+    "createProfile": {
+      "headerTitle": "Aşakdaky maglumatlary giriziň"
+    },
+    "categories": {
+      "headerTitle": "Ähli bölümler",
+      "empty": "Bölümler entek ýok",
+      "emptySubCategories": "Bu bölümde entek kiçi bölümler ýok"
+    },
+    "cart": {
+      "headerTitle": "Sebedim",
+      "aboutDelivery": "Eltip bermek barada",
+      "clearConfirm": {
+        "title": "Sebedi arassalamak isleýärsiňizmi?",
+        "description": "Bu hereketi yzyna gaýtaryp bolmaýar — sebetdäki harytlary gaýtadan dikeltmek mümkin däl"
+      },
+      "loginRequired": {
+        "title": "Ulgama girmeli",
+        "description": "Sargydy resmileşdirmek üçin ilki ulgama giriň"
+      },
+      "footer": {
+        "totalPrice": "Umumy baha:",
+        "discount": "Arzanladyş:",
+        "delivery": "Eltip bermek:",
+        "total": "Jemi:",
+        "submit": "Sebedi tassykla"
+      },
+      "restore": "Yzyna getir"
+    },
+    "checkout": {
+      "headerTitle": "Sargydy resmileşdirmek",
+      "success": {
+        "title": "Sargyt üstünlikli kabul edildi!",
+        "description": "Sargydyňyz kabul edildi. Ony ýakyn wagtda gaýtadan işläp başlarys.",
+        "showOrder": "Sargydy görkez"
+      }
+    },
+    "selectCity": {
+      "headline": "Regiony saýlaň"
+    },
+    "orders": {
+      "headerTitle": "Sargytlarym",
+      "status": {
+        "done": "Taýýar",
+        "cancelled": "Ýatyryldy",
+        "pending": "Garaşylýar",
+        "in_progress": "Taýýarlanýar",
+        "attention": "Üns bermek"
+      },
+      "partiallyRejected": "Sargydyň bir bölegini dükan ret etdi"
+    },
+    "order": {
+      "actions": {
+        "cancel": "Sargydy ýatyrmak",
+        "reorder": "Sargyty gaýtalamak"
+      },
+      "rejectionReasonLabel": "Ret ediliş sebäbi",
+      "footer": {
+        "title": "Umumy baha",
+        "goodsPrice": "Harytlaryň bahasy",
+        "discount": "Arzanladyş",
+        "grandTotal": "Umumy jemi"
+      }
+    },
+    "selectLanguage": {
+      "title": "Dili saýlaň",
+      "subtitle": "Ony soňra profilde üýtgedip bilersiňiz"
+    }
+  },
+  "store": {
+    "home": {
+      "headerTitle": "Baş sahypa",
+      "bestSelling": "Iň köp satylýan",
+      "incomeReport": {
+        "title": "Girdejiler barada hasabat",
+        "subtitle": "Hepdelik girdeji syn",
+        "ordersCount": "Sargytlar: {{value}}",
+        "empty": "Bu hepde entek sargyt ýok"
+      },
+      "bestSellingEmpty": "Entek satuw ýok"
+    },
+    "orders": {
+      "headerTitle": "Sargytlar",
+      "status": {
+        "pending": "Täze",
+        "approved": "Kabul edildi",
+        "rejected": "Ret edildi",
+        "ready_to_take": "Almaga taýýar",
+        "ready_to_deliver": "Eltip bermäge taýýar",
+        "completed": "Tamamlandy"
+      }
+    },
+    "order": {
+      "noApproved": "Operator sargydy kabul edenden soň, sargyt bilen baglanyşykly hereketler elýeterli bolar.",
+      "readyToPickup": "Almaga taýýar"
+    },
+    "add": "Haryt goş",
+    "shopAdditional": {
+      "onboarding": {
+        "headerTitle": "Dükanyňyzy işjeňleşdiriň",
+        "headline": "Dükanyňyzy açmak üçin indiki  ädimleriň hemmesini ýerine ýetiriň",
+        "description": "Zerur maglumatlary doly we dogry girizmegiňizi Sizden haýyş edýäris. Maglumatlar ýa-da gerekli resminamalar yalňyş girizilen halatynda, Siz dükanyňyzy işjeňleşdirip bilmersiňiz",
+        "button": "Işjeňleşdirmek"
+      },
+      "city": "Regiony saýlaň",
+      "addresses": "Salgylar",
+      "warehouseType": {
+        "headerTitle": "Ammaryň görnüşi",
+        "fbs": {
+          "title": "FBS (Fulfilment by Seller)",
+          "description": "FBS harytlar satyjynyň ammarynda saklanýar, satyjy özi gaplaýar we sargyt boýunça getirýär"
+        },
+        "fbo": {
+          "title": "FBO (Fulfilment by Operator)",
+          "description": "FBO harytlar marketpleýsiň ammarynda saklanýar we şol ýerden iberilýär"
+        }
+      },
+      "nameAndDescription": "Ady we düşündirişi",
+      "storeColor": "Dükanyň reňki",
+      "storeLogo": "Dükanyň logotipi",
+      "phoneNumbers": "Telefon belgileri",
+      "storeName": "Dükanyň ady",
+      "addAddress": "Salgy goş",
+      "addPhoneNumber": "Telefon belgisini goş",
+      "addressPlaceholder": "{{index}}-nji salgy",
+      "logo": {
+        "upload": "Logotip ýüklemek üçin basyň",
+        "remove": "Logotipi aýyrmak",
+        "notice": "Dükanyň logotipi .webp görnüşine öwrüler"
+      },
+      "colorInvalid": "Nädogry HEX reňk kody (mysal üçin #A855F7)"
+    },
+    "editShopAdditional": {
+      "headerTitle": "Dükan sazlamalary",
+      "address": "Salgy",
+      "color": "Reňk",
+      "logo": "Logotip",
+      "phoneNumbers": "Telefon belgileri",
+      "baseInfo": "Esasy maglumatlar"
+    },
+    "myProducts": {
+      "headerTitle": "Harytlarym",
+      "empty": {
+        "title": "Entek haryt ýok",
+        "description": "Ilkinji harydyňyzy goşuň — ol dessine dükanyňyzda görner"
+      }
+    },
+    "addEditProduct": {
+      "createHeaderTitle": "Haryt goşmak",
+      "editHeaderTitle": "Haryt üýtgetmek",
+      "price": "Baha",
+      "discount": {
+        "title": "Arzanladyş",
+        "percentage": "Göterim",
+        "fixed": "Kesgitli"
+      },
+      "hashtag": "Heştag",
+      "inputs": {
+        "titlePlaceholder": "Mysal üçin: Ak pagta köýnek",
+        "images": {
+          "label": "Harydyň suratlary",
+          "placeholder": "Surat goşmak üçin basyň",
+          "notice": "Iň köp 5 surat",
+          "cover": "Esasy"
+        },
+        "descriptionPlaceholder": "Haryt barada ýazyň: material, ölçegleri, düzümi"
+      }
+    }
+  },
+  "serverSetup": {
+    "title": "Serweriň salgysy",
+    "subtitle": "Haýsy serwere birikmelidigini görkeziň. Islendik wagt üýtgedip bolýar.",
+    "placeholder": "192.168.1.50:7002",
+    "example": "Meselem: 192.168.1.50:7002 — protokol görkezilmese, http:// goşulýar",
+    "invalid": "Salgy nädogry ýazylan bolmaly",
+    "save": "Ýatda saklamak"
+  },
+  "validation": {
+    "required": "Hökmany meýdan",
+    "minLength": "Iň azy {{min}} belgi",
+    "maxLength": "Iň köpi {{max}} belgi"
+  },
+  "notifications": {
+    "title": "Bildirişler",
+    "empty": "Bildiriş ýok",
+    "markAll": "Ählisini okadym",
+    "seeAll": "Ählisini görmek",
+    "dismiss": "Habarnamany aýyrmak",
+    "loadMore": "Ýene görkez",
+    "kind": {
+      "order_cancelled": "Alyjy sargydy ýatyrdy",
+      "order_created": "Dükanyňyzda täze sargyt",
+      "order_shop_rejected": "Dükan sargydyň bir böleginden ýüz öwürdi",
+      "order_status": "Sargydyň ýagdaýy üýtgedi",
+      "product_approved": "Haryt barlagdan geçdi",
+      "product_declined": "Haryt barlagdan geçmedi",
+      "product_out_of_stock": "Haryt gutardy — galyndyny dolduryň ýa-da satuwdan aýryň",
+      "receipt_confirmed": "Kabul ediliş tassyklandy, haryt galyndyda",
+      "return_approved": "Yzyna gaýtarmak tassyklandy",
+      "return_received": "Harydyňyz boýunça gaýtarma tassyklandy",
+      "return_rejected": "Yzyna gaýtarmak kabul edilmedi",
+      "review_approved": "Synyňyz ýerleşdirildi",
+      "review_received": "Harydyňyz barada täze syn",
+      "review_rejected": "Synyňyz kabul edilmedi",
+      "shop_approved": "Dükan arzasy tassyklandy",
+      "shop_blocked": "Dükan platforma tarapyndan ýapyldy",
+      "shop_rejected": "Dükan arzasy kabul edilmedi"
+    }
+  }
+}

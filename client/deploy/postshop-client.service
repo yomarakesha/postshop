@@ -1,0 +1,18 @@
+[Unit]
+Description=Postshop Client (TanStack Start dev)
+After=network.target
+
+[Service]
+Type=simple
+User=capar
+WorkingDirectory=/home/capar/postshop_client
+Environment=PATH=/usr/bin:/bin
+Environment=HOST=0.0.0.0
+Environment=PORT=7001
+EnvironmentFile=-/home/capar/postshop_client/.env
+ExecStart=/usr/bin/node /home/capar/postshop_client/node_modules/vite/bin/vite.js dev --host 0.0.0.0 --port 7001 --strictPort
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
