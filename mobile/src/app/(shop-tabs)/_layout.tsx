@@ -5,6 +5,7 @@ import useShopStore from "@/store/useShopStore";
 import TabBarIcon from "@/utils/TabBarIcon";
 import { Redirect, Tabs } from "expo-router";
 import React, { useEffect } from "react";
+import { StyleSheet, View } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
 // images & icons
@@ -59,14 +60,18 @@ const ShopTabs = () => {
     }
   }, [shopBaseQuery.data]);
 
-  if (!hasInternetConnection || !isServerAvailable) {
-    return (
-      <InernetError
-        isLoading={shopAdditionalQuery.isLoading}
-        t={t}
-        onRetry={() => shopAdditionalQuery.refetch()}
-      />
-    );
+  const isOffline = !hasInternetConnection || !isServerAvailable;
+  const offlineScreen = (
+    <InernetError
+      isLoading={shopAdditionalQuery.isLoading}
+      t={t}
+      onRetry={() => shopAdditionalQuery.refetch()}
+    />
+  );
+
+  // Магазин ещё не загружен — сохранять нечего, экран ошибки вместо всего.
+  if (isOffline && !shop?.name) {
+    return offlineScreen;
   }
 
   if (!activeShopBaseId || !user || !currentLanguage) {
@@ -81,28 +86,42 @@ const ShopTabs = () => {
     return <CreateShopAdditionalScreen />;
   }
 
+  // При потере связи вкладки остаются на месте, а экран ошибки ложится
+  // поверх. Раньше он заменял их целиком: после восстановления навигация
+  // создавалась заново с «Главной», и пропадало всё — открытая вкладка,
+  // окно изменения остатка, введённое число. Хватало мгновенного «нет сети»
+  // (например, при открытии клавиатуры), чтобы продавца выбросило на главную.
   return (
-    <Tabs
-      initialRouteName="(home)"
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: {
-          backgroundColor: theme.colors.white,
-          elevation: 0,
-          shadowOpacity: 0,
-          borderTopWidth: 0,
-        },
-      }}
-    >
-      {TAB_SCREENS.map(({ name, title, icon }) => (
-        <Tabs.Screen
-          key={name}
-          name={name}
-          options={{ title, tabBarIcon: TabBarIcon(icon) }}
-        />
-      ))}
-    </Tabs>
+    <View style={styles.flex1}>
+      <Tabs
+        initialRouteName="(home)"
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: theme.colors.white,
+            elevation: 0,
+            shadowOpacity: 0,
+            borderTopWidth: 0,
+          },
+        }}
+      >
+        {TAB_SCREENS.map(({ name, title, icon }) => (
+          <Tabs.Screen
+            key={name}
+            name={name}
+            options={{ title, tabBarIcon: TabBarIcon(icon) }}
+          />
+        ))}
+      </Tabs>
+      {isOffline && (
+        <View style={StyleSheet.absoluteFill}>{offlineScreen}</View>
+      )}
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  flex1: { flex: 1 },
+});
 
 export default ShopTabs;
