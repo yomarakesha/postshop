@@ -12,4 +12,21 @@ declare namespace Stock {
     tracked: boolean;
     available: string;
   };
+
+  /**
+   * Движение по складу, которое заводит продавец. Остальные виды (продажа,
+   * возврат от покупателя, пересчёт) пишет сервер сам.
+   */
+  type ManualOperation = "income" | "return_to_supplier";
+
+  namespace API {
+    type Body = {
+      shop_id: number;
+      product_id: number;
+      measure_unit_id: number;
+      quantity: number;
+    };
+
+    type OperationBody = Body & { operation_type: ManualOperation };
+  }
 }

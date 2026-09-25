@@ -558,6 +558,29 @@
         },
         "descriptionPlaceholder": "Опишите товар: материал, размеры, комплектация"
       }
+    },
+    "stock": {
+      "available": "Доступно: {{count}}",
+      "addOperation": "Остаток: {{count}}",
+      "operationTitle": "Изменить остаток",
+      "operations": {
+        "income": "Приход",
+        "return_to_supplier": "Возврат поставщику",
+        "set": "Указать остаток"
+      },
+      "operationsHint": {
+        "income": "Товар поступил на склад и доступен к продаже",
+        "return_to_supplier": "Товар уходит со склада обратно поставщику",
+        "set": "Пересчитали — назовите, сколько доступно к продаже сейчас. Разницу запишем сами."
+      },
+      "quantityPlaceholder": "Количество",
+      "quantityRequired": "Укажите количество больше нуля",
+      "save": "Записать",
+      "saved": "Движение записано",
+      "setSaved": "Остаток обновлён",
+      "amountPlaceholder": "Сколько доступно сейчас",
+      "amountRequired": "Укажите число: ноль или больше",
+      "inWarehouse": "На складе: {{count}}"
     }
   },
   "serverSetup": {

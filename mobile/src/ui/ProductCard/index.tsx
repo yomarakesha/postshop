@@ -66,6 +66,12 @@ type Props = {
   onPress: () => void;
   onToggleFavorite: (productId: number) => void;
   withoutFavorite?: boolean;
+  /**
+   * Низ карточки под названием — например остаток и кнопка его правки в
+   * «Моих товарах». Кнопки внутри нажимаются сами по себе, карточка по ним
+   * не открывается (как с названием магазина выше).
+   */
+  footer?: React.ReactNode;
   t: TFunction;
 };
 
@@ -77,6 +83,7 @@ const ProductCard = ({
   onToggleFavorite,
   withoutFavorite = false,
   onPress,
+  footer,
   t,
 }: Props) => {
   // Раньше язык был захардкожен ("tk") с пометкой «TODO: Dynamic language»,
@@ -226,6 +233,7 @@ const ProductCard = ({
             </Typography>
           </Pressable>
         )}
+        {footer}
       </View>
     </TouchableOpacity>
   );

@@ -554,6 +554,29 @@
         },
         "descriptionPlaceholder": "Describe the product: material, size, what is included"
       }
+    },
+    "stock": {
+      "available": "Available: {{count}}",
+      "addOperation": "In stock: {{count}}",
+      "operationTitle": "Change the stock",
+      "operations": {
+        "income": "Incoming",
+        "return_to_supplier": "Return to supplier",
+        "set": "Set the stock"
+      },
+      "operationsHint": {
+        "income": "Goods arrived at the warehouse and are available for sale",
+        "return_to_supplier": "Goods leave the warehouse back to the supplier",
+        "set": "Counted the shelf — enter how many are available for sale now. We will record the difference."
+      },
+      "quantityPlaceholder": "Quantity",
+      "quantityRequired": "Enter a quantity greater than zero",
+      "save": "Record",
+      "saved": "Movement recorded",
+      "setSaved": "Stock updated",
+      "amountPlaceholder": "How many are available now",
+      "amountRequired": "Enter a number: zero or more",
+      "inWarehouse": "In warehouse: {{count}}"
     }
   },
   "serverSetup": {

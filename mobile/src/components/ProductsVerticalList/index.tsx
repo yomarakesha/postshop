@@ -23,6 +23,8 @@ type Props = Omit<FlatListProps<Product.Item>, "renderItem"> & {
   isFetchingNextPage?: boolean;
   onPress: (id: number) => void;
   withoutFavorite?: boolean;
+  /** Низ карточки для каждого товара — см. ProductCard.footer. */
+  renderItemFooter?: (item: Product.Item) => React.ReactNode;
   t: TFunction;
 };
 
@@ -34,6 +36,7 @@ const ProductsVerticalList = ({
   onPress,
   onEndReached,
   withoutFavorite = false,
+  renderItemFooter,
   t,
   ...props
 }: Props) => {
@@ -54,11 +57,13 @@ const ProductsVerticalList = ({
           onPress={() => onPress(item.id)}
           onToggleFavorite={() => toggleFavorite(item)}
           withoutFavorite={withoutFavorite}
+          footer={renderItemFooter?.(item)}
           t={t}
         />
       );
     },
     [
+      renderItemFooter,
       withoutBrand,
       onPress,
       favoritesData,

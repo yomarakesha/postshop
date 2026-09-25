@@ -1,4 +1,9 @@
-import { useQuery, UseQueryOptions } from "@tanstack/react-query";
+import {
+  useMutation,
+  useQuery,
+  useQueryClient,
+  UseQueryOptions,
+} from "@tanstack/react-query";
 import { AxiosError } from "axios";
 import api from ".";
 
@@ -37,6 +42,44 @@ const useAvailability = (productIds: number[], options?: AvailabilityOptions) =>
   return query;
 };
 
+/** После любого движения остаток на экранах нужно перечитать. */
+const useInvalidateAvailability = () => {
+  const queryClient = useQueryClient();
+  return () =>
+    queryClient.invalidateQueries({ queryKey: ["stock-availability"] });
+};
+
+/** Приход или возврат поставщику: продавец называет, сколько штук. */
+const useCreateOperation = () => {
+  const invalidate = useInvalidateAvailability();
+  return useMutation<unknown, AxiosError<ApiErrorResponse>, Stock.API.OperationBody>({
+    mutationKey: ["stock-operation"],
+    mutationFn: async (body) => {
+      const res = await api.req({ method: "POST", url: "/stock-operations/", data: body });
+      return res.data;
+    },
+    onSuccess: invalidate,
+  });
+};
+
+/**
+ * Пересчёт: продавец называет, сколько товара на полке сейчас, а разницу
+ * записывает сервер. Если остаток не изменился, сервер отвечает 409.
+ */
+const useSetStock = () => {
+  const invalidate = useInvalidateAvailability();
+  return useMutation<unknown, AxiosError<ApiErrorResponse>, Stock.API.Body>({
+    mutationKey: ["stock-set"],
+    mutationFn: async (body) => {
+      const res = await api.req({ method: "POST", url: "/stock-operations/set", data: body });
+      return res.data;
+    },
+    onSuccess: invalidate,
+  });
+};
+
 export const stockApi = {
   useAvailability,
+  useCreateOperation,
+  useSetStock,
 };
