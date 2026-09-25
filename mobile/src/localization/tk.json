@@ -580,6 +580,19 @@
       "amountPlaceholder": "Häzir näçe elýeterli",
       "amountRequired": "San görkeziň: nol ýa-da köp",
       "inWarehouse": "Ammarda: {{count}}"
+    },
+    "close": {
+      "close": "Dükany ýapmak",
+      "closed": "Dükan ýapyldy",
+      "reopen": "Dükany açmak",
+      "reopened": "Dükan açyldy",
+      "reopenSubtitle": "Dükan ýapyk, alyjylar harytlary görmeýär. Açylandan soň harytlar katalogda gaýtadan görkeziler.",
+      "failed": "Dükanyň ýagdaýyny üýtgetmek başartmady",
+      "confirmTitle": "Dükany ýapmalymy?",
+      "confirmText": "Harytlar alyjylara görkezilmegini bes eder. Bu hereketi yzyna almak bolýar.",
+      "confirm": "Ýapmak",
+      "cancel": "Ýatyrmak",
+      "badge": "Ýapyk"
     }
   },
   "serverSetup": {

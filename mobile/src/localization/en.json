@@ -580,6 +580,19 @@
       "amountPlaceholder": "How many are available now",
       "amountRequired": "Enter a number: zero or more",
       "inWarehouse": "In warehouse: {{count}}"
+    },
+    "close": {
+      "close": "Close the store",
+      "closed": "The store is closed",
+      "reopen": "Reopen the store",
+      "reopened": "The store is open",
+      "reopenSubtitle": "The store is closed and customers cannot see its products. Once reopened, the products appear in the catalog again.",
+      "failed": "Could not change the store state",
+      "confirmTitle": "Close the store?",
+      "confirmText": "Products will stop being shown to customers. This can be undone.",
+      "confirm": "Close",
+      "cancel": "Cancel",
+      "badge": "Closed"
     }
   },
   "serverSetup": {

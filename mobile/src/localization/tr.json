@@ -580,6 +580,19 @@
       "amountPlaceholder": "Şu anda kaç adet var",
       "amountRequired": "Bir sayı girin: sıfır veya daha fazla",
       "inWarehouse": "Depoda: {{count}}"
+    },
+    "close": {
+      "close": "Mağazayı kapat",
+      "closed": "Mağaza kapatıldı",
+      "reopen": "Mağazayı aç",
+      "reopened": "Mağaza açıldı",
+      "reopenSubtitle": "Mağaza kapalı, müşteriler ürünleri görmüyor. Açtıktan sonra ürünler katalogda yeniden görünür.",
+      "failed": "Mağaza durumu değiştirilemedi",
+      "confirmTitle": "Mağaza kapatılsın mı?",
+      "confirmText": "Ürünler müşterilere gösterilmeyi bırakır. Bu işlem geri alınabilir.",
+      "confirm": "Kapat",
+      "cancel": "İptal",
+      "badge": "Kapalı"
     }
   },
   "serverSetup": {

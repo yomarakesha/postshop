@@ -48,9 +48,16 @@ const UserShopsSheet = ({ ref, data, onSelect, t }: Props) => {
                 <ShopIcon width={30} height={30} style={styles.icon} />
               )}
             </View>
-            <Typography weight="medium">
-              {item.name || t("noRegistration")}
-            </Typography>
+            <View style={styles.nameRow}>
+              <Typography weight="medium">
+                {item.name || t("noRegistration")}
+              </Typography>
+              {!item.is_active && (
+                <Typography variant="t2" color="secondary">
+                  {t("store.close.badge")}
+                </Typography>
+              )}
+            </View>
           </Pressable>
         ))}
       </ScrollView>
@@ -61,6 +68,10 @@ const UserShopsSheet = ({ ref, data, onSelect, t }: Props) => {
 export default UserShopsSheet;
 
 const styles = StyleSheet.create((theme) => ({
+  nameRow: {
+    flex: 1,
+    gap: theme.spacing(0.5),
+  },
   wrapper: {
     paddingHorizontal: theme.spacing(4),
     paddingTop: 0,

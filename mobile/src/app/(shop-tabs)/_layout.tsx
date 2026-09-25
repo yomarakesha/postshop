@@ -16,15 +16,11 @@ import UserIcon from "@assets/icons/user.svg";
 import { useTranslation } from "react-i18next";
 import InernetError from "@/ui/InternetError";
 import { useUserStore } from "@/store/useUserStore";
-import { shopBaseApi } from "@/api/shopBaseApi";
 
 const ShopTabs = () => {
   const { theme } = useUnistyles();
   const activeShopBaseId = useShopStore((s) => s.activeShopBaseId);
   const shop = useShopStore((s) => s.shop);
-  const shopBaseQuery = shopBaseApi.useGet(activeShopBaseId!, {
-    enabled: !!activeShopBaseId,
-  });
   const shopAdditionalQuery = shopAdditionalApi.useGet(activeShopBaseId!, {
     enabled: !!activeShopBaseId,
   });
@@ -52,13 +48,6 @@ const ShopTabs = () => {
       useShopStore.setState({ shop: shopAdditionalQuery.data });
     }
   }, [shopAdditionalQuery.data]);
-
-  useEffect(() => {
-    if (shopBaseQuery.data && !shopBaseQuery.data.is_active) {
-      useShopStore.setState({ activeShopBaseId: undefined, shop: null });
-      useAppStore.setState({ mode: "client" });
-    }
-  }, [shopBaseQuery.data]);
 
   const isOffline = !hasInternetConnection || !isServerAvailable;
   const offlineScreen = (

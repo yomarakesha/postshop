@@ -71,9 +71,9 @@ const HomeScreen = () => {
 
   const userShops = useMemo(() => {
     return (
-      user?.shops?.filter(
-        (s) => s.registration_status === "approved" && s.is_active,
-      ) || []
+      // Закрытые владельцем магазины тоже в списке: иначе открыть закрытый
+      // магазин из приложения было бы негде. В списке у них пометка.
+      user?.shops?.filter((s) => s.registration_status === "approved") || []
     );
   }, [user]);
 

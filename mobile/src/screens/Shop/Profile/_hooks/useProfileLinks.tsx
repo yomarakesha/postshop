@@ -12,6 +12,11 @@ import useShopStore from "@/store/useShopStore";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { TFunction } from "i18next";
 import { langs } from "@/constants/langs";
+import DoorOpenIcon from "@assets/icons/door-open.svg";
+import StoreFrontIcon from "@assets/icons/store-front.svg";
+import { shopBaseApi } from "@/api/shopBaseApi";
+import ErrorAlert from "@/utils/errorAlert";
+import Toast from "react-native-toast-message";
 
 type Link = {
   title: string;
@@ -30,6 +35,42 @@ type Section = {
 const useProfileLinks = (t: TFunction, language: AppLang) => {
   const queryClient = useQueryClient();
   const langSheetRef = useRef<TrueSheet>(null);
+  const shopBaseId = useShopStore((s) => s.activeShopBaseId);
+  const shopBaseQuery = shopBaseApi.useGet(shopBaseId!, {
+    enabled: !!shopBaseId,
+  });
+  const setOpen = shopBaseApi.useSetOpen(shopBaseId!);
+  const isClosed = shopBaseQuery.data?.is_active === false;
+
+  // Закрыть или снова открыть магазин — как на витрине (/my-store/…/close).
+  // Закрытый магазин пропадает с витрины, но остаётся у владельца, и открыть
+  // его можно здесь же или плашкой на главной кабинета.
+  const onToggleOpen = () => {
+    const run = (open: boolean) =>
+      setOpen.mutate(open, {
+        onSuccess: () =>
+          Toast.show({
+            type: "success",
+            text1: t(open ? "store.close.reopened" : "store.close.closed"),
+          }),
+        onError: (error) => ErrorAlert(t, error),
+      });
+
+    if (isClosed) {
+      run(true);
+      return;
+    }
+    useConfirmationModal.setState({
+      isOpen: true,
+      title: t("store.close.confirmTitle"),
+      description: t("store.close.confirmText"),
+      confirmTitle: t("store.close.confirm"),
+      cancelTitle: t("store.close.cancel"),
+      type: "danger",
+      Icon: DoorOpenIcon,
+      onConfirm: () => run(false),
+    });
+  };
 
   const handleLangChange = () => {
     langSheetRef.current?.present();
@@ -79,7 +120,7 @@ const useProfileLinks = (t: TFunction, language: AppLang) => {
           {
             title: t("profile.links.notifications"),
             icon: BellSimpleIcon,
-            onPress: () => { },
+            onPress: () => {},
           },
         ],
         isVisible: true,
@@ -87,6 +128,12 @@ const useProfileLinks = (t: TFunction, language: AppLang) => {
       {
         title: t("profile.sections.others"),
         data: [
+          {
+            title: t(isClosed ? "store.close.reopen" : "store.close.close"),
+            icon: StoreFrontIcon,
+            onPress: onToggleOpen,
+            isDanger: !isClosed,
+          },
           {
             title: t("profile.links.logout"),
             icon: SignOut,
@@ -103,7 +150,7 @@ const useProfileLinks = (t: TFunction, language: AppLang) => {
         isVisible: true,
       },
     ],
-    [language],
+    [language, isClosed],
   );
 
   return { links, langSheetRef };

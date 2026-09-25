@@ -1,4 +1,5 @@
 import {
+  useQueryClient,
   useMutation,
   useQueries,
   useQuery,
@@ -57,7 +58,9 @@ type GetOptions = Omit<
 
 const useGet = (shopBaseId: number, options?: GetOptions) => {
   const query = useQuery<ShopBase.Item, AxiosError<ApiErrorResponse>>({
-    queryKey: ["shop-base"],
+    // С номером магазина: без него при переходе в другой магазин приложение
+    // какое-то время видело данные предыдущего — и его «закрыт».
+    queryKey: ["shop-base", shopBaseId],
     queryFn: async () => {
       const response = await api.req({
         method: "GET",
@@ -100,4 +103,34 @@ const useGetByIds = (shopBaseIds: number[], options: GetOptions) => {
   return query;
 };
 
-export const shopBaseApi = { useCreate, useUploadDocs, useGet, useGetByIds };
+/**
+ * Закрыть магазин или открыть его снова. Закрытый магазин пропадает с
+ * витрины: покупатели не видят его товары и не могут заказать. Владелец
+ * открывает его обратно сам.
+ */
+const useSetOpen = (shopBaseId: number) => {
+  const queryClient = useQueryClient();
+  return useMutation<ShopBase.Item, AxiosError<ApiErrorResponse>, boolean>({
+    mutationKey: ["shop-base-open", shopBaseId],
+    mutationFn: async (open) => {
+      const response = await api.req({
+        method: "PATCH",
+        url: `/shop-bases/${shopBaseId}/${open ? "unblock" : "block"}`,
+      });
+      return response.data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["shop-base"] });
+      // Список «Мои магазины» с пометкой «закрыт» берётся из /auth/me.
+      queryClient.invalidateQueries({ queryKey: ["get-me"] });
+    },
+  });
+};
+
+export const shopBaseApi = {
+  useCreate,
+  useUploadDocs,
+  useGet,
+  useGetByIds,
+  useSetOpen,
+};
