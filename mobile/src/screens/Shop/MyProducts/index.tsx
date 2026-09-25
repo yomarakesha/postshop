@@ -14,9 +14,21 @@ import { StyleSheet } from "react-native-unistyles";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { stockApi } from "@/api/stockApi";
 import Button from "@/ui/Button";
+import ErrorAlert from "@/utils/errorAlert";
 import { pickTranslatedName } from "@/utils/pickTranslation";
 import useAppStore from "@/store/useAppStore";
 import StockSheet, { StockTarget } from "./_components/StockSheet";
+
+/**
+ * Подпись кнопки на карточке. Карточка в сетке узкая: обычный размер текста
+ * кнопки обрезал «Снять с продажи» до «Снять с прода…». Как на витрине
+ * (size="sm") — текст мельче и при нехватке места в две строки.
+ */
+const CardButtonLabel = ({ children }: { children: string }) => (
+  <Typography variant="t1" weight="medium" numberOfLines={2} isCentered>
+    {children}
+  </Typography>
+);
 
 const MyProductsScreen = () => {
   const router = useRouter();
@@ -70,30 +82,60 @@ const MyProductsScreen = () => {
     [currentLanguage],
   );
 
-  const renderStock = useCallback(
+  const setForSale = productsApi.useSetForSale();
+
+  // Низ карточки, как на витрине: остаток и «Снять с продажи» / «Вернуть в
+  // продажу». Товар при этом не удаляется — покупатель его просто не видит.
+  const renderFooter = useCallback(
     (product: Product.Item) => {
       const found = stockById.get(product.id);
-      // Не отслеживается (склад платформы выключен) — показывать нечего.
-      if (!found?.tracked) return null;
-      const available = Number(found.available);
-      if (!isFbs) {
-        return (
-          <Typography variant="t2" color="secondary">
-            {t("store.stock.inWarehouse", { count: available })}
-          </Typography>
-        );
-      }
-      // Остаток написан на кнопке, которая его и меняет.
+      // Остаток не отслеживается (склад платформы выключен) — не показываем.
+      const available = found?.tracked ? Number(found.available) : null;
+      const isPending =
+        setForSale.isPending && setForSale.variables?.productId === product.id;
+
       return (
-        <Button
-          title={t("store.stock.addOperation", { count: available })}
-          variant="secondary"
-          style={styles.stockButton}
-          onPress={() => openStock(product, available)}
-        />
+        <View style={styles.footer}>
+          {available !== null && !isFbs && (
+            <Typography variant="t2" color="secondary">
+              {t("store.stock.inWarehouse", { count: available })}
+            </Typography>
+          )}
+          {/* Остаток написан на кнопке, которая его и меняет. */}
+          {available !== null && isFbs && (
+            <Button
+              variant="secondary"
+              style={styles.footerButton}
+              onPress={() => openStock(product, available)}
+            >
+              <CardButtonLabel>
+                {t("store.stock.addOperation", { count: available })}
+              </CardButtonLabel>
+            </Button>
+          )}
+          <Button
+            variant="secondary"
+            style={styles.footerButton}
+            disabled={isPending}
+            onPress={() =>
+              setForSale.mutate(
+                { productId: product.id, forSale: !product.is_active },
+                { onError: (error) => ErrorAlert(t, error) },
+              )
+            }
+          >
+            <CardButtonLabel>
+              {t(
+                product.is_active
+                  ? "store.myProducts.hide"
+                  : "store.myProducts.show",
+              )}
+            </CardButtonLabel>
+          </Button>
+        </View>
       );
     },
-    [stockById, isFbs, openStock, t],
+    [stockById, isFbs, openStock, setForSale, t],
   );
 
   const handleEndReached = () => {
@@ -138,9 +180,11 @@ const MyProductsScreen = () => {
         data={products}
         withoutBrand
         onPress={handlePressProduct}
-        renderItemFooter={renderStock}
-        // Список перерисовывается, когда приходит остаток.
-        extraData={stockById}
+        renderItemFooter={renderFooter}
+        unavailableLabel={t("store.myProducts.hidden")}
+        // Список перерисовывается, когда приходит остаток или меняется
+        // состояние кнопки снятия с продажи.
+        extraData={renderFooter}
         onEndReached={handleEndReached}
         isFetchingNextPage={isFetchingNextPage}
         ListEmptyComponent={renderEmpty}
@@ -173,9 +217,14 @@ const styles = StyleSheet.create((theme) => ({
   header: {
     marginBottom: theme.spacing(2),
   },
-  stockButton: {
+  footer: {
     marginTop: theme.spacing(2),
-    minHeight: theme.spacing(9),
+    gap: theme.spacing(2),
+  },
+  footerButton: {
+    minHeight: theme.spacing(10),
+    paddingVertical: theme.spacing(2),
+    paddingHorizontal: theme.spacing(2),
   },
   empty: {
     flex: 1,

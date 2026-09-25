@@ -532,7 +532,10 @@
       "empty": {
         "title": "Henüz ürün yok",
         "description": "İlk ürününüzü ekleyin, mağazanızda hemen görünecek"
-      }
+      },
+      "hide": "Satıştan kaldır",
+      "show": "Satışa döndür",
+      "hidden": "Satışta değil"
     },
     "addEditProduct": {
       "createHeaderTitle": "Ürün ekle",

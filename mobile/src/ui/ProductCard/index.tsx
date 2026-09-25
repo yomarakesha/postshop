@@ -72,6 +72,12 @@ type Props = {
    * не открывается (как с названием магазина выше).
    */
   footer?: React.ReactNode;
+  /**
+   * Подпись значка неактивного товара. По умолчанию «Нет в наличии» — так его
+   * видит покупатель; в «Моих товарах» это «Снят с продажи»: остаток у такого
+   * товара может быть, продавец сам убрал его с витрины.
+   */
+  unavailableLabel?: string;
   t: TFunction;
 };
 
@@ -84,6 +90,7 @@ const ProductCard = ({
   withoutFavorite = false,
   onPress,
   footer,
+  unavailableLabel,
   t,
 }: Props) => {
   // Раньше язык был захардкожен ("tk") с пометкой «TODO: Dynamic language»,
@@ -170,7 +177,7 @@ const ProductCard = ({
             {isUnavailable && (
               <View style={styles.unavailableBadge}>
                 <Typography variant="t2" color="white" weight="medium">
-                  {t("product.outOfStock")}
+                  {unavailableLabel ?? t("product.outOfStock")}
                 </Typography>
               </View>
             )}

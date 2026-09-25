@@ -223,6 +223,37 @@ const useGetMyInfiniteList = (params: Product.API.GetMyVars) => {
   return query;
 };
 
+/**
+ * Снять товар с продажи или вернуть его в продажу.
+ *
+ * Товар не удаляется: он остаётся в «Моих товарах», но покупателю не
+ * показывается и в корзину не кладётся.
+ */
+const useSetForSale = () => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    unknown,
+    AxiosError<ApiErrorResponse>,
+    { productId: number; forSale: boolean }
+  >({
+    mutationKey: ["product-for-sale"],
+    mutationFn: async ({ productId, forSale }) => {
+      const res = await api.req({
+        method: "PATCH",
+        url: `/products/${productId}/${forSale ? "unblock" : "block"}`,
+      });
+      return res.data;
+    },
+    onSuccess: (_, { productId }) => {
+      queryClient.invalidateQueries({ queryKey: ["get-all-products"] });
+      queryClient.invalidateQueries({
+        queryKey: ["products-my-infinite-list"],
+      });
+      queryClient.removeQueries({ queryKey: ["get-product", productId] });
+    },
+  });
+};
+
 export const productsApi = {
   useGetAll,
   useGet,
@@ -232,4 +263,5 @@ export const productsApi = {
   useGetByIds,
   useGetSimilar,
   useGetMyInfiniteList,
+  useSetForSale,
 };

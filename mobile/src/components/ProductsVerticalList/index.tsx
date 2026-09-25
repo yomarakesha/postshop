@@ -25,6 +25,8 @@ type Props = Omit<FlatListProps<Product.Item>, "renderItem"> & {
   withoutFavorite?: boolean;
   /** Низ карточки для каждого товара — см. ProductCard.footer. */
   renderItemFooter?: (item: Product.Item) => React.ReactNode;
+  /** Подпись значка неактивного товара — см. ProductCard.unavailableLabel. */
+  unavailableLabel?: string;
   t: TFunction;
 };
 
@@ -37,6 +39,7 @@ const ProductsVerticalList = ({
   onEndReached,
   withoutFavorite = false,
   renderItemFooter,
+  unavailableLabel,
   t,
   ...props
 }: Props) => {
@@ -58,12 +61,14 @@ const ProductsVerticalList = ({
           onToggleFavorite={() => toggleFavorite(item)}
           withoutFavorite={withoutFavorite}
           footer={renderItemFooter?.(item)}
+          unavailableLabel={unavailableLabel}
           t={t}
         />
       );
     },
     [
       renderItemFooter,
+      unavailableLabel,
       withoutBrand,
       onPress,
       favoritesData,

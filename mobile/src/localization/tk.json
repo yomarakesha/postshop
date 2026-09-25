@@ -532,7 +532,10 @@
       "empty": {
         "title": "Entek haryt ýok",
         "description": "Ilkinji harydyňyzy goşuň — ol dessine dükanyňyzda görner"
-      }
+      },
+      "hide": "Satuwdan aýyrmak",
+      "show": "Satuwa gaýtarmak",
+      "hidden": "Satuwdan aýryldy"
     },
     "addEditProduct": {
       "createHeaderTitle": "Haryt goşmak",
