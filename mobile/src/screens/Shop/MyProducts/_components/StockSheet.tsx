@@ -3,7 +3,6 @@ import HeaderSheet from "@/components/BottomSheet/HeaderSheet";
 import { UniTrueSheet } from "@/ui/BottomSheet";
 import Button from "@/ui/Button";
 import CustomTextInput from "@/ui/CustomTextInput";
-import Radio from "@/ui/Radio";
 import Typography from "@/ui/Typography";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { AxiosError } from "axios";
@@ -118,30 +117,42 @@ const StockSheet = ({ ref, shopId, target, t }: Props) => {
           </View>
         )}
 
-        {MODES.map((value) => (
-          <Pressable
-            key={value}
-            onPress={() => setMode(value)}
-            style={styles.mode(mode === value)}
-            accessibilityRole="radio"
-            accessibilityState={{ selected: mode === value }}
-          >
-            <View style={styles.modeText}>
-              <Typography variant="p3" weight="medium">
+        {/* Действия — переключателями в ряд, пояснение только к выбранному.
+            Три карточки с пояснениями были такими высокими, что открытая
+            клавиатура закрывала поле количества и кнопку «Записать». */}
+        <View style={styles.modes}>
+          {MODES.map((value) => (
+            <Pressable
+              key={value}
+              onPress={() => setMode(value)}
+              style={styles.mode(mode === value)}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: mode === value }}
+            >
+              <Typography
+                variant="t1"
+                weight="medium"
+                isCentered
+                color={mode === value ? "main" : undefined}
+              >
                 {t(`store.stock.operations.${value}`)}
               </Typography>
-              <Typography variant="t1" color="secondary">
-                {t(`store.stock.operationsHint.${value}`)}
-              </Typography>
-            </View>
-            <Radio isActive={mode === value} />
-          </Pressable>
-        ))}
+            </Pressable>
+          ))}
+        </View>
+        <Typography variant="t1" color="secondary">
+          {t(`store.stock.operationsHint.${mode}`)}
+        </Typography>
 
         <CustomTextInput
           value={quantity}
           onChangeText={setQuantity}
           keyboardType="decimal-pad"
+          // «OK» на клавиатуре записывает сразу. Кнопка «Записать» при открытой
+          // клавиатуре на Android срабатывает только со второго нажатия:
+          // первое закрывает клавиатуру (причина не найдена).
+          returnKeyType="done"
+          onSubmitEditing={() => void submit()}
           placeholder={t(
             mode === "set" ? "store.stock.amountPlaceholder" : "store.stock.quantityPlaceholder",
           )}
@@ -172,18 +183,21 @@ const styles = StyleSheet.create((theme) => ({
   target: {
     gap: theme.spacing(1),
   },
-  mode: (isActive: boolean) => ({
+  // Три кнопки равной ширины в один ряд. По содержимому Android мерил текст
+  // этим шрифтом уже, чем рисовал, и «Указать остаток» обрезался до «Указать».
+  modes: {
     flexDirection: "row",
-    alignItems: "center",
-    gap: theme.spacing(3),
-    padding: theme.spacing(3),
+    gap: theme.spacing(2),
+  },
+  mode: (isActive: boolean) => ({
+    flex: 1,
+    justifyContent: "center",
+    minHeight: theme.spacing(12),
+    paddingVertical: theme.spacing(2),
+    paddingHorizontal: theme.spacing(2),
     borderRadius: theme.radius.base,
     borderWidth: 1,
     borderColor: isActive ? theme.colors.blueMain : theme.colors.stroke,
     backgroundColor: isActive ? theme.colors.blue1 : theme.colors.white,
   }),
-  modeText: {
-    flex: 1,
-    gap: theme.spacing(0.5),
-  },
 }));
