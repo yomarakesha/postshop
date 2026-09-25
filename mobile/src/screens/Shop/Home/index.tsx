@@ -16,15 +16,20 @@ const HomeScreen = () => {
   const shop = useShopStore((s) => s.shop);
   const user = useUserStore((s) => s.user);
   const { t } = useTranslation();
-  const weeklyRevenueQuery = orderApi.useGetWeeklyRevenue(shop?.id!, {
-    enabled: !!shop?.id,
+  // Статистика — по номеру магазина (shop_base_id), а не по номеру записи с
+  // его настройками (shop.id). Их путали: сервер получал номер чужого
+  // магазина и отвечал 403 — на экране это выглядело как «нет интернета»,
+  // а при совпадении номеров показалась бы статистика другого магазина.
+  const shopBaseId = shop?.shop_base_id;
+  const weeklyRevenueQuery = orderApi.useGetWeeklyRevenue(shopBaseId!, {
+    enabled: !!shopBaseId,
   });
   const topProductsQuery = orderApi.useGetTopProducts(
     {
       limit: 5,
     },
-    shop?.id!,
-    { enabled: !!shop?.id },
+    shopBaseId!,
+    { enabled: !!shopBaseId },
   );
 
   const handlePressProfile = () => {
