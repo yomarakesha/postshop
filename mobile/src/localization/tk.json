@@ -606,6 +606,34 @@
         "approved": "Gaýtarmak tassyklandy",
         "rejected": "Gaýtarmak kabul edilmedi"
       }
+    },
+    "receipts": {
+      "title": "Ammara kabul ediş",
+      "subtitle": "Harydy Postshop ammaryna ibermek. Kabul edilişi platforma tassyklaýar — şondan soň haryt galynda görkeziler.",
+      "create": "Täze resminama",
+      "created": "Resminama döredildi",
+      "empty": "Kabul ediş resminamalary ýok",
+      "number": "Resminama №{{id}}",
+      "status": {
+        "draft": "Taslama",
+        "confirmed": "Kabul edildi",
+        "cancelled": "Ýatyryldy"
+      },
+      "addItem": "Haryt goşmak",
+      "itemAdded": "Haryt goşuldy",
+      "selectWarehouse": "Ammary saýlaň",
+      "selectProduct": "Haryt saýlaň",
+      "productRequired": "Haryt saýlaň",
+      "addItemsFirst": "Haryt goşuň — boş resminamany platforma kabul etmez",
+      "awaitingConfirmation": "Platformanyň tassyklamasyna garaşýar",
+      "cancel": "Ýatyrmak",
+      "cancelled": "Resminama ýatyryldy",
+      "cancelTitle": "Resminama ýatyrylsynmy?",
+      "cancelText": "Resminama işden çykar. Ondaky harytlar ammara gelmez.",
+      "remove": "Aýyrmak",
+      "quantityPlaceholder": "Mukdary",
+      "quantityRequired": "Nolýdan uly mukdar giriziň",
+      "save": "Ýazmak"
     }
   },
   "serverSetup": {

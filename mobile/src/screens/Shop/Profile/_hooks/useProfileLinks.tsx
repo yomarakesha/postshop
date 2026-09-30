@@ -16,6 +16,7 @@ import DoorOpenIcon from "@assets/icons/door-open.svg";
 import StoreFrontIcon from "@assets/icons/store-front.svg";
 import PackageCheckIcon from "@assets/icons/package-check.svg";
 import { shopBaseApi } from "@/api/shopBaseApi";
+import useFeatures from "@/hooks/useFeatures";
 import ErrorAlert from "@/utils/errorAlert";
 import Toast from "react-native-toast-message";
 
@@ -42,6 +43,11 @@ const useProfileLinks = (t: TFunction, language: AppLang) => {
   });
   const setOpen = shopBaseApi.useSetOpen(shopBaseId!);
   const isClosed = shopBaseQuery.data?.is_active === false;
+  const shop = useShopStore((s) => s.shop);
+  const { fboEnabled } = useFeatures();
+  // Приёмка — только у магазина на складе платформы: его товар хранит
+  // Postshop. Магазин со своим складом правит остаток в «Моих товарах».
+  const hasReceipts = fboEnabled && shop?.warehouse_type === "fbo";
 
   // Закрыть или снова открыть магазин — как на витрине (/my-store/…/close).
   // Закрытый магазин пропадает с витрины, но остаётся у владельца, и открыть
@@ -129,6 +135,15 @@ const useProfileLinks = (t: TFunction, language: AppLang) => {
       {
         title: t("profile.sections.others"),
         data: [
+          ...(hasReceipts
+            ? [
+                {
+                  title: t("store.receipts.title"),
+                  icon: PackageCheckIcon,
+                  onPress: () => router.push("/(shop-tabs)/(profile)/receipts"),
+                },
+              ]
+            : []),
           {
             title: t("store.returns.title"),
             icon: PackageCheckIcon,
@@ -156,7 +171,7 @@ const useProfileLinks = (t: TFunction, language: AppLang) => {
         isVisible: true,
       },
     ],
-    [language, isClosed],
+    [language, isClosed, hasReceipts],
   );
 
   return { links, langSheetRef };

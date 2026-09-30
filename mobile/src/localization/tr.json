@@ -606,6 +606,34 @@
         "approved": "İade onaylandı",
         "rejected": "İade reddedildi"
       }
+    },
+    "receipts": {
+      "title": "Depo kabulü",
+      "subtitle": "Ürünün Postshop deposuna gönderilmesi. Kabulü platform onaylar — ardından ürün stoka girer.",
+      "create": "Yeni belge",
+      "created": "Belge oluşturuldu",
+      "empty": "Henüz kabul belgesi yok",
+      "number": "Belge №{{id}}",
+      "status": {
+        "draft": "Taslak",
+        "confirmed": "Kabul edildi",
+        "cancelled": "İptal edildi"
+      },
+      "addItem": "Ürün ekle",
+      "itemAdded": "Ürün eklendi",
+      "selectWarehouse": "Depo seçin",
+      "selectProduct": "Ürün seçin",
+      "productRequired": "Ürün seçin",
+      "addItemsFirst": "Ürün ekleyin — platform boş belgeyi kabul etmez",
+      "awaitingConfirmation": "Platform onayı bekleniyor",
+      "cancel": "İptal et",
+      "cancelled": "Belge iptal edildi",
+      "cancelTitle": "Belge iptal edilsin mi?",
+      "cancelText": "Belge iş akışından çıkar. İçindeki ürünler depoya gelmez.",
+      "remove": "Kaldır",
+      "quantityPlaceholder": "Miktar",
+      "quantityRequired": "Sıfırdan büyük bir miktar girin",
+      "save": "Kaydet"
     }
   },
   "serverSetup": {
