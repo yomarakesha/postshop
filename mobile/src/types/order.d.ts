@@ -91,20 +91,6 @@ declare namespace Order {
 
     type GetMyResponse = Order.Item[];
 
-    /** Доход магазина за неделю; `by_day` — все семь дней, для графика. */
-    type GetWeeklyRevenueResponse = {
-      shop_id: number;
-      period_start: Date;
-      period_end: Date;
-      orders_count: number;
-      total_revenue: string;
-      by_day: Array<{
-        date: string;
-        orders_count: number;
-        total_revenue: string;
-      }>;
-    };
-
     type GetTopProductsQuery = {
       limit: number;
     };
@@ -114,6 +100,44 @@ declare namespace Order {
       total_quantity: number;
       total_revenue: string;
     }[];
+
+    type SummaryPeriod = "week" | "month" | "quarter";
+    type SummaryTotals = {
+      orders_count: number;
+      total_revenue: string;
+      average_check: string;
+      rejected_count: number;
+      rejected_share: string;
+    };
+    type GetSummaryResponse = {
+      shop_id: number;
+      period: SummaryPeriod;
+      period_start: string;
+      period_end: string;
+      current: SummaryTotals;
+      previous: SummaryTotals;
+      points: { date: string; orders_count: number; total_revenue: string }[];
+    };
+    type GetInsightsResponse = {
+      shop_id: number;
+      period_start: string;
+      period_end: string;
+      rating_avg: string | null;
+      rating_count?: number;
+      new_reviews?: number;
+      unsold?: {
+        product_id: number;
+        translations: Product.Translation[];
+        price: string;
+        views_count: number;
+      }[];
+      returned?: {
+        product_id: number;
+        translations: Product.Translation[];
+        returns_count: number;
+        quantity: string;
+      }[];
+    };
 
     type GetShopOrdersResponse = Order.Item[];
     type GetShopOrdersQuery = {

@@ -461,12 +461,36 @@
       "headerTitle": "Baş sahypa",
       "bestSelling": "Iň köp satylýan",
       "incomeReport": {
-        "title": "Girdejiler barada hasabat",
-        "subtitle": "Hepdelik girdeji syn",
-        "ordersCount": "Sargytlar: {{value}}",
-        "empty": "Bu hepde entek sargyt ýok"
+        "title": "Girdejiler barada hasabat"
       },
-      "bestSellingEmpty": "Entek satuw ýok"
+      "bestSellingEmpty": "Entek satuw ýok",
+      "summary": {
+        "subtitle": "Döwür boýunça jemler we öňkä görä üýtgeýşi.",
+        "noBase": "deňeşdirer ýaly zat ýok",
+        "revenue": "Girdeji",
+        "orders": "Sargytlar",
+        "averageCheck": "Ortaça sargyt",
+        "rejected": "Ret edilen",
+        "empty": "Bu döwürde entek sargyt ýok",
+        "period": {
+          "week": "Hepde",
+          "month": "Aý",
+          "quarter": "3 aý"
+        }
+      },
+      "insights": {
+        "title": "Düzetmäge degýän zatlar",
+        "subtitle": "Şu wagt edip boljak işleriň sanawy.",
+        "noRating": "Baha ýok",
+        "ratingCount": "Bahalar: {{count}}",
+        "newReviews": "Aýda täze syn: {{count}}",
+        "unsold": "Aýyň dowamynda satylmady",
+        "unsoldHint": "Ýokarda köp görülip, satylmaýanlar: köplenç bahasy ýa suraty sebäp.",
+        "returned": "Yzyna gaýtarylan",
+        "returnedHint": "Bir gaýtarma tötänlik, bir haryda üç sanysy — tapgyry barlamaga sebäp.",
+        "returnsCount": "Gaýtarma: {{count}}",
+        "views": "Görlen: {{count}}"
+      }
     },
     "orders": {
       "headerTitle": "Sargytlar",

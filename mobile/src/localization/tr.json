@@ -462,12 +462,36 @@
       "headerTitle": "Ana sayfa",
       "bestSelling": "Çok satanlar",
       "incomeReport": {
-        "title": "Gelir raporu",
-        "subtitle": "Haftalık gelir özeti",
-        "ordersCount": "Sipariş: {{value}}",
-        "empty": "Bu hafta henüz sipariş yok"
+        "title": "Gelir raporu"
       },
-      "bestSellingEmpty": "Henüz satış yok"
+      "bestSellingEmpty": "Henüz satış yok",
+      "summary": {
+        "subtitle": "Dönem toplamları ve bir öncekine göre değişim.",
+        "noBase": "karşılaştıracak veri yok",
+        "revenue": "Ciro",
+        "orders": "Sipariş",
+        "averageCheck": "Ortalama sepet",
+        "rejected": "Reddedilen",
+        "empty": "Bu dönemde henüz sipariş yok",
+        "period": {
+          "week": "Hafta",
+          "month": "Ay",
+          "quarter": "3 ay"
+        }
+      },
+      "insights": {
+        "title": "Düzeltmeye değer",
+        "subtitle": "Şimdi harekete geçebileceğiniz listeler.",
+        "noRating": "Henüz puan yok",
+        "ratingCount": "Puan: {{count}}",
+        "newReviews": "Bu ay yeni yorum: {{count}}",
+        "unsold": "Bu ay satılmadı",
+        "unsoldHint": "En çok görüntülenenler önce: bakıp almıyorlarsa genelde fiyat ya da fotoğraf.",
+        "returned": "İade edildi",
+        "returnedHint": "Bir iade tesadüf, tek üründe üç iade partiyi kontrol etme sebebi.",
+        "returnsCount": "İade: {{count}}",
+        "views": "Görüntülenme: {{count}}"
+      }
     },
     "orders": {
       "headerTitle": "Siparişler",

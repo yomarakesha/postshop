@@ -56,34 +56,6 @@ const useGet = (orderId: number) => {
   return query;
 };
 
-type GetWeeklyRevenueOptions = Omit<
-  UseQueryOptions<
-    Order.API.GetWeeklyRevenueResponse,
-    AxiosError<ApiErrorResponse>
-  >,
-  "queryKey" | "queryFn"
->;
-const useGetWeeklyRevenue = (
-  shopId: number,
-  options: GetWeeklyRevenueOptions,
-) => {
-  const query = useQuery<
-    Order.API.GetWeeklyRevenueResponse,
-    AxiosError<ApiErrorResponse>
-  >({
-    queryKey: ["get-weekly-revenue", shopId],
-    queryFn: async () => {
-      const query = await api.req({
-        method: "GET",
-        url: `/orders/shop/${shopId}/weekly-revenue`,
-      });
-      return query.data;
-    },
-    ...options,
-  });
-  return query;
-};
-
 type GetTopProductsOptions = Omit<
   UseQueryOptions<
     Order.API.GetTopProductsResponse,
@@ -114,6 +86,39 @@ const useGetTopProducts = (
   });
   return query;
 };
+
+/** Сводка за период и такая же за предыдущий — для сравнения. */
+const useGetSummary = (
+  shopId: number,
+  period: Order.API.SummaryPeriod,
+  enabled: boolean = true,
+) =>
+  useQuery<Order.API.GetSummaryResponse, AxiosError<ApiErrorResponse>>({
+    queryKey: ["get-shop-summary", shopId, period],
+    queryFn: async () => {
+      const response = await api.req({
+        method: "GET",
+        url: `/orders/shop/${shopId}/summary`,
+        params: { period },
+      });
+      return response.data;
+    },
+    enabled,
+  });
+
+/** Рейтинг, непроданные и возвращаемые товары за месяц. */
+const useGetInsights = (shopId: number, enabled: boolean = true) =>
+  useQuery<Order.API.GetInsightsResponse, AxiosError<ApiErrorResponse>>({
+    queryKey: ["get-shop-insights", shopId],
+    queryFn: async () => {
+      const response = await api.req({
+        method: "GET",
+        url: `/orders/shop/${shopId}/insights`,
+      });
+      return response.data;
+    },
+    enabled,
+  });
 
 const useGetShopOrders = (
   shopId: number,
@@ -194,8 +199,9 @@ export const orderApi = {
   useCreate,
   useGetAllMy,
   useGet,
-  useGetWeeklyRevenue,
   useGetTopProducts,
+  useGetSummary,
+  useGetInsights,
   useGetShopOrders,
   useUpdateShopStatus,
   useUpdateStatus,

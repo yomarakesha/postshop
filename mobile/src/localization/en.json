@@ -462,12 +462,36 @@
       "headerTitle": "Home",
       "bestSelling": "Best selling",
       "incomeReport": {
-        "title": "Income report",
-        "subtitle": "Weekly income overview",
-        "ordersCount": "Orders: {{value}}",
-        "empty": "No orders this week yet"
+        "title": "Income report"
       },
-      "bestSellingEmpty": "No sales yet"
+      "bestSellingEmpty": "No sales yet",
+      "summary": {
+        "subtitle": "Totals for the period and the change from the previous one.",
+        "noBase": "nothing to compare with",
+        "revenue": "Revenue",
+        "orders": "Orders",
+        "averageCheck": "Average order",
+        "rejected": "Rejected",
+        "empty": "No orders in this period yet",
+        "period": {
+          "week": "Week",
+          "month": "Month",
+          "quarter": "3 months"
+        }
+      },
+      "insights": {
+        "title": "Worth fixing",
+        "subtitle": "Lists you can act on right now.",
+        "noRating": "No ratings yet",
+        "ratingCount": "Ratings: {{count}}",
+        "newReviews": "New reviews this month: {{count}}",
+        "unsold": "No sales this month",
+        "unsoldHint": "Most-viewed first: when people look and do not buy, it is usually the price or the photo.",
+        "returned": "Returned",
+        "returnedHint": "One return is chance, three on one product is a reason to check the batch.",
+        "returnsCount": "Returns: {{count}}",
+        "views": "Views: {{count}}"
+      }
     },
     "orders": {
       "headerTitle": "Orders",

@@ -2,13 +2,15 @@ import React, { useMemo } from "react";
 import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import Header from "@/components/Header";
-import RevenueWidget from "./_components/RevenueWidget";
+import SummaryWidget from "./_components/SummaryWidget";
+import InsightsWidget from "./_components/InsightsWidget";
 import BestSellingWidget from "./_components/BestSellingWidget";
 import useShopStore from "@/store/useShopStore";
 import useAppStore from "@/store/useAppStore";
 import { useUserStore } from "@/store/useUserStore";
 import HeaderRight from "./_components/HeaderRight";
 import { useTranslation } from "react-i18next";
+import { useQueryClient } from "@tanstack/react-query";
 import { orderApi } from "@/api/orderApi";
 import { shopBaseApi } from "@/api/shopBaseApi";
 import Button from "@/ui/Button";
@@ -21,6 +23,8 @@ const HomeScreen = () => {
   const shop = useShopStore((s) => s.shop);
   const user = useUserStore((s) => s.user);
   const { t } = useTranslation();
+  const lang = useAppStore((s) => s.lang);
+  const queryClient = useQueryClient();
   // Статистика — по номеру магазина (shop_base_id), а не по номеру записи с
   // его настройками (shop.id). Их путали: сервер получал номер чужого
   // магазина и отвечал 403 — на экране это выглядело как «нет интернета»,
@@ -38,9 +42,6 @@ const HomeScreen = () => {
         Toast.show({ type: "success", text1: t("store.close.reopened") }),
       onError: (error) => ErrorAlert(t, error),
     });
-  const weeklyRevenueQuery = orderApi.useGetWeeklyRevenue(shopBaseId!, {
-    enabled: !!shopBaseId,
-  });
   const topProductsQuery = orderApi.useGetTopProducts(
     {
       limit: 5,
@@ -60,8 +61,10 @@ const HomeScreen = () => {
     return topProductsQuery.data ?? [];
   }, [topProductsQuery.data]);
 
+  // Потянуть вниз — обновить всё на экране, включая сводку за любой период.
   const handleRefresh = () => {
-    weeklyRevenueQuery.refetch();
+    queryClient.invalidateQueries({ queryKey: ["get-shop-summary"] });
+    queryClient.invalidateQueries({ queryKey: ["get-shop-insights"] });
     topProductsQuery.refetch();
   };
 
@@ -82,9 +85,7 @@ const HomeScreen = () => {
         contentContainerStyle={styles.container}
         refreshControl={
           <RefreshControl
-            refreshing={
-              weeklyRevenueQuery.isFetching || topProductsQuery.isFetching
-            }
+            refreshing={topProductsQuery.isRefetching}
             onRefresh={handleRefresh}
           />
         }
@@ -102,17 +103,13 @@ const HomeScreen = () => {
             />
           </View>
         )}
-        <RevenueWidget
-          amount={weeklyRevenueQuery.data?.total_revenue}
-          ordersCount={weeklyRevenueQuery.data?.orders_count}
-          isLoading={weeklyRevenueQuery.isLoading}
-          t={t}
-        />
+        <SummaryWidget shopBaseId={shopBaseId} t={t} language={lang} />
         <BestSellingWidget
           data={topProducts}
           isLoading={topProductsQuery.isLoading}
           t={t}
         />
+        <InsightsWidget shopBaseId={shopBaseId} t={t} language={lang} />
       </ScrollView>
     </>
   );
