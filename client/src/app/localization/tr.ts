@@ -217,9 +217,30 @@ export const tr = {
     setSaved: 'Stok güncellendi',
     amountPlaceholder: 'Şu anda kaç adet var',
     amountRequired: 'Bir sayı girin: sıfır veya daha fazla',
+    edit: 'Değiştir',
+    fbsOnly:
+      'Bu bölüm FBS mağazaları içindir: ürünlerini kendileri saklar. FBO mağazasının stoku «Depo» bölümündedir.',
+  },
+  intake: {
+    title: 'Ürün kabulü',
+    subtitle:
+      'Ürün geldi — ne kadar geldiğini girin. Stok bu miktar kadar artar ve ürün hemen satın alınabilir.',
+    fbsOnly:
+      'Bu bölüm FBS mağazaları içindir: ürünü kendileri kabul eder. FBO mağazası ürünü Postshop deposuna gönderir — «Depo» bölümünde.',
+    accept: 'Kabul et',
+    modalTitle: 'Ürün kabulü',
+    saved: 'Ürün kabul edildi',
+  },
+  warehouse: {
+    title: 'Depo',
+    subtitle: 'Postshop deposundaki ürünleriniz: orada ne kadar var ve depoya gönderim belgeleri.',
+    fboOnly:
+      'Bu bölüm FBO mağazaları içindir: ürünleri Postshop deposunda saklanır. FBS mağazası kaydını kendisi tutar — «Stok» ve «Ürün kabulü» bölümlerinde.',
+    tabStock: 'Depodaki stok',
+    tabShipments: 'Depoya gönderim',
   },
   receipts: {
-    title: 'Depo kabulü',
+    title: 'Depoya gönderim',
     subtitle:
       'Ürünün Postshop deposuna gönderilmesi. Kabulü platform onaylar — ardından ürün stoka girer.',
     notTracked:

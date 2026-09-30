@@ -37,13 +37,16 @@ import { Route as BaseLayoutStoresIndexRouteImport } from './routes/_base-layout
 import { Route as BaseLayoutSearchIndexRouteImport } from './routes/_base-layout/search/index'
 import { Route as BaseLayoutBrandsIndexRouteImport } from './routes/_base-layout/brands/index'
 import { Route as BaseLayoutProductIdIndexRouteImport } from './routes/_base-layout/$productId/index'
+import { Route as MyStoreStoreIdWarehouseRouteImport } from './routes/my-store/$storeId/warehouse'
 import { Route as MyStoreStoreIdTermsOfUseRouteImport } from './routes/my-store/$storeId/terms-of-use'
 import { Route as MyStoreStoreIdStoreInformationRouteImport } from './routes/my-store/$storeId/store-information'
+import { Route as MyStoreStoreIdStockRouteImport } from './routes/my-store/$storeId/stock'
 import { Route as MyStoreStoreIdReturnsRouteImport } from './routes/my-store/$storeId/returns'
 import { Route as MyStoreStoreIdReceiptsRouteImport } from './routes/my-store/$storeId/receipts'
 import { Route as MyStoreStoreIdProductsRouteImport } from './routes/my-store/$storeId/products'
 import { Route as MyStoreStoreIdPrivacyPolicyRouteImport } from './routes/my-store/$storeId/privacy-policy'
 import { Route as MyStoreStoreIdOrdersRouteImport } from './routes/my-store/$storeId/orders'
+import { Route as MyStoreStoreIdIntakeRouteImport } from './routes/my-store/$storeId/intake'
 import { Route as MyStoreStoreIdCloseRouteImport } from './routes/my-store/$storeId/close'
 import { Route as MyStoreStoreIdProductsIndexRouteImport } from './routes/my-store/$storeId/products.index'
 import { Route as BaseLayoutStoresStoreIdIndexRouteImport } from './routes/_base-layout/stores/$storeId/index'
@@ -196,6 +199,11 @@ const BaseLayoutProductIdIndexRoute =
     path: '/$productId/',
     getParentRoute: () => BaseLayoutRouteRoute,
   } as any)
+const MyStoreStoreIdWarehouseRoute = MyStoreStoreIdWarehouseRouteImport.update({
+  id: '/warehouse',
+  path: '/warehouse',
+  getParentRoute: () => MyStoreStoreIdRouteRoute,
+} as any)
 const MyStoreStoreIdTermsOfUseRoute =
   MyStoreStoreIdTermsOfUseRouteImport.update({
     id: '/terms-of-use',
@@ -208,6 +216,11 @@ const MyStoreStoreIdStoreInformationRoute =
     path: '/store-information',
     getParentRoute: () => MyStoreStoreIdRouteRoute,
   } as any)
+const MyStoreStoreIdStockRoute = MyStoreStoreIdStockRouteImport.update({
+  id: '/stock',
+  path: '/stock',
+  getParentRoute: () => MyStoreStoreIdRouteRoute,
+} as any)
 const MyStoreStoreIdReturnsRoute = MyStoreStoreIdReturnsRouteImport.update({
   id: '/returns',
   path: '/returns',
@@ -232,6 +245,11 @@ const MyStoreStoreIdPrivacyPolicyRoute =
 const MyStoreStoreIdOrdersRoute = MyStoreStoreIdOrdersRouteImport.update({
   id: '/orders',
   path: '/orders',
+  getParentRoute: () => MyStoreStoreIdRouteRoute,
+} as any)
+const MyStoreStoreIdIntakeRoute = MyStoreStoreIdIntakeRouteImport.update({
+  id: '/intake',
+  path: '/intake',
   getParentRoute: () => MyStoreStoreIdRouteRoute,
 } as any)
 const MyStoreStoreIdCloseRoute = MyStoreStoreIdCloseRouteImport.update({
@@ -324,13 +342,16 @@ export interface FileRoutesByFullPath {
   '/profile/': typeof ProfileIndexRoute
   '/terms-of-use/': typeof TermsOfUseIndexRoute
   '/my-store/$storeId/close': typeof MyStoreStoreIdCloseRoute
+  '/my-store/$storeId/intake': typeof MyStoreStoreIdIntakeRoute
   '/my-store/$storeId/orders': typeof MyStoreStoreIdOrdersRoute
   '/my-store/$storeId/privacy-policy': typeof MyStoreStoreIdPrivacyPolicyRoute
   '/my-store/$storeId/products': typeof MyStoreStoreIdProductsRouteWithChildren
   '/my-store/$storeId/receipts': typeof MyStoreStoreIdReceiptsRoute
   '/my-store/$storeId/returns': typeof MyStoreStoreIdReturnsRoute
+  '/my-store/$storeId/stock': typeof MyStoreStoreIdStockRoute
   '/my-store/$storeId/store-information': typeof MyStoreStoreIdStoreInformationRoute
   '/my-store/$storeId/terms-of-use': typeof MyStoreStoreIdTermsOfUseRoute
+  '/my-store/$storeId/warehouse': typeof MyStoreStoreIdWarehouseRoute
   '/$productId/': typeof BaseLayoutProductIdIndexRoute
   '/brands/': typeof BaseLayoutBrandsIndexRoute
   '/search/': typeof BaseLayoutSearchIndexRoute
@@ -368,12 +389,15 @@ export interface FileRoutesByTo {
   '/profile': typeof ProfileIndexRoute
   '/terms-of-use': typeof TermsOfUseIndexRoute
   '/my-store/$storeId/close': typeof MyStoreStoreIdCloseRoute
+  '/my-store/$storeId/intake': typeof MyStoreStoreIdIntakeRoute
   '/my-store/$storeId/orders': typeof MyStoreStoreIdOrdersRoute
   '/my-store/$storeId/privacy-policy': typeof MyStoreStoreIdPrivacyPolicyRoute
   '/my-store/$storeId/receipts': typeof MyStoreStoreIdReceiptsRoute
   '/my-store/$storeId/returns': typeof MyStoreStoreIdReturnsRoute
+  '/my-store/$storeId/stock': typeof MyStoreStoreIdStockRoute
   '/my-store/$storeId/store-information': typeof MyStoreStoreIdStoreInformationRoute
   '/my-store/$storeId/terms-of-use': typeof MyStoreStoreIdTermsOfUseRoute
+  '/my-store/$storeId/warehouse': typeof MyStoreStoreIdWarehouseRoute
   '/$productId': typeof BaseLayoutProductIdIndexRoute
   '/brands': typeof BaseLayoutBrandsIndexRoute
   '/search': typeof BaseLayoutSearchIndexRoute
@@ -416,13 +440,16 @@ export interface FileRoutesById {
   '/profile/': typeof ProfileIndexRoute
   '/terms-of-use/': typeof TermsOfUseIndexRoute
   '/my-store/$storeId/close': typeof MyStoreStoreIdCloseRoute
+  '/my-store/$storeId/intake': typeof MyStoreStoreIdIntakeRoute
   '/my-store/$storeId/orders': typeof MyStoreStoreIdOrdersRoute
   '/my-store/$storeId/privacy-policy': typeof MyStoreStoreIdPrivacyPolicyRoute
   '/my-store/$storeId/products': typeof MyStoreStoreIdProductsRouteWithChildren
   '/my-store/$storeId/receipts': typeof MyStoreStoreIdReceiptsRoute
   '/my-store/$storeId/returns': typeof MyStoreStoreIdReturnsRoute
+  '/my-store/$storeId/stock': typeof MyStoreStoreIdStockRoute
   '/my-store/$storeId/store-information': typeof MyStoreStoreIdStoreInformationRoute
   '/my-store/$storeId/terms-of-use': typeof MyStoreStoreIdTermsOfUseRoute
+  '/my-store/$storeId/warehouse': typeof MyStoreStoreIdWarehouseRoute
   '/_base-layout/$productId/': typeof BaseLayoutProductIdIndexRoute
   '/_base-layout/brands/': typeof BaseLayoutBrandsIndexRoute
   '/_base-layout/search/': typeof BaseLayoutSearchIndexRoute
@@ -465,13 +492,16 @@ export interface FileRouteTypes {
     | '/profile/'
     | '/terms-of-use/'
     | '/my-store/$storeId/close'
+    | '/my-store/$storeId/intake'
     | '/my-store/$storeId/orders'
     | '/my-store/$storeId/privacy-policy'
     | '/my-store/$storeId/products'
     | '/my-store/$storeId/receipts'
     | '/my-store/$storeId/returns'
+    | '/my-store/$storeId/stock'
     | '/my-store/$storeId/store-information'
     | '/my-store/$storeId/terms-of-use'
+    | '/my-store/$storeId/warehouse'
     | '/$productId/'
     | '/brands/'
     | '/search/'
@@ -509,12 +539,15 @@ export interface FileRouteTypes {
     | '/profile'
     | '/terms-of-use'
     | '/my-store/$storeId/close'
+    | '/my-store/$storeId/intake'
     | '/my-store/$storeId/orders'
     | '/my-store/$storeId/privacy-policy'
     | '/my-store/$storeId/receipts'
     | '/my-store/$storeId/returns'
+    | '/my-store/$storeId/stock'
     | '/my-store/$storeId/store-information'
     | '/my-store/$storeId/terms-of-use'
+    | '/my-store/$storeId/warehouse'
     | '/$productId'
     | '/brands'
     | '/search'
@@ -556,13 +589,16 @@ export interface FileRouteTypes {
     | '/profile/'
     | '/terms-of-use/'
     | '/my-store/$storeId/close'
+    | '/my-store/$storeId/intake'
     | '/my-store/$storeId/orders'
     | '/my-store/$storeId/privacy-policy'
     | '/my-store/$storeId/products'
     | '/my-store/$storeId/receipts'
     | '/my-store/$storeId/returns'
+    | '/my-store/$storeId/stock'
     | '/my-store/$storeId/store-information'
     | '/my-store/$storeId/terms-of-use'
+    | '/my-store/$storeId/warehouse'
     | '/_base-layout/$productId/'
     | '/_base-layout/brands/'
     | '/_base-layout/search/'
@@ -790,6 +826,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BaseLayoutProductIdIndexRouteImport
       parentRoute: typeof BaseLayoutRouteRoute
     }
+    '/my-store/$storeId/warehouse': {
+      id: '/my-store/$storeId/warehouse'
+      path: '/warehouse'
+      fullPath: '/my-store/$storeId/warehouse'
+      preLoaderRoute: typeof MyStoreStoreIdWarehouseRouteImport
+      parentRoute: typeof MyStoreStoreIdRouteRoute
+    }
     '/my-store/$storeId/terms-of-use': {
       id: '/my-store/$storeId/terms-of-use'
       path: '/terms-of-use'
@@ -802,6 +845,13 @@ declare module '@tanstack/react-router' {
       path: '/store-information'
       fullPath: '/my-store/$storeId/store-information'
       preLoaderRoute: typeof MyStoreStoreIdStoreInformationRouteImport
+      parentRoute: typeof MyStoreStoreIdRouteRoute
+    }
+    '/my-store/$storeId/stock': {
+      id: '/my-store/$storeId/stock'
+      path: '/stock'
+      fullPath: '/my-store/$storeId/stock'
+      preLoaderRoute: typeof MyStoreStoreIdStockRouteImport
       parentRoute: typeof MyStoreStoreIdRouteRoute
     }
     '/my-store/$storeId/returns': {
@@ -837,6 +887,13 @@ declare module '@tanstack/react-router' {
       path: '/orders'
       fullPath: '/my-store/$storeId/orders'
       preLoaderRoute: typeof MyStoreStoreIdOrdersRouteImport
+      parentRoute: typeof MyStoreStoreIdRouteRoute
+    }
+    '/my-store/$storeId/intake': {
+      id: '/my-store/$storeId/intake'
+      path: '/intake'
+      fullPath: '/my-store/$storeId/intake'
+      preLoaderRoute: typeof MyStoreStoreIdIntakeRouteImport
       parentRoute: typeof MyStoreStoreIdRouteRoute
     }
     '/my-store/$storeId/close': {
@@ -979,25 +1036,31 @@ const MyStoreStoreIdProductsRouteWithChildren =
 
 interface MyStoreStoreIdRouteRouteChildren {
   MyStoreStoreIdCloseRoute: typeof MyStoreStoreIdCloseRoute
+  MyStoreStoreIdIntakeRoute: typeof MyStoreStoreIdIntakeRoute
   MyStoreStoreIdOrdersRoute: typeof MyStoreStoreIdOrdersRoute
   MyStoreStoreIdPrivacyPolicyRoute: typeof MyStoreStoreIdPrivacyPolicyRoute
   MyStoreStoreIdProductsRoute: typeof MyStoreStoreIdProductsRouteWithChildren
   MyStoreStoreIdReceiptsRoute: typeof MyStoreStoreIdReceiptsRoute
   MyStoreStoreIdReturnsRoute: typeof MyStoreStoreIdReturnsRoute
+  MyStoreStoreIdStockRoute: typeof MyStoreStoreIdStockRoute
   MyStoreStoreIdStoreInformationRoute: typeof MyStoreStoreIdStoreInformationRoute
   MyStoreStoreIdTermsOfUseRoute: typeof MyStoreStoreIdTermsOfUseRoute
+  MyStoreStoreIdWarehouseRoute: typeof MyStoreStoreIdWarehouseRoute
   MyStoreStoreIdIndexRoute: typeof MyStoreStoreIdIndexRoute
 }
 
 const MyStoreStoreIdRouteRouteChildren: MyStoreStoreIdRouteRouteChildren = {
   MyStoreStoreIdCloseRoute: MyStoreStoreIdCloseRoute,
+  MyStoreStoreIdIntakeRoute: MyStoreStoreIdIntakeRoute,
   MyStoreStoreIdOrdersRoute: MyStoreStoreIdOrdersRoute,
   MyStoreStoreIdPrivacyPolicyRoute: MyStoreStoreIdPrivacyPolicyRoute,
   MyStoreStoreIdProductsRoute: MyStoreStoreIdProductsRouteWithChildren,
   MyStoreStoreIdReceiptsRoute: MyStoreStoreIdReceiptsRoute,
   MyStoreStoreIdReturnsRoute: MyStoreStoreIdReturnsRoute,
+  MyStoreStoreIdStockRoute: MyStoreStoreIdStockRoute,
   MyStoreStoreIdStoreInformationRoute: MyStoreStoreIdStoreInformationRoute,
   MyStoreStoreIdTermsOfUseRoute: MyStoreStoreIdTermsOfUseRoute,
+  MyStoreStoreIdWarehouseRoute: MyStoreStoreIdWarehouseRoute,
   MyStoreStoreIdIndexRoute: MyStoreStoreIdIndexRoute,
 }
 

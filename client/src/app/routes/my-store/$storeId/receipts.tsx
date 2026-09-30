@@ -1,13 +1,13 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { RequireFbo } from '#/shared/lib/requireFbo'
-import { StoreReceiptsPage } from '#/pages/my-store-receipts'
+import { createFileRoute, redirect } from '@tanstack/react-router'
 
+// «Приёмка на склад» стала вкладкой раздела «Склад». Старый адрес остаётся
+// в закладках и прочитанных уведомлениях — ведём оттуда на новое место.
 export const Route = createFileRoute('/my-store/$storeId/receipts')({
-  // Страница доступна по прямой ссылке даже когда пункт скрыт из меню —
-  // поэтому проверка стоит и здесь.
-  component: () => (
-    <RequireFbo>
-      <StoreReceiptsPage />
-    </RequireFbo>
-  ),
+  beforeLoad: ({ params }) => {
+    throw redirect({
+      to: '/my-store/$storeId/warehouse',
+      params,
+      search: { tab: 'shipments' },
+    })
+  },
 })

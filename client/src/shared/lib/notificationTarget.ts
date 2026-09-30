@@ -50,7 +50,7 @@ export function notificationTarget(
     case NotificationKind.ORDER_CANCELLED:
       return store('/orders')
     case NotificationKind.RECEIPT_CONFIRMED:
-      return store('/receipts')
+      return store('/warehouse?tab=shipments')
     // Раньше вести было некуда — экрана возвратов у продавца не существовало.
     case NotificationKind.RETURN_RECEIVED:
       return store('/returns')

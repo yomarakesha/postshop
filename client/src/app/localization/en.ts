@@ -218,9 +218,30 @@ export const en = {
     setSaved: 'Stock updated',
     amountPlaceholder: 'How many are available now',
     amountRequired: 'Enter a number: zero or more',
+    edit: 'Change',
+    fbsOnly:
+      'This section is for FBS shops: they store goods themselves. FBO shop stock is under “Warehouse”.',
+  },
+  intake: {
+    title: 'Goods intake',
+    subtitle:
+      'Goods arrived — record how many. Stock grows by that amount and the product can be bought right away.',
+    fbsOnly:
+      'This section is for FBS shops: they receive goods themselves. An FBO shop ships goods to the Postshop warehouse — see “Warehouse”.',
+    accept: 'Receive',
+    modalTitle: 'Goods intake',
+    saved: 'Goods received',
+  },
+  warehouse: {
+    title: 'Warehouse',
+    subtitle: 'Your goods at the Postshop warehouse: how much is there and your shipments to it.',
+    fboOnly:
+      'This section is for FBO shops: their goods are stored at the Postshop warehouse. An FBS shop keeps its own records in “Stock” and “Goods intake”.',
+    tabStock: 'Stock at warehouse',
+    tabShipments: 'Shipments to warehouse',
   },
   receipts: {
-    title: 'Warehouse intake',
+    title: 'Shipments to warehouse',
     subtitle:
       'Sending goods to a Postshop warehouse. The platform confirms intake — after that the goods appear in stock.',
     notTracked:

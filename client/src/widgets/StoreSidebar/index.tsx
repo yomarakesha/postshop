@@ -1,12 +1,14 @@
 import { Link, useParams, useRouterState } from '@tanstack/react-router'
 import {
+  Boxes,
   ChartNoAxesCombined,
   Info,
-  PackageCheck,
+  PackagePlus,
   PackageX,
   Power,
   PowerOff,
   ShieldCheck,
+  Warehouse,
 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useFeatures } from '#/shared/hooks/useFeatures'
@@ -35,12 +37,12 @@ export const StoreSidebar = () => {
     state.profile?.shops?.find((x) => x.id === Number(storeId)),
   )
   const isApproved = shop?.registration_status === RegistrationStatus.APPROVED
-  // FBS и FBO — разные способы работы, и у каждого свои разделы. Остатки
-  // больше не отдельный пункт: они живут на карточке товара в «Моих товарах»,
-  // где товар и правят, — два списка одних и тех же товаров продавцу ни к
-  // чему. FBO отправляет товар на склад платформы через «Приёмку на склад».
+  // FBS и FBO — разные способы работы, и у каждого свои разделы. Магазин FBS
+  // хранит товар сам: ему «Остатки» и «Приём товара». Магазин FBO держит товар
+  // на складе Postshop: ему «Склад» — остатки там и отправка товара туда.
   const { fboEnabled } = useFeatures()
   const warehouseType = shopAdditional?.warehouse_type
+  const isFbs = warehouseType === WarehouseType.FBS
   const isFbo = warehouseType === WarehouseType.FBO
   // Страница за этим пунктом сама переключается между закрытием и открытием,
   // а пункт меню всегда говорил «Закрыть магазин» — у закрытого магазина это
@@ -82,13 +84,27 @@ export const StoreSidebar = () => {
       href: `/my-store/${storeId}/store-information`,
       icon: Info,
     },
-    // Приёмка — только FBO и только пока платформа принимает товар на хранение.
+    ...(isFbs
+      ? [
+          {
+            title: t('stock.title'),
+            href: `/my-store/${storeId}/stock`,
+            icon: Boxes,
+          },
+          {
+            title: t('intake.title'),
+            href: `/my-store/${storeId}/intake`,
+            icon: PackagePlus,
+          },
+        ]
+      : []),
+    // «Склад» — только FBO и только пока платформа принимает товар на хранение.
     ...(isFbo && fboEnabled
       ? [
           {
-            title: t('receipts.title'),
-            href: `/my-store/${storeId}/receipts`,
-            icon: PackageCheck,
+            title: t('warehouse.title'),
+            href: `/my-store/${storeId}/warehouse`,
+            icon: Warehouse,
           },
         ]
       : []),

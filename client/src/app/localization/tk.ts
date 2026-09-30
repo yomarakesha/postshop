@@ -218,9 +218,30 @@ export const tk = {
     setSaved: 'Galyndy täzelendi',
     amountPlaceholder: 'Häzir näçe elýeterli',
     amountRequired: 'San görkeziň: nol ýa-da köp',
+    edit: 'Üýtgetmek',
+    fbsOnly:
+      'Bu bölüm FBS dükanlary üçin: olar harydy özleri saklaýar. FBO dükanyň galyndylary «Ammar» bölüminde.',
+  },
+  intake: {
+    title: 'Haryt kabul etmek',
+    subtitle:
+      'Haryt geldi — näçe gelendigini belläň. Galyndy şonça artar we haryt derrew satyn alnyp bilner.',
+    fbsOnly:
+      'Bu bölüm FBS dükanlary üçin: olar harydy özleri kabul edýär. FBO dükany harydy Postshop ammaryna ugradýar — «Ammar» bölüminde.',
+    accept: 'Kabul etmek',
+    modalTitle: 'Haryt kabul etmek',
+    saved: 'Haryt kabul edildi',
+  },
+  warehouse: {
+    title: 'Ammar',
+    subtitle: 'Postshop ammaryndaky harydyňyz: onda näçe bar we ammara ugradyş resminamalary.',
+    fboOnly:
+      'Bu bölüm FBO dükanlary üçin: olaryň harydy Postshop ammarynda saklanýar. FBS dükany hasaby özi alyp barýar — «Galyndylar» we «Haryt kabul etmek» bölümlerinde.',
+    tabStock: 'Ammardaky galyndylar',
+    tabShipments: 'Ammara ugratmak',
   },
   receipts: {
-    title: 'Ammara kabul ediş',
+    title: 'Ammara ugratmak',
     subtitle:
       'Harydy Postshop ammaryna ibermek. Kabul edilişi platforma tassyklaýar — şondan soň haryt galynda görkeziler.',
     notTracked:
