@@ -8,7 +8,7 @@ import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { AxiosError } from "axios";
 import { TFunction } from "i18next";
 import React, { RefObject, useEffect, useState } from "react";
-import { Pressable, View } from "react-native";
+import { Keyboard, Pressable, View } from "react-native";
 import Toast from "react-native-toast-message";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -34,7 +34,8 @@ type Props = {
 
 /** Текст отказа сервера: у HTTPException detail — строка, у ошибок схемы — список. */
 const serverMessage = (error: unknown) => {
-  const detail = (error as AxiosError<{ detail?: unknown }>)?.response?.data?.detail;
+  const detail = (error as AxiosError<{ detail?: unknown }>)?.response?.data
+    ?.detail;
   if (typeof detail === "string") return detail;
   if (Array.isArray(detail) && detail[0]?.msg) return String(detail[0].msg);
   return undefined;
@@ -63,7 +64,12 @@ const StockSheet = ({ ref, shopId, target, t }: Props) => {
     setQuantity("");
   }, [target?.productId]);
 
-  const close = () => ref.current?.dismiss();
+  // Поле ввода остаётся в фокусе и после закрытия окна — тогда первое
+  // нажатие на экране уходило на снятие фокуса и терялось. Снимаем сами.
+  const close = () => {
+    Keyboard.dismiss();
+    ref.current?.dismiss();
+  };
 
   const submit = async () => {
     if (!target) return;
@@ -76,7 +82,11 @@ const StockSheet = ({ ref, shopId, target, t }: Props) => {
     if (!valid) {
       Toast.show({
         type: "error",
-        text1: t(mode === "set" ? "store.stock.amountRequired" : "store.stock.quantityRequired"),
+        text1: t(
+          mode === "set"
+            ? "store.stock.amountRequired"
+            : "store.stock.quantityRequired",
+        ),
       });
       return;
     }
@@ -98,7 +108,11 @@ const StockSheet = ({ ref, shopId, target, t }: Props) => {
     } catch (error) {
       // Причину отказа показываем как есть: «остаток не изменился», «нельзя
       // уйти в минус» — это осмысленные ответы, а не сбой.
-      Toast.show({ type: "error", text1: t("error"), text2: serverMessage(error) });
+      Toast.show({
+        type: "error",
+        text1: t("error"),
+        text2: serverMessage(error),
+      });
     }
   };
 
@@ -154,7 +168,9 @@ const StockSheet = ({ ref, shopId, target, t }: Props) => {
           returnKeyType="done"
           onSubmitEditing={() => void submit()}
           placeholder={t(
-            mode === "set" ? "store.stock.amountPlaceholder" : "store.stock.quantityPlaceholder",
+            mode === "set"
+              ? "store.stock.amountPlaceholder"
+              : "store.stock.quantityPlaceholder",
           )}
         />
 

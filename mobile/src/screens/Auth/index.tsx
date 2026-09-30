@@ -72,6 +72,10 @@ const AuthScreen = () => {
   return (
     <>
       <KeyboardAwareScrollView
+        // Нажатие на кнопку при открытой клавиатуре срабатывает сразу. По
+        // умолчанию («never») первое нажатие только закрывало клавиатуру, и
+        // «Далее» / «Подтвердить» приходилось нажимать дважды.
+        keyboardShouldPersistTaps="handled"
         contentContainerStyle={styles.container(insets.top)}
         bottomOffset={footerHeight}
       >
@@ -89,44 +93,44 @@ const AuthScreen = () => {
                 +993
               </Typography>
               <Controller
-                  name="phoneNumber"
-                  control={control}
-                  rules={{
-                    required: true,
-                    minLength: 8,
-                    maxLength: 8,
-                  }}
-                  render={({ field: { onChange, value } }) => (
-                    <MaskInput
-                      mask={[
-                        /\d/,
-                        /\d/,
-                        " ",
-                        /\d/,
-                        /\d/,
-                        " ",
-                        /\d/,
-                        /\d/,
-                        " ",
-                        /\d/,
-                        /\d/,
-                      ]}
-                      value={value}
-                      onChangeText={(_, unmasked) => {
-                        setTooManyRequestsError(false);
-                        onChange(unmasked);
-                      }}
-                      style={styles.input}
-                      keyboardType="number-pad"
-                      placeholder=""
-                      placeholderTextColor={theme.colors.passive1}
-                      // @ts-expect-error no-type
-                      includeFontPadding={false}
-                      autoFocus
-                      maxLength={11}
-                    />
-                  )}
-                />
+                name="phoneNumber"
+                control={control}
+                rules={{
+                  required: true,
+                  minLength: 8,
+                  maxLength: 8,
+                }}
+                render={({ field: { onChange, value } }) => (
+                  <MaskInput
+                    mask={[
+                      /\d/,
+                      /\d/,
+                      " ",
+                      /\d/,
+                      /\d/,
+                      " ",
+                      /\d/,
+                      /\d/,
+                      " ",
+                      /\d/,
+                      /\d/,
+                    ]}
+                    value={value}
+                    onChangeText={(_, unmasked) => {
+                      setTooManyRequestsError(false);
+                      onChange(unmasked);
+                    }}
+                    style={styles.input}
+                    keyboardType="number-pad"
+                    placeholder=""
+                    placeholderTextColor={theme.colors.passive1}
+                    // @ts-expect-error no-type
+                    includeFontPadding={false}
+                    autoFocus
+                    maxLength={11}
+                  />
+                )}
+              />
             </View>
             {tooManyRequestsError ? (
               <Typography variant="p3" color="error" weight="bold" isCentered>
@@ -157,7 +161,12 @@ const AuthScreen = () => {
                 ) : undefined}
               </Button>
             </View>
-            <Typography variant="t1" color="tertiary" weight="medium" isCentered>
+            <Typography
+              variant="t1"
+              color="tertiary"
+              weight="medium"
+              isCentered
+            >
               {t("common.authAgreement.prefix")}
               <Typography
                 variant="t1"

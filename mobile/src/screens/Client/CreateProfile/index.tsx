@@ -86,6 +86,10 @@ const CreateProfileScreen = () => {
         backgroundColor={theme.colors.white}
       />
       <KeyboardAwareScrollView
+        // Нажатие на кнопку при открытой клавиатуре срабатывает сразу. По
+        // умолчанию («never») первое нажатие только закрывало клавиатуру, и
+        // «Далее» / «Подтвердить» приходилось нажимать дважды.
+        keyboardShouldPersistTaps="handled"
         contentContainerStyle={styles.contentContainer}
         showsVerticalScrollIndicator={false}
         bottomOffset={footerHeight}
