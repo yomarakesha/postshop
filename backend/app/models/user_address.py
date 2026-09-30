@@ -1,8 +1,9 @@
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from app.database import Base
+from app.core.utc_datetime import UTCDateTime
 
 
 class UserAddress(Base):
@@ -29,7 +30,7 @@ class UserAddress(Base):
     # это поддерживается в роутере, а не ограничением базы: снять флаг у
     # прежнего и поставить новому нельзя одним выражением.
     is_default = Column(Boolean, nullable=False, default=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    created_at = Column(UTCDateTime(), server_default=func.now())
+    updated_at = Column(UTCDateTime(), onupdate=func.now())
 
     user = relationship("User")

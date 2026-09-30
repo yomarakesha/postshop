@@ -70,11 +70,19 @@ async def get_pickup_points(
     limit:   int           = limit_param(20),
     city_id: int | None = None,
     name: Optional[str] = Query(default=None, description="Фильтр по части названия"),
+    is_active: bool | None = Query(
+        default=None,
+        description="true — только работающие пункты (оформление заказа); без параметра — все (админка)",
+    ),
     db: AsyncSession = Depends(get_db),
 ):
     query = _pickup_point_query()
     if city_id is not None:
         query = query.where(PickupPoint.city_id == city_id)
+    # Оформление заказа предлагало и закрытые пункты: выбрать можно, а заказ
+    # потом падал с 400 «pickup point is not active».
+    if is_active is not None:
+        query = query.where(PickupPoint.is_active.is_(is_active))
     # Поля поиска в админке не было, потому что искать было нечем: параметра
     # у метода не существовало, и найти запись за пределами первой страницы
     # оказывалось невозможно.

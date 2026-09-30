@@ -1,9 +1,10 @@
-from sqlalchemy import Column, Integer, DateTime, ForeignKey, Enum, Text, UniqueConstraint
+from sqlalchemy import Column, Integer, ForeignKey, Enum, Text, UniqueConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
 from app.models.shop_additional import WarehouseType
 import enum
+from app.core.utc_datetime import UTCDateTime
 
 
 class LocalOrderStatusCode(str, enum.Enum):
@@ -40,8 +41,8 @@ class OrderShop(Base):
     # Для FBS не используется и остаётся NULL.
     warehouse_id   = Column(Integer, ForeignKey("warehouses.id", ondelete="SET NULL"), nullable=True)
 
-    created_at   = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at   = Column(DateTime(timezone=True), onupdate=func.now())
+    created_at   = Column(UTCDateTime(), server_default=func.now())
+    updated_at   = Column(UTCDateTime(), onupdate=func.now())
 
     order     = relationship("Order", back_populates="order_shops")
     shop_base = relationship("ShopBase")

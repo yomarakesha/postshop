@@ -3,8 +3,8 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Form, Query, Response
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
-from sqlalchemy.orm import selectinload
+from sqlalchemy import exists, select
+from sqlalchemy.orm import aliased, selectinload
 from app.core.images import remove_files, check_content_type, process_upload
 
 from app.database import get_db
@@ -15,7 +15,9 @@ from app.models.city import City
 from app.models.region import Region
 from app.models.country import Country
 from app.schemas.shop_additional import ShopAdditionalResponse, ShopAdditionalUpdate
-from app.core.dependencies import require_permissions
+from app.core.dependencies import get_optional_user, require_permissions
+from app.core.visibility import shop_public_conditions
+from app.services.stock import warehouse_type_change_blockers
 from app.config import settings
 from app.core.ownership import STAFF_SHOPS, ensure_can_manage_shop, is_staff
 from app.models.user import User
@@ -158,8 +160,20 @@ async def get_shop_additionals(
         default=None, description="Фильтр по статусу регистрации базового магазина"
     ),
     db: AsyncSession = Depends(get_db),
+    viewer: User | None = Depends(get_optional_user),
 ):
     query = _shop_additional_query()
+    # Покупателю — только магазины, которые можно показать (см. visibility).
+    if viewer is None or not is_staff(viewer, *STAFF_SHOPS):
+        base = aliased(ShopBase)
+        query = query.where(
+            exists(
+                select(base.id).where(
+                    base.id == ShopAdditional.shop_base_id,
+                    *shop_public_conditions(base),
+                )
+            )
+        )
     if name:
         query = query.where(ShopAdditional.name.ilike(f"%{name}%"))
     if registration_status is not None:
@@ -174,6 +188,7 @@ async def get_shop_additionals(
 async def get_shop_additional_by_shop_base(
     shop_base_id: int,
     db: AsyncSession = Depends(get_db),
+    viewer: User | None = Depends(get_optional_user),
 ):
     result = await db.execute(
         _shop_additional_query().where(ShopAdditional.shop_base_id == shop_base_id)
@@ -181,6 +196,18 @@ async def get_shop_additional_by_shop_base(
     shop_add = result.scalar_one_or_none()
     if not shop_add:
         raise HTTPException(status_code=404, detail="Shop additional not found for this shop base")
+
+    # Страница магазина открывалась у любого магазина — заблокированного, ещё
+    # не одобренного, не заполненного. Владелец и сотрудник видят его всегда:
+    # владелец заполняет его в кабинете как раз по этому методу.
+    shop = (await db.execute(select(ShopBase).where(ShopBase.id == shop_base_id))).scalar_one()
+    is_owner = viewer is not None and shop.owner_id == viewer.id
+    if not is_owner and (viewer is None or not is_staff(viewer, *STAFF_SHOPS)):
+        visible = (await db.execute(
+            select(ShopBase.id).where(ShopBase.id == shop_base_id, *shop_public_conditions())
+        )).first()
+        if not visible:
+            raise HTTPException(status_code=404, detail="Shop additional not found for this shop base")
     return shop_add
 
 
@@ -208,6 +235,13 @@ async def delete_shop_additional(
     """
     shop_add = await get_shop_additional_or_404(shop_additional_id, db)
     await ensure_can_manage_shop(shop_add.shop_base_id, current_user, db)
+    # Удалить профиль и создать заново — обход запрета менять тип склада:
+    # новый профиль создаётся с любым типом. Продавцу это больше не доступно.
+    if not is_staff(current_user, *STAFF_SHOPS):
+        raise HTTPException(
+            status_code=403,
+            detail="Shop profile is deleted by platform staff only",
+        )
 
     logo_path = shop_add.logo_path
     await db.delete(shop_add)
@@ -253,6 +287,13 @@ async def update_shop_additional(
                 detail="Warehouse type is changed by platform staff only",
             )
         _check_fbo_allowed(warehouse_type)
+        blockers = await warehouse_type_change_blockers(db, shop_add.shop_base_id)
+        if blockers:
+            raise HTTPException(
+                status_code=409,
+                detail="Warehouse type can be changed only when the shop has no stock, "
+                       "open orders or draft receipts. Now: " + "; ".join(blockers),
+            )
         shop_add.warehouse_type = warehouse_type
     if name is not None:
         shop_add.name = name

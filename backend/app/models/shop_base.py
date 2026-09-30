@@ -1,8 +1,9 @@
-from sqlalchemy import Numeric, Column, Integer, Boolean, DateTime, Enum, JSON, ForeignKey, String
+from sqlalchemy import Numeric, Column, Integer, Boolean, Enum, JSON, ForeignKey, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
 import enum
+from app.core.utc_datetime import UTCDateTime
 
 
 class LegalEntityType(str, enum.Enum):
@@ -75,8 +76,8 @@ class ShopBase(Base):
     rating_avg   = Column(Numeric(3, 2), nullable=True)
     rating_count = Column(Integer, nullable=False, default=0)
 
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    created_at = Column(UTCDateTime(), server_default=func.now())
+    updated_at = Column(UTCDateTime(), onupdate=func.now())
 
     owner      = relationship("User")
     additional = relationship("ShopAdditional", uselist=False, back_populates="shop_base")

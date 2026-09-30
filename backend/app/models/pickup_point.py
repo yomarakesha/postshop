@@ -1,7 +1,8 @@
-from sqlalchemy import Column, Integer, Boolean, DateTime, ForeignKey, Numeric, String, Text
+from sqlalchemy import Column, Integer, Boolean, ForeignKey, Numeric, String, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
+from app.core.utc_datetime import UTCDateTime
 
 
 class PickupPoint(Base):
@@ -14,7 +15,7 @@ class PickupPoint(Base):
     latitude   = Column(Numeric(10, 7), nullable=False)
     longitude  = Column(Numeric(10, 7), nullable=False)
     is_active  = Column(Boolean, default=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    created_at = Column(UTCDateTime(), server_default=func.now())
+    updated_at = Column(UTCDateTime(), onupdate=func.now())
 
     city = relationship("City")

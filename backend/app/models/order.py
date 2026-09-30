@@ -1,8 +1,9 @@
-from sqlalchemy import Column, Integer, Boolean, DateTime, ForeignKey, Enum, Numeric, Text
+from sqlalchemy import Column, Integer, Boolean, ForeignKey, Enum, Numeric, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
 import enum
+from app.core.utc_datetime import UTCDateTime
 
 
 class PaymentType(str, enum.Enum):
@@ -24,8 +25,8 @@ class Order(Base):
     delivery_price   = Column(Numeric(10, 2), nullable=True)
     pickup_point_id  = Column(Integer, ForeignKey("pickup_points.id", ondelete="SET NULL"), nullable=True)
     comment          = Column(Text, nullable=True)
-    created_at       = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at       = Column(DateTime(timezone=True), onupdate=func.now())
+    created_at       = Column(UTCDateTime(), server_default=func.now())
+    updated_at       = Column(UTCDateTime(), onupdate=func.now())
 
     user         = relationship("User")
     order_status = relationship("OrderStatus")

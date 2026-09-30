@@ -21,7 +21,8 @@ from app.models.shop_additional import ShopAdditional
 from app.models.user import User
 from app.schemas.shop_base import ShopBaseCreate, ShopBaseUpdate, ShopBaseStatusUpdate, ShopBaseResponse, ShopFullResponse
 from app.schemas.shop_additional import ShopAdditionalResponse
-from app.core.dependencies import require_permissions
+from app.core.dependencies import get_optional_user, require_permissions
+from app.core.visibility import shop_public_conditions
 from app.core.ownership import ensure_can_manage_shop, is_staff, STAFF_SHOPS
 from app.core.permissions import Perm
 from app.models.notification import NotificationKind
@@ -217,6 +218,7 @@ async def get_all_shops_full(
         default=None, description="Поиск по названию магазина"
     ),
     db: AsyncSession = Depends(get_db),
+    viewer: User | None = Depends(get_optional_user),
 ):
     # Город и его дерево загружаются сразу: сборка ответа по модели обращается
     # к связям, а ленивая загрузка в асинхронном режиме даёт MissingGreenlet.
@@ -235,6 +237,10 @@ async def get_all_shops_full(
     )
     if registration_status is not None:
         query = query.where(ShopBase.registration_status == registration_status)
+    # Выдача публичная: витрина строит на ней список магазинов. Покупателю —
+    # только открытые, одобренные и заполненные; админке — все.
+    if viewer is None or not is_staff(viewer, *STAFF_SHOPS):
+        query = query.where(*shop_public_conditions())
 
     # Список магазинов в админке построен на этой выдаче и посылал параметр
     # search, которого здесь не было: поиск молча не работал.

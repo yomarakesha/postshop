@@ -1,9 +1,10 @@
 import enum
 
-from sqlalchemy import Column, Integer, String, Boolean, Date, DateTime, CheckConstraint
+from sqlalchemy import Column, Integer, String, Boolean, Date, CheckConstraint
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
+from app.core.utc_datetime import UTCDateTime
 
 
 class BannerPosition(str, enum.Enum):
@@ -34,8 +35,8 @@ class Banner(Base):
     priority   = Column(Integer, nullable=False, default=1)
     start_date = Column(Date, nullable=True)
     end_date   = Column(Date, nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    created_at = Column(UTCDateTime(), server_default=func.now())
+    updated_at = Column(UTCDateTime(), onupdate=func.now())
 
     images = relationship("BannerImage", back_populates="banner", cascade="all, delete-orphan")
 

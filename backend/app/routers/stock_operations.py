@@ -39,6 +39,7 @@ POSITIVE_TYPES = {
     OperationType.correction,
 }
 NEGATIVE_TYPES = {OperationType.sold, OperationType.return_to_supplier}
+MANUAL_TYPES = {OperationType.income, OperationType.return_to_supplier}
 
 def _compute_balance(operations: list[StockOperation]) -> Decimal:
     balance = Decimal("0")
@@ -151,6 +152,15 @@ async def create_stock_operation(
             status_code=400,
             detail="Corrections are written by POST /stock-operations/set, "
                    "which computes the difference itself.",
+        )
+    # Продажу и возврат от покупателя пишет сервер — по заказу и по возврату.
+    # Руками их можно было записать без заказа: журнал показывал продажи,
+    # которых не было, а статистика и остатки расходились с заказами.
+    if payload.operation_type not in MANUAL_TYPES:
+        raise HTTPException(
+            status_code=400,
+            detail="Only 'income' and 'return_to_supplier' are recorded by hand; "
+                   "sales and customer returns are written by orders and returns.",
         )
 
     await ensure_can_manage_shop(payload.shop_id, current_user, db,

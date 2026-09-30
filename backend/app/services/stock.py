@@ -410,6 +410,7 @@ class OutOfStockNotice:
     product_id: int
     product_name: str
     phone: str | None
+    warehouse_type: WarehouseType | None = None
 
 
 async def _product_name(db: AsyncSession, product_id: int) -> str:
@@ -478,7 +479,11 @@ async def note_if_out_of_stock(
     # позиций одного товара, и проверка «уже уведомляли» иначе их не видит.
     await db.flush()
     return OutOfStockNotice(
-        shop_id=shop_id, product_id=product_id, product_name=name, phone=owner.phone
+        shop_id=shop_id,
+        product_id=product_id,
+        product_name=name,
+        phone=owner.phone,
+        warehouse_type=warehouse_type,
     )
 
 
@@ -487,8 +492,78 @@ async def send_out_of_stock_sms(notices: Sequence[OutOfStockNotice]) -> None:
     for notice in notices:
         if not notice.phone:
             continue
+        # Пополняют по-разному: FBS принимает товар у себя, FBO отправляет его
+        # на склад Postshop. Совет «пополните остаток» магазину FBO вёл в
+        # раздел, которого у него нет.
+        advice = (
+            "Отправьте товар на склад Postshop или снимите его с продажи."
+            if notice.warehouse_type == WarehouseType.fbo
+            else "Примите товар в «Приёме товара» или снимите его с продажи."
+        )
         await send_sms(
             notice.phone,
-            f"Postshop: товар «{notice.product_name}» закончился. "
-            f"Пополните остаток или снимите его с продажи.",
+            f"Postshop: товар «{notice.product_name}» закончился. {advice}",
         )
+
+
+# ── Смена типа склада ────────────────────────────────────────────────────────
+
+async def warehouse_type_change_blockers(db: AsyncSession, shop_id: int) -> list[str]:
+    """Почему магазину сейчас нельзя сменить FBS ↔ FBO; пусто — можно.
+
+    Остаток, резерв и приёмка живут каждый в своём учёте: остаток FBS — в
+    журнале магазина, FBO — на складах платформы. После смены типа старый
+    учёт просто перестаёт читаться — товар «исчезает» с одной стороны и не
+    появляется с другой, открытый заказ списывается не оттуда, а черновик
+    приёмки уже не подтвердить. Поэтому тип меняется только на чистом месте:
+    остатки сведены к нулю, открытых заказов и черновиков приёмки нет.
+    """
+    from app.models.stock_receipt import ReceiptStatus, StockReceipt
+
+    reasons: list[str] = []
+
+    open_orders = (await db.execute(
+        select(func.count(func.distinct(OrderShop.order_id)))
+        .select_from(OrderShop)
+        .join(Order, OrderShop.order_id == Order.id)
+        .join(OrderStatus, Order.order_status_id == OrderStatus.id)
+        .where(
+            OrderShop.shop_base_id == shop_id,
+            OrderShop.status != LocalOrderStatusCode.rejected,
+            OrderStatus.code.notin_(_CLOSED_ORDER_STATUSES),
+        )
+    )).scalar_one()
+    if open_orders:
+        reasons.append(f"open orders: {open_orders}")
+
+    drafts = (await db.execute(
+        select(func.count(StockReceipt.id)).where(
+            StockReceipt.shop_id == shop_id, StockReceipt.status == ReceiptStatus.draft
+        )
+    )).scalar_one()
+    if drafts:
+        reasons.append(f"draft stock receipts: {drafts}")
+
+    signed_fbs = case(
+        (StockOperation.operation_type.in_(_POSITIVE_TYPES), StockOperation.quantity),
+        else_=-StockOperation.quantity,
+    )
+    fbs_left = (await db.execute(
+        select(StockOperation.product_id)
+        .where(StockOperation.shop_id == shop_id)
+        .group_by(StockOperation.product_id)
+        .having(func.sum(signed_fbs) != 0)
+    )).all()
+    if fbs_left:
+        reasons.append(f"products with own (FBS) stock: {len(fbs_left)}")
+
+    fbo_left = (await db.execute(
+        select(WarehouseOperation.product_id)
+        .where(WarehouseOperation.shop_id == shop_id)
+        .group_by(WarehouseOperation.product_id)
+        .having(func.sum(_fbo_signed_quantity()) != 0)
+    )).all()
+    if fbo_left:
+        reasons.append(f"products at the platform warehouse (FBO): {len(fbo_left)}")
+
+    return reasons

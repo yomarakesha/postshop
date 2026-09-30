@@ -82,6 +82,13 @@ class ProductResponse(BaseModel):
     measure_unit:    MeasureUnitShort
     translations:    List[ProductTranslationResponse]
     hashtag:      Optional[str] = None
+    # Штрихкод Postshop (есть у каждого товара) и заводской, если продавец его
+    # указал — см. app/services/barcode.py.
+    barcode:        Optional[str] = None
+    vendor_barcode: Optional[str] = None
+    # Название магазина. Заполняется там, где его показывают рядом с товаром
+    # без карточки магазина — в очереди модерации; в остальных выдачах пусто.
+    shop_name:      Optional[str] = None
     images:       List[str] = []
     price:        Decimal
     currency_id:  Optional[int] = None

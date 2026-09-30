@@ -1,9 +1,10 @@
 from decimal import Decimal, ROUND_HALF_UP
-from sqlalchemy import Column, Integer, Boolean, DateTime, ForeignKey, Enum, Numeric, JSON, String
+from sqlalchemy import UniqueConstraint, Column, Integer, Boolean, ForeignKey, Enum, Numeric, JSON, String
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
 import enum
+from app.core.utc_datetime import UTCDateTime
 
 
 
@@ -40,6 +41,10 @@ def effective_price(product) -> Decimal:
 
 class Product(Base):
     __tablename__ = "products"
+    __table_args__ = (
+        UniqueConstraint("barcode", name="uq_products_barcode"),
+        UniqueConstraint("shop_base_id", "vendor_barcode", name="uq_product_shop_vendor_barcode"),
+    )
 
     id           = Column(Integer, primary_key=True, index=True)
     category_id     = Column(Integer, ForeignKey("categories.id", ondelete="RESTRICT"), nullable=False)
@@ -48,6 +53,10 @@ class Product(Base):
     measure_unit_id = Column(Integer, ForeignKey("measure_units.id", ondelete="RESTRICT"), nullable=False)
 
     hashtag      = Column(String(255), nullable=True)
+    # Штрихкод Postshop (выдаёт платформа) и заводской штрихкод продавца —
+    # см. app/services/barcode.py.
+    barcode        = Column(String(13), nullable=True)
+    vendor_barcode = Column(String(14), nullable=True)
     images       = Column(JSON, default=list)
 
     price         = Column(Numeric(10, 2), nullable=False)
@@ -72,8 +81,8 @@ class Product(Base):
     is_active  = Column(Boolean, default=True)
     status     = Column(Enum(ProductStatus), default=ProductStatus.pending, nullable=False, index=True)
     moderation_comment = Column(String(500), nullable=True)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    created_at = Column(UTCDateTime(), server_default=func.now())
+    updated_at = Column(UTCDateTime(), onupdate=func.now())
 
     category     = relationship("Category")
     shop_base    = relationship("ShopBase")

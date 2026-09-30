@@ -1,8 +1,9 @@
 import enum
-from sqlalchemy import Column, Integer, Numeric, DateTime, ForeignKey, Enum
+from sqlalchemy import Column, Integer, Numeric, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
+from app.core.utc_datetime import UTCDateTime
 
 
 class WarehouseOperationType(str, enum.Enum):
@@ -26,7 +27,7 @@ class WarehouseOperation(Base):
     # Часть заказа, по которой списан или возвращён товар; NULL — приёмка и
     # ручные операции. Не даёт списать один заказ дважды.
     order_shop_id   = Column(Integer, ForeignKey("order_shops.id", ondelete="SET NULL"), nullable=True, index=True)
-    created_at      = Column(DateTime(timezone=True), server_default=func.now())
+    created_at      = Column(UTCDateTime(), server_default=func.now())
 
     warehouse    = relationship("Warehouse")
     shop         = relationship("ShopBase")

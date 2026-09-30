@@ -29,8 +29,9 @@ from app.core.permissions import Perm
 from app.models.notification import NotificationKind
 from app.services.notifications import notify
 from app.core.ownership import is_staff
-from app.core.visibility import visible_to_customer
+from app.core.visibility import visible_to_customer, shop_public_conditions
 from app.core.images import remove_files, check_content_type, process_upload
+from app.services.barcode import normalize_vendor_barcode, platform_barcode
 
 SortOption = Literal["most_expensive", "most_cheap", "recently_added", "with_discounts"]
 
@@ -199,6 +200,41 @@ async def process_and_save_product_images(files: List[UploadFile]) -> List[str]:
     return saved_paths
 
 
+async def _ensure_vendor_barcode_free(
+    db: AsyncSession, shop_id: int, code: str | None, product_id: int | None = None
+) -> None:
+    """Заводской штрихкод в магазине не повторяется — отвечаем понятно, а не
+    ошибкой уникального индекса при коммите."""
+    if code is None:
+        return
+    query = select(Product.id).where(
+        Product.shop_base_id == shop_id, Product.vendor_barcode == code
+    )
+    if product_id is not None:
+        query = query.where(Product.id != product_id)
+    if (await db.execute(query)).first():
+        raise HTTPException(
+            status_code=409,
+            detail="A product with this barcode already exists in this shop",
+        )
+
+
+async def _with_shop_names(db: AsyncSession, products: list[Product]) -> list[ProductResponse]:
+    """Ответ с названиями магазинов — модератору нужно имя, а не номер."""
+    shop_ids = {p.shop_base_id for p in products}
+    names: dict[int, str | None] = {}
+    if shop_ids:
+        rows = await db.execute(
+            select(ShopAdditional.shop_base_id, ShopAdditional.name)
+            .where(ShopAdditional.shop_base_id.in_(shop_ids))
+        )
+        names = {shop_id: name for shop_id, name in rows.all()}
+    return [
+        ProductResponse.model_validate(p).model_copy(update={"shop_name": names.get(p.shop_base_id)})
+        for p in products
+    ]
+
+
 async def get_product_or_404(product_id: int, db: AsyncSession) -> Product:
     result = await db.execute(_product_query().where(Product.id == product_id))
     product = result.scalar_one_or_none()
@@ -215,6 +251,7 @@ async def create_product(
     brand_id:        Optional[int] = Form(None),
     translations:    str = Form(..., description='JSON: [{"language":"ru","name":"...","description":"..."}]'),
     hashtag:         Optional[str] = Form(None),
+    vendor_barcode:  Optional[str] = Form(None, description="Заводской штрихкод: 8, 12, 13 или 14 цифр"),
     price:           Decimal = Form(...),
     currency_id:     Optional[int] = Form(None),
     discount_type:   Optional[DiscountType] = Form(None),
@@ -228,12 +265,14 @@ async def create_product(
         raise HTTPException(status_code=400, detail="At least one translation is required")
 
     _validate_pricing(price, discount_type, discount)
+    vendor_code = normalize_vendor_barcode(vendor_barcode)
 
     cat_res = await db.execute(select(Category).where(Category.id == category_id))
     if not cat_res.scalar_one_or_none():
         raise HTTPException(status_code=404, detail="Category not found")
 
     await _ensure_can_manage_shop(shop_base_id, current_user, db)
+    await _ensure_vendor_barcode_free(db, shop_base_id, vendor_code)
 
     mu_res = await db.execute(select(MeasureUnit).where(MeasureUnit.id == measure_unit_id))
     if not mu_res.scalar_one_or_none():
@@ -262,6 +301,7 @@ async def create_product(
         brand_id=brand_id,
         measure_unit_id=measure_unit_id,
         hashtag=hashtag,
+        vendor_barcode=vendor_code,
         price=price,
         currency_id=currency_id,
         discount_type=discount_type,
@@ -271,6 +311,8 @@ async def create_product(
     )
     db.add(product)
     await db.flush()
+    # Штрихкод Postshop строится из номера, а номер известен только после flush.
+    product.barcode = platform_barcode(product.id)
 
     for t in parsed_translations:
         db.add(ProductTranslation(product_id=product.id, language=t.language, name=t.name, description=t.description))
@@ -407,7 +449,7 @@ async def get_moderation_queue(
     if city_id is not None:
         query = query.where(_in_city_expr(city_id))
     result = await db.execute(await paginate(db, response, query, skip=skip, limit=limit))
-    return list(result.scalars().all())
+    return await _with_shop_names(db, list(result.scalars().all()))
 
 
 @router.get("/moderation/{product_id}", response_model=ProductResponse)
@@ -421,7 +463,7 @@ async def get_product_for_moderation(
     product = result.scalar_one_or_none()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
-    return product
+    return (await _with_shop_names(db, [product]))[0]
 
 
 @router.get("/brands", response_model=list[BrandResponse])
@@ -447,8 +489,7 @@ async def get_brands_by_category_and_city(
             Product.category_id.in_(category_ids),
             Product.is_active.is_(True),
             Product.status == ProductStatus.approved,
-            ShopBase.is_active.is_(True),
-            ShopBase.registration_status == RegistrationStatus.approved,
+            *shop_public_conditions(),
             ShopAdditional.city_id == city_id,
         )
         .distinct()
@@ -499,6 +540,7 @@ async def update_product(
     translations:    Optional[str] = Form(None, description='JSON: [{"language":"ru","name":"...","description":"..."}]'),
     brand_id:        Optional[int] = Form(None),
     hashtag:         Optional[str] = Form(None),
+    vendor_barcode:  Optional[str] = Form(None, description="Заводской штрихкод; пустая строка — убрать"),
     price:           Optional[Decimal] = Form(None),
     currency_id:     Optional[int] = Form(None),
     discount_type:   Optional[DiscountType] = Form(None),
@@ -560,6 +602,11 @@ async def update_product(
 
     if hashtag is not None:
         product.hashtag = hashtag
+    if vendor_barcode is not None:
+        vendor_code = normalize_vendor_barcode(vendor_barcode)
+        if vendor_code != product.vendor_barcode:
+            await _ensure_vendor_barcode_free(db, product.shop_base_id, vendor_code, product.id)
+        product.vendor_barcode = vendor_code
     if price is not None:
         product.price = price
     if currency_id is not None:

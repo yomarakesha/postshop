@@ -47,6 +47,7 @@ from app.models.return_request import ReturnRequest, ReturnStatus
 from app.models.review import Review, ReviewStatus
 from app.services.notifications import notify, notify_shop_owner
 from app.services.stock import check_cart_stock, record_sold_for_order, send_out_of_stock_sms
+from app.core.business_time import BUSINESS_TZ, local_date_expr, local_midnight_utc, local_now
 
 router = APIRouter()
 
@@ -472,18 +473,19 @@ def _summary_bounds(period: SummaryPeriod) -> tuple[datetime, datetime, timedelt
     Календарный месяц сделал бы сравнение неравным (28 дней против 31), а
     продавцу нужно сравнить одинаковые отрезки, а не имена месяцев.
     """
-    today = datetime.now()
-    day_start = datetime(today.year, today.month, today.day)
-    end = day_start + timedelta(days=1)
+    # Сутки — местные (Ашхабад), а сравнение с базой идёт в UTC.
+    today = local_now().date()
+    tomorrow = today + timedelta(days=1)
+    end = local_midnight_utc(tomorrow)
 
     if period == SummaryPeriod.week:
-        start = day_start - timedelta(days=today.weekday())
+        start = local_midnight_utc(today - timedelta(days=today.weekday()))
         step = 1
     elif period == SummaryPeriod.month:
-        start = end - timedelta(days=30)
+        start = local_midnight_utc(tomorrow - timedelta(days=30))
         step = 1
     else:
-        start = end - timedelta(days=90)
+        start = local_midnight_utc(tomorrow - timedelta(days=90))
         # У квартала 90 точек на графике нечитаемы — группируем по неделям.
         step = 7
 
@@ -556,7 +558,7 @@ async def get_shop_summary(
     current = await _summary_totals(db, shop_id, start, end)
     previous = await _summary_totals(db, shop_id, prev_start, prev_end)
 
-    day_expr = func.date(Order.created_at)
+    day_expr = local_date_expr(Order.created_at)
     rows = (await db.execute(
         _completed_shop_sales(
             shop_id,
@@ -578,13 +580,15 @@ async def get_shop_summary(
         orders = revenue = 0
         day = cursor
         while day < bucket_end:
-            found = by_day.get(day.date())
+            found = by_day.get(day.astimezone(BUSINESS_TZ).date())
             if found:
                 orders += int(found.orders)
                 revenue += Decimal(found.revenue)
             day += timedelta(days=1)
         points.append(SummaryPoint(
-            date=cursor.date(), orders_count=orders, total_revenue=Decimal(revenue)
+            date=cursor.astimezone(BUSINESS_TZ).date(),
+            orders_count=orders,
+            total_revenue=Decimal(revenue),
         ))
         cursor = bucket_end
 
@@ -719,9 +723,10 @@ async def get_shop_weekly_revenue(
     await ensure_can_manage_shop(shop_id, current_user, db, staff_codes=STAFF_ORDERS,
                                  detail="You can only read orders of your own shops")
 
-    today = datetime.now()
-    week_start = datetime(today.year, today.month, today.day) - timedelta(days=today.weekday())
-    week_end = week_start + timedelta(days=7)
+    today = local_now().date()
+    monday = today - timedelta(days=today.weekday())
+    week_start = local_midnight_utc(monday)
+    week_end = local_midnight_utc(monday + timedelta(days=7))
 
     row = (await db.execute(
         _completed_shop_sales(
@@ -734,7 +739,7 @@ async def get_shop_weekly_revenue(
     # Разбивка по дням: в ответе её не было, поэтому график выручки в кабинете
     # продавца лежал закомментированным, а на экране оставался заголовок без
     # содержимого.
-    day_expr = func.date(Order.created_at)
+    day_expr = local_date_expr(Order.created_at)
     day_rows = (await db.execute(
         _completed_shop_sales(
             shop_id,
@@ -751,7 +756,7 @@ async def get_shop_weekly_revenue(
     # продаж просто исчезали с оси.
     by_day = []
     for offset in range(7):
-        day = (week_start + timedelta(days=offset)).date()
+        day = monday + timedelta(days=offset)
         found = by_day_map.get(day)
         by_day.append(DailyRevenue(
             date=day,
@@ -916,6 +921,16 @@ async def update_shop_order_status(
     order_shop = next((os for os in order.order_shops if os.shop_base_id == shop_id), None)
     if order_shop is None:
         raise HTTPException(status_code=404, detail="This shop has no part in the order")
+
+    # Часть FBO собирает склад Postshop: товар лежит там, а не у продавца.
+    # Продавец раньше «принимал» такой заказ и отмечал «готов к выдаче», хотя
+    # физически ничего не собирал. Статус этой части ведёт сотрудник.
+    if order_shop.warehouse_type == WarehouseType.fbo and not is_staff(current_user, *STAFF_ORDERS):
+        raise HTTPException(
+            status_code=403,
+            detail="FBO orders are fulfilled by the Postshop warehouse; "
+                   "their status is changed by platform staff",
+        )
 
     current_code = LocalOrderStatusCode(order_shop.status)
     allowed = LOCAL_VALID_TRANSITIONS[current_code]

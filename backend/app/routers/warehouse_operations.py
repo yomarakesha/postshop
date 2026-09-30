@@ -7,6 +7,7 @@ from sqlalchemy import case, exists, func, select
 from sqlalchemy.orm import selectinload
 
 from app.database import get_db
+from app.models.shop_additional import ShopAdditional, WarehouseType
 from app.models.warehouse_operation import WarehouseOperation, WarehouseOperationType
 from app.models.warehouse import Warehouse
 from app.models.shop_base import ShopBase
@@ -80,8 +81,26 @@ async def create_warehouse_operation(
 ):
     await _get_warehouse_or_404(payload.warehouse_id, db)
     await _get_shop_or_404(payload.shop_id, db)
-    await _get_product_or_404(payload.product_id, db)
+    product = await _get_product_or_404(payload.product_id, db)
     await _get_measure_unit_or_404(payload.measure_unit_id, db)
+
+    # Склад платформы хранит товар только магазинов FBO. Операция для FBS
+    # записывалась молча и ни на что не влияла: остаток FBS читается из
+    # журнала магазина, а не со склада.
+    warehouse_type = (await db.execute(
+        select(ShopAdditional.warehouse_type).where(ShopAdditional.shop_base_id == payload.shop_id)
+    )).scalar_one_or_none()
+    if warehouse_type != WarehouseType.fbo:
+        raise HTTPException(
+            status_code=409,
+            detail="Platform warehouse operations are for FBO shops only",
+        )
+    if product.shop_base_id != payload.shop_id:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Product {product.id} belongs to shop {product.shop_base_id}, "
+                   f"not to shop {payload.shop_id}",
+        )
 
     if payload.operation_type in NEGATIVE_TYPES:
         # Без блокировки строки два одновременных списания проходили одну и ту

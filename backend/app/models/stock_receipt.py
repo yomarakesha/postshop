@@ -1,8 +1,9 @@
 import enum
-from sqlalchemy import Column, Integer, Numeric, DateTime, ForeignKey, Enum
+from sqlalchemy import Column, Integer, Numeric, ForeignKey, Enum
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
+from app.core.utc_datetime import UTCDateTime
 
 
 class ReceiptStatus(str, enum.Enum):
@@ -20,8 +21,8 @@ class StockReceipt(Base):
     shop_id      = Column(Integer, ForeignKey("shop_bases.id",  ondelete="CASCADE"), nullable=False, index=True)
     warehouse_id = Column(Integer, ForeignKey("warehouses.id",  ondelete="RESTRICT"), nullable=False, index=True)
     status       = Column(Enum(ReceiptStatus), nullable=False, default=ReceiptStatus.draft)
-    created_at   = Column(DateTime(timezone=True), server_default=func.now())
-    confirmed_at = Column(DateTime(timezone=True), nullable=True)
+    created_at   = Column(UTCDateTime(), server_default=func.now())
+    confirmed_at = Column(UTCDateTime(), nullable=True)
 
     shop      = relationship("ShopBase")
     warehouse = relationship("Warehouse")

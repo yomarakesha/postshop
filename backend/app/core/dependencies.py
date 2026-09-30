@@ -7,6 +7,7 @@ from app.core.security import decode_token
 from app.models.user import User
 
 bearer_scheme = HTTPBearer()
+optional_bearer_scheme = HTTPBearer(auto_error=False)
 
 
 async def get_current_user(
@@ -23,6 +24,29 @@ async def get_current_user(
 
     if not user or not user.is_active:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found or inactive")
+    return user
+
+
+async def get_optional_user(
+    credentials: HTTPAuthorizationCredentials | None = Depends(optional_bearer_scheme),
+    db: AsyncSession = Depends(get_db),
+) -> User | None:
+    """Пользователь, если запрос пришёл с действующим токеном, иначе None.
+
+    Для публичных методов, которые отдают владельцу и сотруднику больше, чем
+    гостю: например, свой ещё не заполненный магазин продавец видеть должен, а
+    покупатель — нет. Неверный токен здесь не ошибка, а просто гость.
+    """
+    if credentials is None:
+        return None
+    payload = decode_token(credentials.credentials)
+    if not payload or payload.get("type") != "access":
+        return None
+    user = (
+        await db.execute(select(User).where(User.id == int(payload.get("sub"))))
+    ).scalar_one_or_none()
+    if not user or not user.is_active:
+        return None
     return user
 
 

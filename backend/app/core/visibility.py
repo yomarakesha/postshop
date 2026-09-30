@@ -17,15 +17,53 @@ from typing import Iterable
 
 from sqlalchemy import exists, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import aliased
 
 from app.models.category import Category
 from app.models.product import Product, ProductStatus
+from app.models.shop_additional import ShopAdditional
 from app.models.shop_base import ShopBase, RegistrationStatus
+
+
+def shop_profile_ready_expr(shop_id_column):
+    """
+    EXISTS-условие: продавец заполнил витрину магазина — есть название и логотип.
+
+    Регистрацию одобряет администратор, а данные магазина продавец заполняет
+    уже после. Одобренный, но не заполненный магазин показывался покупателям
+    пустой карточкой без имени и картинки — вместе со своими товарами.
+    """
+    # Свой алиас: запросы, где ShopAdditional уже присоединён (поиск, список
+    # магазинов), иначе «съедали» таблицу подзапроса автокорреляцией.
+    profile = aliased(ShopAdditional)
+    return exists(
+        select(profile.id).where(
+            profile.shop_base_id == shop_id_column,
+            profile.name.is_not(None),
+            profile.name != "",
+            profile.logo_path.is_not(None),
+            profile.logo_path != "",
+        )
+    )
+
+
+def shop_public_conditions(shop=ShopBase):
+    """Магазин виден покупателю: открыт, одобрен, витрина заполнена.
+
+    `shop` — ShopBase или его алиас: в подзапросе к запросу, где ShopBase уже
+    присоединён, нужен алиас, иначе таблицу поглотит автокорреляция.
+    """
+    return (
+        shop.is_active.is_(True),
+        shop.registration_status == RegistrationStatus.approved,
+        shop_profile_ready_expr(shop.id),
+    )
 
 
 def shop_visible_expr():
     """
-    EXISTS-условие: магазин-владелец товара открыт и прошёл регистрацию.
+    EXISTS-условие: магазин-владелец товара открыт, прошёл регистрацию и
+    заполнил витрину.
 
     Сделано через EXISTS, а не JOIN, чтобы условие можно было навесить на любой
     запрос по Product, не меняя его состав строк и не рискуя дублями.
@@ -33,8 +71,7 @@ def shop_visible_expr():
     return exists(
         select(ShopBase.id).where(
             ShopBase.id == Product.shop_base_id,
-            ShopBase.is_active.is_(True),
-            ShopBase.registration_status == RegistrationStatus.approved,
+            *shop_public_conditions(),
         )
     )
 
@@ -105,8 +142,7 @@ async def unavailable_product_ids(products: Iterable[Product], db: AsyncSession)
     rows = await db.execute(
         select(ShopBase.id).where(
             ShopBase.id.in_(shop_ids),
-            ShopBase.is_active.is_(True),
-            ShopBase.registration_status == RegistrationStatus.approved,
+            *shop_public_conditions(),
         )
     )
     open_shops = set(rows.scalars().all())
@@ -147,8 +183,7 @@ async def unavailable_reason(product_id: int, db: AsyncSession) -> str:
         await db.execute(
             select(ShopBase.id).where(
                 ShopBase.id == product.shop_base_id,
-                ShopBase.is_active.is_(True),
-                ShopBase.registration_status == RegistrationStatus.approved,
+                *shop_public_conditions(),
             )
         )
     ).scalar_one_or_none()

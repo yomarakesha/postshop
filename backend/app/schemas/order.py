@@ -1,4 +1,5 @@
 import enum
+from app.models.shop_additional import WarehouseType
 from pydantic import BaseModel, Field, computed_field, model_validator
 from datetime import date as date_type, datetime
 from decimal import Decimal
@@ -190,6 +191,9 @@ class OrderShopResponse(BaseModel):
     shop_base_id: int
     shop:         ShopFullResponse
     status:       LocalOrderStatusCode
+    # Тип склада на момент заказа. FBO — часть собирает склад Postshop, и
+    # статус ей меняет сотрудник, а не продавец.
+    warehouse_type: Optional[WarehouseType] = None
     comment:      Optional[str] = None
     items:        list[OrderItemResponse]
 

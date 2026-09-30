@@ -10,6 +10,9 @@ engine = create_async_engine(
     pool_recycle=settings.MYSQL_POOL_RECYCLE,
     pool_pre_ping=True,
     echo=False,
+    # NOW() в значениях по умолчанию берёт зону сессии. Закрепляем UTC, чтобы
+    # время не зависело от настроек сервера MySQL (см. app/core/utc_datetime.py).
+    connect_args={"init_command": "SET time_zone = '+00:00'"},
 )
 
 AsyncSessionLocal = async_sessionmaker(

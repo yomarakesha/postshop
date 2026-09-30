@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.database import get_db
+from app.core.visibility import shop_public_conditions
 from app.core.pagination import limit_param, paginate, skip_param
 from app.models.brand import Brand
 from app.models.category import Category
@@ -100,6 +101,10 @@ def _token_match_expr(token: str):
     match = _name_match(like) | _desc_match(like) | _brand_match(like)
     if len(token) >= MIN_TOKEN_LEN:
         match = match | Product.hashtag.ilike(like)
+    # Штрихкод — точным совпадением: его сканируют или вводят целиком, а
+    # частичное совпадение цифр находило бы случайные товары.
+    if token.isdigit() and len(token) >= 8:
+        match = match | (Product.barcode == token) | (Product.vendor_barcode == token)
     return match
 
 
@@ -118,8 +123,7 @@ def _sellable_product_exists(match):
             match,
             Product.is_active.is_(True),
             Product.status == ProductStatus.approved,
-            ShopBase.is_active.is_(True),
-            ShopBase.registration_status == RegistrationStatus.approved,
+            *shop_public_conditions(),
         )
         .exists()
     )
@@ -166,8 +170,7 @@ async def search(
         .where(
             Product.is_active.is_(True),
             Product.status == ProductStatus.approved,
-            ShopBase.is_active.is_(True),
-            ShopBase.registration_status == RegistrationStatus.approved,
+            *shop_public_conditions(),
         )
         .options(
             selectinload(Product.translations),
@@ -278,8 +281,7 @@ async def search(
             select(ShopBase)
             .join(ShopAdditional, ShopAdditional.shop_base_id == ShopBase.id)
             .where(
-                ShopBase.is_active.is_(True),
-                ShopBase.registration_status == RegistrationStatus.approved,
+                *shop_public_conditions(),
                 ShopAdditional.name.ilike(like),
             )
             .options(

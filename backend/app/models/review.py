@@ -3,7 +3,6 @@ import enum
 from sqlalchemy import (
     CheckConstraint,
     Column,
-    DateTime,
     Enum,
     ForeignKey,
     Integer,
@@ -14,6 +13,7 @@ from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 
 from app.database import Base
+from app.core.utc_datetime import UTCDateTime
 
 
 class ReviewStatus(str, enum.Enum):
@@ -57,8 +57,8 @@ class Review(Base):
     status        = Column(Enum(ReviewStatus), nullable=False, default=ReviewStatus.pending, index=True)
     # Почему отклонён — автору это надо сказать, иначе отзыв просто исчезает.
     moderation_comment = Column(Text, nullable=True)
-    created_at    = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at    = Column(DateTime(timezone=True), onupdate=func.now())
+    created_at    = Column(UTCDateTime(), server_default=func.now())
+    updated_at    = Column(UTCDateTime(), onupdate=func.now())
 
     user       = relationship("User")
     product    = relationship("Product")
