@@ -30,7 +30,12 @@ import AddItemSheet from "./_components/AddItemSheet";
  * этого товар попадает в остаток. Пока документ не подтверждён, продавец
  * может убрать из него товар или отменить его целиком.
  */
-const ShopReceiptsScreen = () => {
+type Props = {
+  /** Внутри «Склада» заголовок у экрана свой — второй не нужен. */
+  withHeader?: boolean;
+};
+
+const ShopReceiptsScreen = ({ withHeader = true }: Props) => {
   const { t } = useTranslation();
   const shopId = useShopStore((s) => s.activeShopBaseId);
   const { data, isLoading, isRefetching, refetch } = receiptApi.useList(
@@ -177,11 +182,13 @@ const ShopReceiptsScreen = () => {
 
   return (
     <>
-      <Header
-        withGoBack
-        title={t("store.receipts.title")}
-        backgroundColor="white"
-      />
+      {withHeader && (
+        <Header
+          withGoBack
+          title={t("store.receipts.title")}
+          backgroundColor="white"
+        />
+      )}
       <FlatList
         data={data ?? []}
         renderItem={renderReceipt}

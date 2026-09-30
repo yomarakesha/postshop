@@ -17,7 +17,7 @@ import Button from "@/ui/Button";
 import ErrorAlert from "@/utils/errorAlert";
 import { pickTranslatedName } from "@/utils/pickTranslation";
 import useAppStore from "@/store/useAppStore";
-import StockSheet, { StockTarget } from "./_components/StockSheet";
+import StockSheet, { StockTarget } from "@/components/StockSheet";
 
 /**
  * Подпись кнопки на карточке. Карточка в сетке узкая: обычный размер текста

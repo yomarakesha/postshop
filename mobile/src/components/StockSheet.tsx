@@ -37,6 +37,8 @@ type Props = {
   modes?: StockMode[];
   /** Заголовок окна; по умолчанию «Изменить остаток». */
   title?: string;
+  /** Сообщение после записи прихода или возврата; по умолчанию «Движение записано». */
+  savedText?: string;
 };
 
 /** Текст отказа сервера: у HTTPException detail — строка, у ошибок схемы — список. */
@@ -66,6 +68,7 @@ const StockSheet = ({
   t,
   modes = ALL_MODES,
   title,
+  savedText,
 }: Props) => {
   const [mode, setMode] = useState<StockMode>(modes[0]);
   const [quantity, setQuantity] = useState("");
@@ -120,7 +123,10 @@ const StockSheet = ({
       else await createOperation.mutateAsync({ ...body, operation_type: mode });
       Toast.show({
         type: "success",
-        text1: t(mode === "set" ? "store.stock.setSaved" : "store.stock.saved"),
+        text1:
+          mode === "set"
+            ? t("store.stock.setSaved")
+            : (savedText ?? t("store.stock.saved")),
       });
       close();
     } catch (error) {
@@ -157,26 +163,26 @@ const StockSheet = ({
             клавиатура закрывала поле количества и кнопку «Записать». */}
         {/* Одно действие — выбирать не из чего. */}
         {modes.length > 1 && (
-        <View style={styles.modes}>
-          {modes.map((value) => (
-            <Pressable
-              key={value}
-              onPress={() => setMode(value)}
-              style={styles.mode(mode === value)}
-              accessibilityRole="radio"
-              accessibilityState={{ selected: mode === value }}
-            >
-              <Typography
-                variant="t1"
-                weight="medium"
-                isCentered
-                color={mode === value ? "main" : undefined}
+          <View style={styles.modes}>
+            {modes.map((value) => (
+              <Pressable
+                key={value}
+                onPress={() => setMode(value)}
+                style={styles.mode(mode === value)}
+                accessibilityRole="radio"
+                accessibilityState={{ selected: mode === value }}
               >
-                {t(`store.stock.operations.${value}`)}
-              </Typography>
-            </Pressable>
-          ))}
-        </View>
+                <Typography
+                  variant="t1"
+                  weight="medium"
+                  isCentered
+                  color={mode === value ? "main" : undefined}
+                >
+                  {t(`store.stock.operations.${value}`)}
+                </Typography>
+              </Pressable>
+            ))}
+          </View>
         )}
         <Typography variant="t1" color="secondary">
           {t(`store.stock.operationsHint.${mode}`)}

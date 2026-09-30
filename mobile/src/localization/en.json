@@ -603,7 +603,11 @@
       "setSaved": "Stock updated",
       "amountPlaceholder": "How many are available now",
       "amountRequired": "Enter a number: zero or more",
-      "inWarehouse": "In warehouse: {{count}}"
+      "inWarehouse": "In warehouse: {{count}}",
+      "title": "Stock",
+      "subtitle": "How much is available for sale. What open orders already hold is subtracted.",
+      "edit": "Change",
+      "fbsOnly": "This section is for FBS shops: they store goods themselves. FBO shop stock is under “Warehouse”."
     },
     "close": {
       "close": "Close the store",
@@ -631,8 +635,23 @@
         "rejected": "Return declined"
       }
     },
+    "intake": {
+      "title": "Goods intake",
+      "subtitle": "Goods arrived — record how many. Stock grows by that amount and the product can be bought right away.",
+      "accept": "Receive",
+      "fbsOnly": "This section is for FBS shops: they receive goods themselves. An FBO shop ships goods to the Postshop warehouse — see “Warehouse”.",
+      "saved": "Goods received"
+    },
+    "warehouse": {
+      "title": "Warehouse",
+      "tabStock": "Stock at warehouse",
+      "tabShipments": "Shipments to warehouse",
+      "stockHint": "Your goods are stored at Postshop warehouses. Stock grows when the platform accepts a shipment and drops with each completed order.",
+      "fboOnly": "This section is for FBO shops: their goods are stored at the Postshop warehouse. An FBS shop keeps its own records in “Stock” and “Goods intake”.",
+      "disabled": "The platform warehouse is switched off: the platform is not accepting goods for storage right now."
+    },
     "receipts": {
-      "title": "Warehouse intake",
+      "title": "Shipments to warehouse",
       "subtitle": "Sending goods to a Postshop warehouse. The platform confirms intake — after that the goods appear in stock.",
       "create": "New document",
       "created": "Document created",

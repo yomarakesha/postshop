@@ -603,7 +603,11 @@
       "setSaved": "Galyndy täzelendi",
       "amountPlaceholder": "Häzir näçe elýeterli",
       "amountRequired": "San görkeziň: nol ýa-da köp",
-      "inWarehouse": "Ammarda: {{count}}"
+      "inWarehouse": "Ammarda: {{count}}",
+      "title": "Galyndylar",
+      "subtitle": "Satuwa näçe haryt elýeterli. Açyk sargytlaryň eýeleýäni aýrylýar.",
+      "edit": "Üýtgetmek",
+      "fbsOnly": "Bu bölüm FBS dükanlary üçin: olar harydy özleri saklaýar. FBO dükanyň galyndylary «Ammar» bölüminde."
     },
     "close": {
       "close": "Dükany ýapmak",
@@ -631,8 +635,23 @@
         "rejected": "Gaýtarmak kabul edilmedi"
       }
     },
+    "intake": {
+      "title": "Haryt kabul etmek",
+      "subtitle": "Haryt geldi — näçe gelendigini belläň. Galyndy şonça artar we haryt derrew satyn alnyp bilner.",
+      "accept": "Kabul etmek",
+      "fbsOnly": "Bu bölüm FBS dükanlary üçin: olar harydy özleri kabul edýär. FBO dükany harydy Postshop ammaryna ugradýar — «Ammar» bölüminde.",
+      "saved": "Haryt kabul edildi"
+    },
+    "warehouse": {
+      "title": "Ammar",
+      "tabStock": "Ammardaky galyndylar",
+      "tabShipments": "Ammara ugratmak",
+      "stockHint": "Harydyňyz Postshop ammarlarynda saklanýar. Platforma ugradyş resminamasyny kabul edende galyndy artýar, her tamamlanan sargyt bilen azalýar.",
+      "fboOnly": "Bu bölüm FBO dükanlary üçin: olaryň harydy Postshop ammarynda saklanýar. FBS dükany hasaby özi alyp barýar — «Galyndylar» we «Haryt kabul etmek» bölümlerinde.",
+      "disabled": "Platformanyň ammary öçürilen: platforma häzir harydy saklamaga kabul etmeýär."
+    },
     "receipts": {
-      "title": "Ammara kabul ediş",
+      "title": "Ammara ugratmak",
       "subtitle": "Harydy Postshop ammaryna ibermek. Kabul edilişi platforma tassyklaýar — şondan soň haryt galynda görkeziler.",
       "create": "Täze resminama",
       "created": "Resminama döredildi",

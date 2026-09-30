@@ -15,6 +15,8 @@ import { langs } from "@/constants/langs";
 import DoorOpenIcon from "@assets/icons/door-open.svg";
 import StoreFrontIcon from "@assets/icons/store-front.svg";
 import PackageCheckIcon from "@assets/icons/package-check.svg";
+import CubeIcon from "@assets/icons/cube.svg";
+import PlusIcon from "@assets/icons/plus.svg";
 import { shopBaseApi } from "@/api/shopBaseApi";
 import useFeatures from "@/hooks/useFeatures";
 import ErrorAlert from "@/utils/errorAlert";
@@ -45,9 +47,12 @@ const useProfileLinks = (t: TFunction, language: AppLang) => {
   const isClosed = shopBaseQuery.data?.is_active === false;
   const shop = useShopStore((s) => s.shop);
   const { fboEnabled } = useFeatures();
-  // Приёмка — только у магазина на складе платформы: его товар хранит
-  // Postshop. Магазин со своим складом правит остаток в «Моих товарах».
-  const hasReceipts = fboEnabled && shop?.warehouse_type === "fbo";
+  // FBS и FBO — разные способы работы, и у каждого свои разделы, как на
+  // витрине. Магазин FBS хранит товар сам: ему «Остатки» и «Приём товара».
+  // Магазин FBO держит товар на складе Postshop: ему «Склад» — и только пока
+  // платформа принимает товар на хранение.
+  const isFbs = shop?.warehouse_type === "fbs";
+  const hasWarehouse = fboEnabled && shop?.warehouse_type === "fbo";
 
   // Закрыть или снова открыть магазин — как на витрине (/my-store/…/close).
   // Закрытый магазин пропадает с витрины, но остаётся у владельца, и открыть
@@ -135,12 +140,27 @@ const useProfileLinks = (t: TFunction, language: AppLang) => {
       {
         title: t("profile.sections.others"),
         data: [
-          ...(hasReceipts
+          ...(isFbs
             ? [
                 {
-                  title: t("store.receipts.title"),
+                  title: t("store.stock.title"),
+                  icon: CubeIcon,
+                  onPress: () => router.push("/(shop-tabs)/(profile)/stock"),
+                },
+                {
+                  title: t("store.intake.title"),
+                  icon: PlusIcon,
+                  onPress: () => router.push("/(shop-tabs)/(profile)/intake"),
+                },
+              ]
+            : []),
+          ...(hasWarehouse
+            ? [
+                {
+                  title: t("store.warehouse.title"),
                   icon: PackageCheckIcon,
-                  onPress: () => router.push("/(shop-tabs)/(profile)/receipts"),
+                  onPress: () =>
+                    router.push("/(shop-tabs)/(profile)/warehouse"),
                 },
               ]
             : []),
@@ -171,7 +191,7 @@ const useProfileLinks = (t: TFunction, language: AppLang) => {
         isVisible: true,
       },
     ],
-    [language, isClosed, hasReceipts],
+    [language, isClosed, isFbs, hasWarehouse],
   );
 
   return { links, langSheetRef };

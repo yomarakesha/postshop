@@ -603,7 +603,11 @@
       "setSaved": "Stok güncellendi",
       "amountPlaceholder": "Şu anda kaç adet var",
       "amountRequired": "Bir sayı girin: sıfır veya daha fazla",
-      "inWarehouse": "Depoda: {{count}}"
+      "inWarehouse": "Depoda: {{count}}",
+      "title": "Stok",
+      "subtitle": "Satışa ne kadar ürün hazır. Açık siparişlerin tuttuğu miktar düşülür.",
+      "edit": "Değiştir",
+      "fbsOnly": "Bu bölüm FBS mağazaları içindir: ürünlerini kendileri saklar. FBO mağazasının stoku «Depo» bölümündedir."
     },
     "close": {
       "close": "Mağazayı kapat",
@@ -631,8 +635,23 @@
         "rejected": "İade reddedildi"
       }
     },
+    "intake": {
+      "title": "Ürün kabulü",
+      "subtitle": "Ürün geldi — ne kadar geldiğini girin. Stok bu miktar kadar artar ve ürün hemen satın alınabilir.",
+      "accept": "Kabul et",
+      "fbsOnly": "Bu bölüm FBS mağazaları içindir: ürünü kendileri kabul eder. FBO mağazası ürünü Postshop deposuna gönderir — «Depo» bölümünde.",
+      "saved": "Ürün kabul edildi"
+    },
+    "warehouse": {
+      "title": "Depo",
+      "tabStock": "Depodaki stok",
+      "tabShipments": "Depoya gönderim",
+      "stockHint": "Ürünleriniz Postshop depolarında saklanır. Platform gönderim belgesini kabul edince stok artar, her tamamlanan siparişle azalır.",
+      "fboOnly": "Bu bölüm FBO mağazaları içindir: ürünleri Postshop deposunda saklanır. FBS mağazası kaydını kendisi tutar — «Stok» ve «Ürün kabulü» bölümlerinde.",
+      "disabled": "Platform deposu kapalı: platform şu anda ürünü depolamaya kabul etmiyor."
+    },
     "receipts": {
-      "title": "Depo kabulü",
+      "title": "Depoya gönderim",
       "subtitle": "Ürünün Postshop deposuna gönderilmesi. Kabulü platform onaylar — ardından ürün stoka girer.",
       "create": "Yeni belge",
       "created": "Belge oluşturuldu",
