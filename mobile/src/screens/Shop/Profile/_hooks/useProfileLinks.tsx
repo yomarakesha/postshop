@@ -14,6 +14,7 @@ import { TFunction } from "i18next";
 import { langs } from "@/constants/langs";
 import DoorOpenIcon from "@assets/icons/door-open.svg";
 import StoreFrontIcon from "@assets/icons/store-front.svg";
+import PackageCheckIcon from "@assets/icons/package-check.svg";
 import { shopBaseApi } from "@/api/shopBaseApi";
 import ErrorAlert from "@/utils/errorAlert";
 import Toast from "react-native-toast-message";
@@ -128,6 +129,11 @@ const useProfileLinks = (t: TFunction, language: AppLang) => {
       {
         title: t("profile.sections.others"),
         data: [
+          {
+            title: t("store.returns.title"),
+            icon: PackageCheckIcon,
+            onPress: () => router.push("/(shop-tabs)/(profile)/returns"),
+          },
           {
             title: t(isClosed ? "store.close.reopen" : "store.close.close"),
             icon: StoreFrontIcon,

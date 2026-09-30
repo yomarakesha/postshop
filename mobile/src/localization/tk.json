@@ -593,6 +593,19 @@
       "confirm": "Ýapmak",
       "cancel": "Ýatyrmak",
       "badge": "Ýapyk"
+    },
+    "returns": {
+      "title": "Yzyna gaýtarmalar",
+      "subtitle": "Dükanyňyzyň harytlary boýunça yzyna gaýtarmalar. Karary platforma kabul edýär.",
+      "empty": "Gaýtarmak arzasy ýok",
+      "unknownProduct": "Haryt aýryldy",
+      "quantityShort": "gaýtarylýan: {{count}}",
+      "fromOrder": "sargyt №{{id}}",
+      "status": {
+        "pending": "Gaýtarmak seredilýär",
+        "approved": "Gaýtarmak tassyklandy",
+        "rejected": "Gaýtarmak kabul edilmedi"
+      }
     }
   },
   "serverSetup": {

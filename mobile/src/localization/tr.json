@@ -593,6 +593,19 @@
       "confirm": "Kapat",
       "cancel": "İptal",
       "badge": "Kapalı"
+    },
+    "returns": {
+      "title": "İadeler",
+      "subtitle": "Mağazanızın ürünleri için iadeler. Kararı platform verir.",
+      "empty": "Henüz iade talebi yok",
+      "unknownProduct": "Ürün kaldırıldı",
+      "quantityShort": "iade edilecek: {{count}}",
+      "fromOrder": "sipariş #{{id}}",
+      "status": {
+        "pending": "İade inceleniyor",
+        "approved": "İade onaylandı",
+        "rejected": "İade reddedildi"
+      }
     }
   },
   "serverSetup": {

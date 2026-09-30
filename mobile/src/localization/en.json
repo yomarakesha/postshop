@@ -593,6 +593,19 @@
       "confirm": "Close",
       "cancel": "Cancel",
       "badge": "Closed"
+    },
+    "returns": {
+      "title": "Returns",
+      "subtitle": "Returns for your store products. The platform makes the decision.",
+      "empty": "No return requests yet",
+      "unknownProduct": "Product removed",
+      "quantityShort": "to return: {{count}}",
+      "fromOrder": "order #{{id}}",
+      "status": {
+        "pending": "Return under review",
+        "approved": "Return approved",
+        "rejected": "Return declined"
+      }
     }
   },
   "serverSetup": {
