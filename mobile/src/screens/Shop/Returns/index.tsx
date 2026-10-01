@@ -6,7 +6,8 @@ import EmptyState from "@/ui/EmptyState";
 import RefreshControl from "@/ui/RefreshControl";
 import Typography from "@/ui/Typography";
 import useAppStore from "@/store/useAppStore";
-import React, { useCallback, useMemo } from "react";
+import { formatApiDate } from "@/utils/formatDate";
+import React, { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { FlatList, ListRenderItem, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
@@ -25,10 +26,6 @@ const ShopReturnsScreen = () => {
   const lang = useAppStore((s) => s.lang);
   const { data, isLoading, isRefetching, refetch } = returnApi.useShopReturns(
     shopBaseId!,
-  );
-  const dateFormat = useMemo(
-    () => new Intl.DateTimeFormat(lang ?? undefined, { dateStyle: "medium" }),
-    [lang],
   );
 
   const renderItem: ListRenderItem<ReturnRequest.Item> = useCallback(
@@ -86,13 +83,13 @@ const ShopReturnsScreen = () => {
           )}
           {!!item.created_at && (
             <Typography variant="t2" color="tertiary">
-              {dateFormat.format(new Date(item.created_at))}
+              {formatApiDate(item.created_at, lang, { dateStyle: "medium" })}
             </Typography>
           )}
         </View>
       );
     },
-    [t, dateFormat],
+    [t, lang],
   );
 
   return (

@@ -23,6 +23,9 @@ import PriceSummary from "@/ui/PriceSummary";
 import { deliveryMessageApi } from "@/api/deliveryMessageApi";
 import { usePickupPointStore } from "@/store/usePickupPointStore";
 import ActivityIndicator from "@/ui/ActivityIndicator";
+import { pickupPointsApi } from "@/api/pickupPointsApi";
+import { useUserStore } from "@/store/useUserStore";
+import { MAX_PAGE_SIZE } from "@/constants/pagination";
 
 type InputsType = Pick<Order.API.CreateBody, "comment" | "delivery_address">;
 
@@ -60,6 +63,39 @@ const CheckoutScreen = () => {
     "pickup",
   );
   const [paymentMethod, setPaymentMethod] = useState<Order.PaymentType>("card");
+
+  /**
+   * Пункты выдачи выбранного города — те же параметры, что у карты
+   * (`/pickup-map`), поэтому запрос общий. Раньше самовывоз стоял по
+   * умолчанию всегда: в городе без пунктов карта открывалась пустой, кнопка
+   * «Оформить» не включалась, и покупатель не понимал почему.
+   */
+  const cityId = useUserStore((s) => s.cityId);
+  const pickupPointsQuery = pickupPointsApi.useGetAll(
+    { limit: MAX_PAGE_SIZE, skip: 0, city_id: cityId!, is_active: true },
+    { enabled: !!cityId },
+  );
+  const noPickupPoints =
+    !cityId ||
+    (pickupPointsQuery.isSuccess && pickupPointsQuery.data.length === 0);
+
+  useEffect(() => {
+    if (noPickupPoints) setDeliveryMethod("delivery");
+  }, [noPickupPoints]);
+
+  // Пункт, выбранный раньше, мог остаться от другого города или быть с тех
+  // пор выключен — такой заказ сервер не примет.
+  useEffect(() => {
+    if (!selectedPickupPoint || !pickupPointsQuery.isSuccess) return;
+    const stillAvailable = pickupPointsQuery.data.some(
+      (point) => point.id === selectedPickupPoint.id,
+    );
+    if (!stillAvailable) usePickupPointStore.getState().selectPickupPoint(null);
+  }, [
+    selectedPickupPoint,
+    pickupPointsQuery.isSuccess,
+    pickupPointsQuery.data,
+  ]);
 
   const [isSuccess, setIsSuccess] = useState(false);
   const { t } = useTranslation();
@@ -188,12 +224,23 @@ const CheckoutScreen = () => {
               {t("deliveryMethod.title")}
             </Typography>
             <Pressable
-              style={styles.switcherButton}
+              style={[
+                styles.switcherButton,
+                noPickupPoints && styles.switcherDisabled,
+              ]}
               onPress={() => setDeliveryMethod("pickup")}
+              disabled={noPickupPoints}
             >
-              <Typography>{t("deliveryMethod.pickup")}</Typography>
+              <Typography color={noPickupPoints ? "secondary" : undefined}>
+                {t("deliveryMethod.pickup")}
+              </Typography>
               <Radio isActive={deliveryMethod === "pickup"} />
             </Pressable>
+            {noPickupPoints && (
+              <Typography variant="t1" color="secondary">
+                {t("deliveryMethod.noPickupPoints")}
+              </Typography>
+            )}
             <Pressable
               style={styles.switcherButton}
               onPress={() => setDeliveryMethod("delivery")}
@@ -336,6 +383,9 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing(4),
     borderRadius: theme.spacing(3),
     gap: theme.spacing(2),
+  },
+  switcherDisabled: {
+    opacity: 0.5,
   },
   switcherButton: {
     flexDirection: "row",

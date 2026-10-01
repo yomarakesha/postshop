@@ -7,16 +7,16 @@ import Typography from "@/ui/Typography";
 import Header from "@/components/Header";
 import RightChevronIcon from "@assets/icons/right-chevron.svg";
 import { useTranslation } from "react-i18next";
+import useShopStore from "@/store/useShopStore";
 
 export type ShopAdditionalEditLinkType =
-  // | "warehouse"
   "name" | "addresses" | "phones" | "color" | "logo";
 
 const EditShopScreen = () => {
   const { t } = useTranslation();
+  const warehouseType = useShopStore((s) => s.shop?.warehouse_type);
 
   const steps: { key: ShopAdditionalEditLinkType; title: string }[] = [
-    // { key: "warehouse", title: "Ammar görnüşi" },
     { key: "name", title: t("store.editShopAdditional.baseInfo") },
     { key: "addresses", title: t("store.editShopAdditional.address") },
     { key: "phones", title: t("store.editShopAdditional.phoneNumbers") },
@@ -40,6 +40,24 @@ const EditShopScreen = () => {
         backgroundColor="white"
       />
       <View style={styles.container}>
+        {/*
+          Тип склада раньше был закомментирован, и продавец нигде не видел,
+          FBS у него или FBO. Меняет его только сотрудник Postshop, поэтому
+          это строка для чтения, а не пункт с переходом.
+        */}
+        {!!warehouseType && (
+          <View style={[styles.tile, styles.infoTile]}>
+            <Typography variant="p3" color="secondary">
+              {t("store.shopAdditional.warehouseType.headerTitle")}
+            </Typography>
+            <Typography weight="medium">
+              {t(`store.editShopAdditional.warehouse.${warehouseType}`)}
+            </Typography>
+            <Typography variant="t1" color="secondary">
+              {t("store.editShopAdditional.warehouse.hint")}
+            </Typography>
+          </View>
+        )}
         {steps.map((step) => (
           <Pressable
             key={step.key}
@@ -78,6 +96,12 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.white,
     borderRadius: theme.spacing(3),
     ...theme.shadows.soft,
+  },
+  infoTile: {
+    flexDirection: "column",
+    alignItems: "flex-start",
+    justifyContent: "flex-start",
+    gap: theme.spacing(1),
   },
   shrink: {
     flexShrink: 1,

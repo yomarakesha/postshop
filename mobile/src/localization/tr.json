@@ -54,7 +54,8 @@
     "pickup": "Teslim alma noktasından teslim al",
     "delivery": "Adrese teslimat",
     "addressPlaceholder": "Magtymguly Bulvarı, 1 numaralı bina",
-    "selectPickupPoint": "Teslim alma noktası seçin"
+    "selectPickupPoint": "Teslim alma noktası seçin",
+    "noPickupPoints": "Şehrinizde henüz teslim alma noktası yok — adrese teslimatı seçin veya şehri değiştirin"
   },
   "common": {
     "next": "İleri",
@@ -506,7 +507,8 @@
     },
     "order": {
       "noApproved": "Sipariş işlemleri, bir operatör siparişi kabul ettikten sonra kullanılabilir olacaktır.",
-      "readyToPickup": "Teslim almaya hazır"
+      "readyToPickup": "Teslim almaya hazır",
+      "fboNote": "Sipariş Postshop deposu tarafından hazırlanıyor — sizden bir şey yapmanız gerekmiyor"
     },
     "shopAdditional": {
       "onboarding": {
@@ -549,7 +551,12 @@
       "color": "Renk",
       "logo": "Logo",
       "phoneNumbers": "Telefon numaraları",
-      "baseInfo": "Temel bilgiler"
+      "baseInfo": "Temel bilgiler",
+      "warehouse": {
+        "fbs": "FBS — ürünleri kendim saklıyorum",
+        "fbo": "FBO — ürünler Postshop deposunda",
+        "hint": "Depo türünü Postshop çalışanları değiştirir. Değiştirmek için destek ekibine başvurun."
+      }
     },
     "myProducts": {
       "headerTitle": "Ürünlerim",
@@ -580,6 +587,15 @@
           "cover": "Kapak"
         },
         "descriptionPlaceholder": "Ürünü tanımlayın: malzeme, ölçüler, içerik"
+      },
+      "barcode": {
+        "platformLabel": "Postshop barkodu",
+        "platformHint": "Otomatik atanır, değiştirilemez",
+        "vendorLabel": "Üretici barkodu",
+        "vendorPlaceholder": "örn. 4601234567893",
+        "vendorHint": "İsteğe bağlı. Ambalajdaki gibi 8, 12, 13 veya 14 hane",
+        "invalid": "Barkod 8, 12, 13 veya 14 haneden oluşmalıdır",
+        "duplicate": "Mağazanızda bu barkoda sahip bir ürün zaten var"
       }
     },
     "stock": {

@@ -7,7 +7,7 @@ import Header from "@/components/Header";
 import Typography from "@/ui/Typography";
 import { useTranslation } from "react-i18next";
 import { orderApi } from "@/api/orderApi";
-import dayjs from "dayjs";
+import { formatApiDateTimeNumeric, getAshgabatParts } from "@/utils/formatDate";
 import { ScrollView } from "react-native-gesture-handler";
 import Card from "./_components/Card";
 import RefreshControl from "@/ui/RefreshControl";
@@ -27,9 +27,11 @@ type OrderMonthGroup = {
 const groupByMonth = (orders: Order.Item[]): OrderMonthGroup[] => {
   const map = new Map<string, OrderMonthGroup>();
   for (const order of orders) {
-    const d = dayjs(order.created_at);
-    const monthKey = d.month() + 1;
-    const year = d.year();
+    // Месяц — по Ашхабаду: заказ 1-го числа в 02:00 по-местному в UTC ещё
+    // прошлый месяц, и раньше он попадал не в ту группу.
+    const parts = getAshgabatParts(order.created_at);
+    const monthKey = parts?.month ?? 0;
+    const year = parts?.year ?? 0;
     const key = `${year}-${monthKey}`;
     if (!map.has(key)) {
       map.set(key, { monthKey, year, items: [] });
@@ -81,9 +83,7 @@ const OrdersScreen = () => {
 
   return (
     <>
-      <Header
-        backgroundColor={theme.colors.white}
-      />
+      <Header backgroundColor={theme.colors.white} />
       <ScrollView
         style={styles.scroll}
         contentContainerStyle={styles.contentContainer}
@@ -110,7 +110,7 @@ const OrdersScreen = () => {
                   key={String(el.id)}
                   id={el.id}
                   onPress={handleClickOrder}
-                  date={dayjs(el.created_at).format("DD.MM.YYYY • HH:mm")}
+                  date={formatApiDateTimeNumeric(el.created_at)}
                   status={
                     el.all_shops_rejected
                       ? "cancelled"

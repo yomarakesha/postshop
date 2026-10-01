@@ -1,7 +1,7 @@
 import { productsApi } from "@/api/products";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import * as ExpoImagePicker from "expo-image-picker";
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm, useWatch } from "react-hook-form";
 import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
 import { StyleSheet } from "react-native-unistyles";
@@ -16,9 +16,15 @@ import MeasureUnitSheet from "@/components/BottomSheet/MeasureUnitSheet";
 import useAppStore from "@/store/useAppStore";
 import useShopStore from "@/store/useShopStore";
 import ErrorAlert from "@/utils/errorAlert";
+import Toast from "react-native-toast-message";
 import { useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Platform } from "react-native";
+import BarcodeSection, {
+  isVendorBarcodeValid,
+  normalizeVendorBarcode,
+  productSaveError,
+} from "../_components/BarcodeSection";
 import CategoryBrandSection from "../_components/CategoryBrandSection";
 import PriceSection from "../_components/CurrencyPriceSection";
 import DiscountSection from "../_components/DiscountSection";
@@ -28,6 +34,10 @@ import MeasureUnitSection from "../_components/MeasureUnitSection";
 import ProductInfoSection from "../_components/ProductInfoSection";
 import CurrencySheet from "@/components/BottomSheet/CurrencySheet";
 import useLayoutHeight from "@/hooks/useLayoutHeight";
+import {
+  downscaleImages,
+  PRODUCT_IMAGE_MAX_SIDE,
+} from "@/utils/downscaleImage";
 
 const CreateProductScreen = () => {
   const shopBaseId = useShopStore((s) => s.activeShopBaseId);
@@ -77,11 +87,17 @@ const CreateProductScreen = () => {
       price: 0,
       discount: undefined,
       hashtag: undefined,
+      vendor_barcode: "",
     },
   });
 
   const discount = useWatch({ control, name: "discount" });
   const hashtag = useWatch({ control, name: "hashtag" });
+  const vendorBarcode = useWatch({ control, name: "vendor_barcode" });
+  const [barcodeServerError, setBarcodeServerError] = useState<string>();
+
+  // Отказ сервера относится к введённому коду — после правки он неактуален.
+  useEffect(() => setBarcodeServerError(undefined), [vendorBarcode]);
 
   const isDisabled =
     !isValid ||
@@ -90,7 +106,8 @@ const CreateProductScreen = () => {
     !selectedBrand ||
     !selectedMeasureUnit ||
     (hasDiscount && !discount) ||
-    (hasHashtag && !hashtag);
+    (hasHashtag && !hashtag) ||
+    !isVendorBarcodeValid(vendorBarcode);
 
   const handleSelectImages = async () => {
     if (images.length >= 5) return;
@@ -108,13 +125,16 @@ const CreateProductScreen = () => {
     });
 
     if (!result.canceled) {
-      if (!result.canceled) {
-        setImages((prev) => {
-          const remaining = 5 - prev.length;
+      // quality пикера только пережимает JPEG, а не уменьшает фото в пикселях.
+      const resized = await downscaleImages(
+        result.assets,
+        PRODUCT_IMAGE_MAX_SIDE,
+      );
+      setImages((prev) => {
+        const remaining = 5 - prev.length;
 
-          return [...prev, ...result.assets.slice(0, remaining)];
-        });
-      }
+        return [...prev, ...resized.slice(0, remaining)];
+      });
     }
   };
 
@@ -208,11 +228,20 @@ const CreateProductScreen = () => {
           type: img.mimeType ?? "image/jpeg",
         })),
         currency_id: selectedCurrency ? selectedCurrency.id : undefined,
+        // Пустое поле не отправляем: штрихкод производителя необязателен.
+        vendor_barcode:
+          normalizeVendorBarcode(data.vendor_barcode) || undefined,
       });
 
       router.back();
     } catch (e: any) {
-      ErrorAlert(t, e);
+      const { message, field } = productSaveError(t, e);
+      if (field === "vendor_barcode") setBarcodeServerError(message);
+      if (message) {
+        Toast.show({ type: "error", text1: t("error"), text2: message });
+      } else {
+        ErrorAlert(t, e);
+      }
     }
   };
   return (
@@ -245,6 +274,11 @@ const CreateProductScreen = () => {
         <MeasureUnitSection
           selectedMeasureUnit={selectedMeasureUnit?.name}
           onPressMeasureUnit={handlePressMeasureUnit}
+          t={t}
+        />
+        <BarcodeSection
+          control={control}
+          serverError={barcodeServerError}
           t={t}
         />
         <CategoryBrandSection

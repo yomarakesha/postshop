@@ -6,10 +6,7 @@ declare namespace Product {
   };
 
   type Sort =
-    | "most_expensive"
-    | "most_cheap"
-    | "recently_added"
-    | "with_discounts";
+    "most_expensive" | "most_cheap" | "recently_added" | "with_discounts";
 
   type DiscountType = "percentage" | "fixed";
 
@@ -38,6 +35,10 @@ declare namespace Product {
     rating_avg?: string | null;
     rating_count?: number;
     is_active: boolean;
+    /** Штрихкод Postshop (EAN-13): выдаёт сервер, всегда есть, менять нельзя. */
+    barcode: string;
+    /** Заводской штрихкод производителя (8/12/13/14 цифр) или null. */
+    vendor_barcode: string | null;
     created_at: Date;
     updated_at: Date;
   }
@@ -60,6 +61,8 @@ declare namespace Product {
       // преобразования — форма редактирования именно так и делает.
       discount?: number | string | null;
       hashtag?: string | null;
+      /** Штрихкод производителя; пусто — не указан. */
+      vendor_barcode?: string | null;
     };
   }
 
@@ -96,6 +99,9 @@ declare namespace Product {
       // преобразования — форма редактирования именно так и делает.
       discount?: number | string | null;
       hashtag?: string | null;
+      // Пустая строка стирает штрихкод на сервере. null/undefined сериализатор
+      // multipart выбрасывает, и поле тогда просто не меняется.
+      vendor_barcode?: string | null;
     };
 
     type GetMyVars = Product.Filters & {

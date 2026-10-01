@@ -6,6 +6,7 @@ import CloseIcon from "@assets/icons/close.svg";
 import { TFunction } from "i18next";
 import { STATUS_COMMENT_KINDS } from "@/utils/notificationTarget";
 import { orderStatus } from "@/utils/orderStatus";
+import { formatApiDate } from "@/utils/formatDate";
 
 type Props = {
   data: Notification.Item;
@@ -51,12 +52,11 @@ const NotificationRow = ({
 
   // Без даты лучше пустая строка, чем 01.01.1970: у старых уведомлений
   // сервер отдаёт created_at пустым.
-  const date = data.created_at
-    ? new Intl.DateTimeFormat(language, {
-        dateStyle: "short",
-        timeStyle: "short",
-      }).format(new Date(data.created_at))
-    : "";
+  // Время — по Ашхабаду, а не по поясу телефона (см. utils/formatDate).
+  const date = formatApiDate(data.created_at, language, {
+    dateStyle: "short",
+    timeStyle: "short",
+  });
 
   return (
     <View style={styles.container(data.is_read)}>

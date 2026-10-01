@@ -83,11 +83,9 @@ const OrderScreen = () => {
     (el) => el.shop_base_id === shop?.shop_base_id,
   );
 
-  const Icon =
-    isGlobalRejected
-      ? orderStatus.shop.getIcon("rejected")
-      : orderStatus.shop.getIcon(orderShop?.status);
-
+  const Icon = isGlobalRejected
+    ? orderStatus.shop.getIcon("rejected")
+    : orderStatus.shop.getIcon(orderShop?.status);
 
   const handleCancel = () => {
     useConfirmationModal.setState({
@@ -113,6 +111,20 @@ const OrderScreen = () => {
 
   const actions = useMemo(() => {
     if (isGlobalRejected) return null;
+    // FBO: товар на складе Postshop, часть собирают сотрудники платформы.
+    // Раньше продавец видел «Принять/Отклонить/Готов к выдаче», а сервер
+    // отвечал на них 403 — кнопки прячем и объясняем, почему их нет.
+    if (orderShop?.warehouse_type === "fbo") {
+      // После выдачи/отказа подсказка уже не нужна — как и кнопки у FBS.
+      if (orderShop.status !== "pending" && orderShop.status !== "approved") {
+        return null;
+      }
+      return (
+        <Typography color="secondary" isCentered>
+          {t("store.order.fboNote")}
+        </Typography>
+      );
+    }
     if (orderShop?.status === "pending") {
       if (data?.order_status.code === "pending") {
         return (
@@ -159,10 +171,7 @@ const OrderScreen = () => {
         withGoBack
         backgroundColor="white"
       />
-      <ScrollView
-        style={styles.flex1}
-        contentContainerStyle={styles.wrapper}
-      >
+      <ScrollView style={styles.flex1} contentContainerStyle={styles.wrapper}>
         <View style={styles.contentContainer}>
           {Icon && (
             <Icon

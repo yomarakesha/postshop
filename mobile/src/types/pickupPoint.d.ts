@@ -17,6 +17,8 @@ declare namespace PickupPoint {
       skip: number;
       limit: number;
       city_id?: number;
+      /** true — только работающие пункты: выключенный выбрать нельзя. */
+      is_active?: boolean;
     };
     type GetAllResponse = Item[];
     type GetResponse = Item;

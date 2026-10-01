@@ -42,6 +42,12 @@ declare namespace Order {
     comment: string | null;
     items: ItemProduct[];
     subtotal: string;
+    /**
+     * Склад, с которого собирается часть заказа. У FBO товар лежит на складе
+     * Postshop и часть собирают сотрудники платформы — сменить её статус
+     * продавец не может (сервер отвечает 403). null — у старых заказов.
+     */
+    warehouse_type: ShopBase.WarehouseType | null;
   };
 
   type Item = {

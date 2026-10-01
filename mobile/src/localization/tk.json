@@ -54,7 +54,8 @@
     "pickup": "Sargyt alyş nokadyndan al",
     "delivery": "Eltip bermek",
     "addressPlaceholder": "Magtymguly şaýoly, jaý 1",
-    "selectPickupPoint": "Sargyt alyş nokadyny saýla"
+    "selectPickupPoint": "Sargyt alyş nokadyny saýla",
+    "noPickupPoints": "Siziň şäheriňizde entek sargyt alyş nokady ýok — eltip bermegi saýlaň ýa-da şäheri üýtgediň"
   },
   "common": {
     "next": "Indiki",
@@ -505,7 +506,8 @@
     },
     "order": {
       "noApproved": "Operator sargydy kabul edenden soň, sargyt bilen baglanyşykly hereketler elýeterli bolar.",
-      "readyToPickup": "Almaga taýýar"
+      "readyToPickup": "Almaga taýýar",
+      "fboNote": "Sargydy Postshop ammary ýygnaýar — sizden hiç zat talap edilmeýär"
     },
     "add": "Haryt goş",
     "shopAdditional": {
@@ -549,7 +551,12 @@
       "color": "Reňk",
       "logo": "Logotip",
       "phoneNumbers": "Telefon belgileri",
-      "baseInfo": "Esasy maglumatlar"
+      "baseInfo": "Esasy maglumatlar",
+      "warehouse": {
+        "fbs": "FBS — harydy özüm saklaýaryn",
+        "fbo": "FBO — haryt Postshop ammarynda",
+        "hint": "Ammaryň görnüşini Postshop işgärleri üýtgedýär. Üýtgetmek üçin goldaw gullugyna ýüz tutuň."
+      }
     },
     "myProducts": {
       "headerTitle": "Harytlarym",
@@ -580,6 +587,15 @@
           "cover": "Esasy"
         },
         "descriptionPlaceholder": "Haryt barada ýazyň: material, ölçegleri, düzümi"
+      },
+      "barcode": {
+        "platformLabel": "Postshop ştrihkody",
+        "platformHint": "Awtomatik berilýär, üýtgedip bolmaýar",
+        "vendorLabel": "Öndürijiniň ştrihkody",
+        "vendorPlaceholder": "Mysal üçin: 4601234567893",
+        "vendorHint": "Hökmany däl. 8, 12, 13 ýa-da 14 san — gaplamadaky ýaly",
+        "invalid": "Ştrihkod 8, 12, 13 ýa-da 14 sandan ybarat bolmaly",
+        "duplicate": "Şeýle ştrihkodly haryt dükanyňyzda eýýäm bar"
       }
     },
     "stock": {

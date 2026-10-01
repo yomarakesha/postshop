@@ -1,5 +1,6 @@
 import { shopAdditionalApi } from "@/api/shopAdditionalApi";
 import useShopStore from "@/store/useShopStore";
+import ActivityIndicator from "@/ui/ActivityIndicator";
 import Button from "@/ui/Button";
 import ScreenFooter from "@/ui/ScreenFooter";
 import Typography from "@/ui/Typography";
@@ -45,7 +46,10 @@ const CreateShopAdditionalScreen = () => {
   const stepRefs = useRef<(RefType | null)[]>([]);
   const { t } = useTranslation();
   const [footerHeight, setFooterHeight] = useState<number>(0);
-  const { fboEnabled } = useFeatures();
+  // Пока флаг не пришёл, fboEnabled = false: раньше мастер собирался без шага
+  // склада, а через миг шаг появлялся — страницы сдвигались под продавцом, и
+  // успевший пройти мастер создавал магазин FBS по умолчанию. Ждём ответ.
+  const { fboEnabled, isLoading: isFeaturesLoading } = useFeatures();
 
   /**
    * Шаги мастера по порядку. Массивом, а не набором вложенных страниц с
@@ -57,9 +61,13 @@ const CreateShopAdditionalScreen = () => {
    * отклонит. Поменять тип позже продавец не может — это делает сотрудник
    * платформы, — поэтому шаг стоит здесь, при активации.
    */
-  const steps: ((props: StepsProps & { footerHeight: number }) => React.ReactNode)[] = [
+  const steps: ((
+    props: StepsProps & { footerHeight: number },
+  ) => React.ReactNode)[] = [
     (props) => <City {...props} />,
-    ...(fboEnabled ? [(props: StepsProps) => <WarehouseType {...props} />] : []),
+    ...(fboEnabled
+      ? [(props: StepsProps) => <WarehouseType {...props} />]
+      : []),
     (props) => <NameAndDescription {...props} />,
     (props) => <Addresses {...props} />,
     (props) => <PhoneNumbers {...props} />,
@@ -109,6 +117,8 @@ const CreateShopAdditionalScreen = () => {
     pagerViewRef.current?.setPage(currentIndex - 1);
     setCurrentIndex((prev) => prev - 1);
   };
+
+  if (isFeaturesLoading) return <ActivityIndicator isFullScreen />;
 
   return (
     <>

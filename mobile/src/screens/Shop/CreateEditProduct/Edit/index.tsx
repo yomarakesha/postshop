@@ -26,10 +26,16 @@ import useAppStore from "@/store/useAppStore";
 import useShopStore from "@/store/useShopStore";
 import ActivityIndicator from "@/ui/ActivityIndicator";
 import ErrorAlert from "@/utils/errorAlert";
+import Toast from "react-native-toast-message";
 import { getImageUrl } from "@/utils/getImageUrl";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useTranslation } from "react-i18next";
 import { Platform, View } from "react-native";
+import BarcodeSection, {
+  isVendorBarcodeValid,
+  normalizeVendorBarcode,
+  productSaveError,
+} from "../_components/BarcodeSection";
 import CategoryBrandSection from "../_components/CategoryBrandSection";
 import PriceSection from "../_components/CurrencyPriceSection";
 import DiscountSection from "../_components/DiscountSection";
@@ -39,6 +45,10 @@ import MeasureUnitSection from "../_components/MeasureUnitSection";
 import ProductInfoSection from "../_components/ProductInfoSection";
 import CurrencySheet from "@/components/BottomSheet/CurrencySheet";
 import useLayoutHeight from "@/hooks/useLayoutHeight";
+import {
+  downscaleImages,
+  PRODUCT_IMAGE_MAX_SIDE,
+} from "@/utils/downscaleImage";
 
 const EditProductScreen = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -128,6 +138,7 @@ const EditProductScreen = () => {
       price: Number(data.price),
       discount: data.discount,
       hashtag: data.hashtag,
+      vendor_barcode: data.vendor_barcode ?? "",
     };
   }, [data]);
 
@@ -143,6 +154,7 @@ const EditProductScreen = () => {
       price: 0,
       discount: undefined,
       hashtag: undefined,
+      vendor_barcode: "",
     },
     values: formValues,
     resetOptions: {
@@ -152,6 +164,11 @@ const EditProductScreen = () => {
 
   const discount = useWatch({ control, name: "discount" });
   const hashtag = useWatch({ control, name: "hashtag" });
+  const vendorBarcode = useWatch({ control, name: "vendor_barcode" });
+  const [barcodeServerError, setBarcodeServerError] = useState<string>();
+
+  // Отказ сервера относится к введённому коду — после правки он неактуален.
+  useEffect(() => setBarcodeServerError(undefined), [vendorBarcode]);
 
   const isDisabled =
     !isValid ||
@@ -160,7 +177,8 @@ const EditProductScreen = () => {
     !selectedBrand ||
     !selectedMeasureUnit ||
     (hasDiscount && !discount) ||
-    (hasHashtag && !hashtag);
+    (hasHashtag && !hashtag) ||
+    !isVendorBarcodeValid(vendorBarcode);
 
   const handleSelectImages = async () => {
     if (images.length >= 5) return;
@@ -175,10 +193,15 @@ const EditProductScreen = () => {
       selectionLimit: 5 - images.length,
     });
     if (!result.canceled) {
+      // quality пикера только пережимает JPEG, а не уменьшает фото в пикселях.
+      const resized = await downscaleImages(
+        result.assets,
+        PRODUCT_IMAGE_MAX_SIDE,
+      );
       setImages((prev) => {
         const remaining = 5 - prev.length;
 
-        return [...prev, ...result.assets.slice(0, remaining)];
+        return [...prev, ...resized.slice(0, remaining)];
       });
     }
   };
@@ -272,6 +295,9 @@ const EditProductScreen = () => {
           type: img.mimeType ?? "image/jpeg",
         })),
         currency_id: selectedCurrency?.id ? selectedCurrency.id : undefined,
+        // Всегда шлём строку: "" стирает штрихкод. null/undefined сериализатор
+        // multipart выбрасывает, и очистить поле было бы нельзя.
+        vendor_barcode: normalizeVendorBarcode(data.vendor_barcode),
       });
 
       for (const img of images) {
@@ -283,7 +309,13 @@ const EditProductScreen = () => {
 
       router.back();
     } catch (e: any) {
-      ErrorAlert(t, e);
+      const { message, field } = productSaveError(t, e);
+      if (field === "vendor_barcode") setBarcodeServerError(message);
+      if (message) {
+        Toast.show({ type: "error", text1: t("error"), text2: message });
+      } else {
+        ErrorAlert(t, e);
+      }
     }
   };
 
@@ -439,6 +471,12 @@ const EditProductScreen = () => {
             <MeasureUnitSection
               selectedMeasureUnit={selectedMeasureUnit?.name}
               onPressMeasureUnit={handlePressMeasureUnit}
+              t={t}
+            />
+            <BarcodeSection
+              control={control}
+              platformBarcode={data?.barcode}
+              serverError={barcodeServerError}
               t={t}
             />
             <CategoryBrandSection

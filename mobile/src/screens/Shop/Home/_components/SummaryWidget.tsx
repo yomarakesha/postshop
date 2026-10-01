@@ -6,6 +6,7 @@ import { orderApi } from "@/api/orderApi";
 import ActivityIndicator from "@/ui/ActivityIndicator";
 import Typography from "@/ui/Typography";
 import { formatAmount, getCurrencyCode } from "@/utils/formatMoney";
+import { formatApiDate } from "@/utils/formatDate";
 
 const PERIODS: Order.API.SummaryPeriod[] = ["week", "month", "quarter"];
 
@@ -105,12 +106,14 @@ const SummaryWidget = ({ shopBaseId, t, language }: Props) => {
     current.orders_count + current.rejected_count === 0 &&
     previous.orders_count + previous.rejected_count === 0;
 
-  const dayFormat = new Intl.DateTimeFormat(language ?? undefined, {
-    day: "2-digit",
-    month: "2-digit",
-  });
+  // point.date — календарный день ("YYYY-MM-DD"). `new Date(...)` делал из
+  // него полночь UTC, и на телефоне с поясом западнее UTC подпись уезжала
+  // на предыдущий день; formatApiDate показывает дату как есть.
   const points = (data?.points ?? []).map((point) => ({
-    label: dayFormat.format(new Date(point.date)),
+    label: formatApiDate(point.date, language, {
+      day: "2-digit",
+      month: "2-digit",
+    }),
     value: Number(point.total_revenue),
   }));
   const maxValue = Math.max(...points.map((p) => p.value), 0);

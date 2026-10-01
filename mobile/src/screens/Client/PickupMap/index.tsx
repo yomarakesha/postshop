@@ -35,6 +35,9 @@ const PickupMapScreen = () => {
       limit: MAX_PAGE_SIZE,
       skip: 0,
       city_id: selectedCityId!,
+      // Без фильтра на карте были и выключенные пункты — заказ в такой пункт
+      // сервер не примет. Параметры те же, что на экране оформления: один кэш.
+      is_active: true,
     },
     { enabled: !!selectedCityId },
   );

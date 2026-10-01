@@ -54,7 +54,8 @@
     "pickup": "Pick up from pickup point",
     "delivery": "Home delivery",
     "addressPlaceholder": "Magtymguly Avenue, house 1",
-    "selectPickupPoint": "Select pickup point"
+    "selectPickupPoint": "Select pickup point",
+    "noPickupPoints": "There are no pickup points in your city yet — choose delivery or change the city"
   },
   "common": {
     "next": "Next",
@@ -506,7 +507,8 @@
     },
     "order": {
       "noApproved": "Order actions will be available once an operator accepts the order.",
-      "readyToPickup": "Ready to pickup"
+      "readyToPickup": "Ready to pickup",
+      "fboNote": "The order is fulfilled by the Postshop warehouse — nothing is required from you"
     },
     "shopAdditional": {
       "onboarding": {
@@ -549,7 +551,12 @@
       "color": "Color",
       "logo": "Logo",
       "phoneNumbers": "Phone numbers",
-      "baseInfo": "Basic info"
+      "baseInfo": "Basic info",
+      "warehouse": {
+        "fbs": "FBS — I store the goods myself",
+        "fbo": "FBO — goods are at the Postshop warehouse",
+        "hint": "The warehouse type is changed by Postshop staff. Contact support to change it."
+      }
     },
     "myProducts": {
       "headerTitle": "My products",
@@ -580,6 +587,15 @@
           "cover": "Cover"
         },
         "descriptionPlaceholder": "Describe the product: material, size, what is included"
+      },
+      "barcode": {
+        "platformLabel": "Postshop barcode",
+        "platformHint": "Assigned automatically, cannot be changed",
+        "vendorLabel": "Manufacturer barcode",
+        "vendorPlaceholder": "e.g. 4601234567893",
+        "vendorHint": "Optional. 8, 12, 13 or 14 digits, as on the package",
+        "invalid": "The barcode must be 8, 12, 13 or 14 digits",
+        "duplicate": "A product with this barcode already exists in your store"
       }
     },
     "stock": {

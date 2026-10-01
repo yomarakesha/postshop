@@ -3,6 +3,7 @@ import UploadIcon from "@assets/icons/upload-solid.svg";
 import { getImageUrl } from "@/utils/getImageUrl";
 import { File, Paths } from "expo-file-system";
 import * as ImagePicker from "expo-image-picker";
+import { downscaleImage, LOGO_IMAGE_MAX_SIDE } from "@/utils/downscaleImage";
 import React, { Ref, useEffect, useImperativeHandle, useState } from "react";
 import { Image, Platform, Pressable, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
@@ -67,11 +68,13 @@ const StoreLogo = ({ data, setIsValid, ref, t }: Props) => {
       mediaTypes: ["images"],
       allowsEditing: true,
       aspect: [1, 1],
-      quality: 1,
+      // Было quality: 1 — логотип уходил несжатым снимком камеры в несколько
+      // мегабайт и на слабой связи не загружался.
+      quality: 0.8,
     });
 
     if (!result.canceled) {
-      setImage(result.assets[0]);
+      setImage(await downscaleImage(result.assets[0], LOGO_IMAGE_MAX_SIDE));
     }
   };
 
