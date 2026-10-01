@@ -46,6 +46,7 @@ from app.models.notification import NotificationKind
 from app.models.return_request import ReturnRequest, ReturnStatus
 from app.models.review import Review, ReviewStatus
 from app.services.notifications import notify, notify_shop_owner
+from app.services.sms import send_sms
 from app.services.stock import check_cart_stock, record_sold_for_order, send_out_of_stock_sms
 from app.core.business_time import BUSINESS_TZ, local_date_expr, local_midnight_utc, local_now
 
@@ -274,22 +275,57 @@ async def create_order(
 
     await db.execute(sql_delete(CartItem).where(CartItem.cart_id == cart.id))
 
-    # Магазин узнавал о новом заказе, только зайдя и обновив список: ни отметки,
-    # ни письма. Заказ, о котором продавец не знает, он и не собирает — это
-    # самое дорогое из того, что уведомления закрывают.
-    # Перебираем items_by_shop, а не order.order_shops: связь у только что
-    # созданного заказа не подгружена, и обращение к ней в async-сессии падает
-    # MissingGreenlet. Номера магазинов и так под рукой.
-    for shop_base_id in items_by_shop:
-        await notify_shop_owner(
-            db,
-            shop_base_id=shop_base_id,
-            kind=NotificationKind.order_created,
-            entity_id=order.id,
-        )
+    # Магазину о заказе сообщается при одобрении оператором, а не здесь: до
+    # одобрения продавец сделать ничего не может, а когда наступало время
+    # собирать, ему не приходило ничего (см. update_order_status).
 
     await db.commit()
     return await get_order_or_404(order.id, db)
+
+
+@router.get("/pending/count")
+async def get_pending_orders_count(
+    db: AsyncSession = Depends(get_db),
+    _=Depends(require_permissions(Perm.ORDERS_UPDATE_STATUS)),
+):
+    """Сколько заказов ждут оператора — для счётчика в меню админки.
+
+    Оператор узнавал о новом заказе, только открыв список: у модерации,
+    возвратов и приёмки счётчики были, у заказов — нет.
+    """
+    count = (await db.execute(
+        select(func.count(Order.id))
+        .join(OrderStatus, Order.order_status_id == OrderStatus.id)
+        .where(OrderStatus.code == OrderStatusCode.pending)
+    )).scalar_one()
+    return {"count": count}
+
+
+@router.get("/shop/{shop_id}/attention-count")
+async def get_shop_attention_count(
+    shop_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_permissions(Perm.ORDERS_READ)),
+):
+    """Сколько заказов ждут действий продавца — для счётчика «Мои заказы».
+
+    Это части FBS в одобренном оператором заказе, которые ещё не приняты или
+    не собраны. Части FBO собирает склад Postshop — продавцу они не задача.
+    """
+    await ensure_can_manage_shop(shop_id, current_user, db, staff_codes=STAFF_ORDERS,
+                                 detail="You can only read orders of your own shops")
+    count = (await db.execute(
+        select(func.count(OrderShop.id))
+        .join(Order, OrderShop.order_id == Order.id)
+        .join(OrderStatus, Order.order_status_id == OrderStatus.id)
+        .where(
+            OrderShop.shop_base_id == shop_id,
+            OrderStatus.code == OrderStatusCode.approved,
+            OrderShop.status.in_((LocalOrderStatusCode.pending, LocalOrderStatusCode.approved)),
+            (OrderShop.warehouse_type.is_(None)) | (OrderShop.warehouse_type != WarehouseType.fbo),
+        )
+    )).scalar_one()
+    return {"count": count}
 
 
 @router.get("/", response_model=list[OrderResponse])
@@ -884,10 +920,40 @@ async def update_order_status(
         comment=payload.status_code.value,
     )
 
+    # Одобрение — момент, когда продавцу пора собирать заказ. Раньше ему
+    # сообщали при оформлении, когда действовать было ещё нельзя, а при
+    # одобрении не приходило ничего, и заказ лежал несобранным.
+    shop_sms: list[tuple[str, str]] = []
+    if payload.status_code == OrderStatusCode.approved:
+        for order_shop in order.order_shops:
+            if order_shop.status == LocalOrderStatusCode.rejected:
+                continue
+            await notify_shop_owner(
+                db,
+                shop_base_id=order_shop.shop_base_id,
+                kind=NotificationKind.order_created,
+                entity_id=order.id,
+            )
+            # Часть FBO собирает склад Postshop — продавцу SMS ни к чему.
+            if order_shop.warehouse_type != WarehouseType.fbo:
+                phone = (await db.execute(
+                    select(User.phone)
+                    .join(ShopBase, ShopBase.owner_id == User.id)
+                    .where(ShopBase.id == order_shop.shop_base_id)
+                )).scalar_one_or_none()
+                if phone:
+                    shop_sms.append((
+                        phone,
+                        f"Postshop: новый заказ №{order.id}. Примите его и соберите "
+                        f"в кабинете продавца.",
+                    ))
+
     await db.commit()
     # SMS — после коммита: иначе продавец получал бы сообщение и о том, чего
     # не случилось, если транзакция не зафиксировалась.
     await send_out_of_stock_sms(out_of_stock)
+    for phone, text in shop_sms:
+        await send_sms(phone, text)
     return await get_order_or_404(order_id, db)
 
 

@@ -146,3 +146,46 @@ def test_platform_warehouse_refuses_fbs_shop(client: httpx.Client, staff: dict):
 def test_pickup_points_can_be_limited_to_working_ones(client: httpx.Client):
     points = client.get("/pickup-points/", params={"is_active": True, "limit": 100}).json()
     assert all(point["is_active"] for point in points)
+
+
+# ── Находки 01.10: заказы, возвраты ─────────────────────────────────────────
+
+def test_operator_has_pending_orders_counter(client: httpx.Client, staff: dict):
+    """Оператор узнавал о новом заказе, только открыв список."""
+    response = client.get("/orders/pending/count", headers=staff["headers"])
+    assert response.status_code == 200, response.text
+    assert isinstance(response.json()["count"], int)
+
+
+def test_pending_orders_counter_is_staff_only(client: httpx.Client, outsider: dict):
+    response = client.get("/orders/pending/count", headers=outsider["headers"])
+    assert response.status_code == 403, response.text
+
+
+def test_orders_say_how_they_are_received(client: httpx.Client, staff: dict):
+    """По способу получения подписывается шаг: «в пункте выдачи» или «в доставке»."""
+    orders = client.get("/orders/", params={"limit": 20}, headers=staff["headers"]).json()
+    if not orders:
+        pytest.skip("заказов нет")
+    for order in orders:
+        expected = "delivery" if order["delivery_address"] else "pickup"
+        assert order["delivery_method"] == expected
+
+
+def test_return_cannot_be_received_before_approval(client: httpx.Client, staff: dict):
+    returns = client.get(
+        "/returns/", params={"return_status": "pending", "limit": 1}, headers=staff["headers"]
+    ).json()
+    if not returns:
+        pytest.skip("нет заявок на рассмотрении")
+    response = client.patch(
+        f"/returns/{returns[0]['id']}/receive", headers=staff["headers"], json={"restock": True}
+    )
+    assert response.status_code == 400, response.text
+
+
+def test_receiving_unknown_return_is_404(client: httpx.Client, staff: dict):
+    response = client.patch(
+        "/returns/99999999/receive", headers=staff["headers"], json={"restock": False}
+    )
+    assert response.status_code == 404, response.text

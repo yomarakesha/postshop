@@ -554,22 +554,30 @@ async def update_product(
     product = await get_product_or_404(product_id, db)
     await _ensure_can_manage_shop(product.shop_base_id, current_user, db)
 
+    # Изменилось ли то, что проверяет модератор: название, описание, фото,
+    # категория, бренд, единица, тег. Цена, скидка, валюта и штрихкод на
+    # модерацию не отправляют — см. конец метода.
+    content_changed = False
+
     if category_id is not None:
         cat_res = await db.execute(select(Category).where(Category.id == category_id))
         if not cat_res.scalar_one_or_none():
             raise HTTPException(status_code=404, detail="Category not found")
+        content_changed |= product.category_id != category_id
         product.category_id = category_id
 
     if measure_unit_id is not None:
         mu_res = await db.execute(select(MeasureUnit).where(MeasureUnit.id == measure_unit_id))
         if not mu_res.scalar_one_or_none():
             raise HTTPException(status_code=404, detail="Measure unit not found")
+        content_changed |= product.measure_unit_id != measure_unit_id
         product.measure_unit_id = measure_unit_id
 
     if brand_id is not None:
         brand_res = await db.execute(select(Brand).where(Brand.id == brand_id))
         if not brand_res.scalar_one_or_none():
             raise HTTPException(status_code=404, detail="Brand not found")
+        content_changed |= product.brand_id != brand_id
         product.brand_id = brand_id
 
     if translations is not None:
@@ -577,9 +585,12 @@ async def update_product(
         existing = {t.language: t for t in product.translations}
         for t in parsed_translations:
             if t.language in existing:
-                existing[t.language].name = t.name
-                existing[t.language].description = t.description
+                current = existing[t.language]
+                content_changed |= (current.name, current.description) != (t.name, t.description)
+                current.name = t.name
+                current.description = t.description
             else:
+                content_changed = True
                 db.add(ProductTranslation(product_id=product.id, language=t.language, name=t.name, description=t.description))
 
     if remove_discount and (discount_type is not None or discount is not None):
@@ -636,12 +647,18 @@ async def update_product(
         saved_images = await process_and_save_product_images(images)
         replaced_images = list(product.images or [])
         product.images = saved_images
+        content_changed = True
 
     # Правка владельца отправляет товар на повторную модерацию, правка
     # сотрудника — нет. Раньше сбрасывался статус у любой правки, поэтому
     # исправление опечатки модератором убирало одобренный товар из каталога
     # и отправляло его в очередь к самому же модератору.
-    if not is_staff(current_user, Perm.PRODUCTS_MODERATE):
+    #
+    # И только правка содержимого. Продавец менял цену — и товар пропадал из
+    # каталога до модерации; сохранение без изменений делало то же самое.
+    # Цену, скидку и штрихкод модератор не проверяет, и снимать за них товар
+    # с продажи незачем.
+    if content_changed and not is_staff(current_user, Perm.PRODUCTS_MODERATE):
         product.status = ProductStatus.pending
         product.moderation_comment = None
 

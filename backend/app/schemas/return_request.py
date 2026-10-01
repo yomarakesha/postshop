@@ -5,6 +5,7 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 from app.models.return_request import ReturnStatus
+from app.models.shop_additional import WarehouseType
 from app.schemas.common import Comment1000
 
 
@@ -18,6 +19,11 @@ class ReturnCreateRequest(BaseModel):
 
 class ReturnResolveRequest(BaseModel):
     resolution_comment: Optional[Comment1000] = None
+
+
+class ReturnReceiveRequest(BaseModel):
+    # True — товар цел, возвращается в продажу (остаток растёт); False — брак.
+    restock: bool
 
 
 class ReturnRejectRequest(BaseModel):
@@ -41,6 +47,10 @@ class ReturnResponse(BaseModel):
     reason: str
     status: ReturnStatus
     resolution_comment: Optional[str] = None
+    # Кто получает товар назад: FBS — продавец, FBO — склад Postshop.
+    warehouse_type: Optional[WarehouseType] = None
+    received_at: Optional[datetime] = None
+    restocked: Optional[bool] = None
     created_at: Optional[datetime] = None
 
     class Config:

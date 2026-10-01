@@ -3,7 +3,7 @@ from app.models.shop_additional import WarehouseType
 from pydantic import BaseModel, Field, computed_field, model_validator
 from datetime import date as date_type, datetime
 from decimal import Decimal
-from typing import List, Optional
+from typing import List, Literal, Optional
 from app.models.order import PaymentType
 from app.models.order_status import OrderStatusCode
 from app.models.order_shop import LocalOrderStatusCode
@@ -222,6 +222,18 @@ class OrderResponse(BaseModel):
     order_shops:      list[OrderShopResponse]    = []
     created_at:       datetime
     updated_at:       datetime | None
+
+    @computed_field
+    @property
+    def delivery_method(self) -> Literal["pickup", "delivery"]:
+        """Как покупатель получает заказ.
+
+        От этого зависят названия шагов: при самовывозе после сборки заказ
+        «ждёт в пункте выдачи», а не «передан в доставку». Коды статусов одни
+        для обоих способов, а админка и витрина показывали «Готов к доставке»
+        и заказу из пункта выдачи.
+        """
+        return "delivery" if self.delivery_address else "pickup"
 
     @computed_field
     @property

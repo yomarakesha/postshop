@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from decimal import Decimal
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
@@ -6,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from app.core.dependencies import get_current_user, require_permissions
-from app.core.ownership import STAFF_ORDERS, ensure_can_manage_shop
+from app.core.ownership import STAFF_ORDERS, ensure_can_manage_shop, has_permission
 from app.core.pagination import limit_param, set_pagination_headers, skip_param
 from app.core.permissions import Perm
 from app.database import get_db
@@ -15,9 +16,11 @@ from app.models.order import Order, OrderItem
 from app.models.order_status import OrderStatus, OrderStatusCode
 from app.models.product import Product
 from app.models.return_request import ReturnRequest, ReturnStatus
+from app.models.shop_additional import WarehouseType
 from app.models.user import User
 from app.schemas.return_request import (
     ReturnCreateRequest,
+    ReturnReceiveRequest,
     ReturnRejectRequest,
     ReturnResolveRequest,
     ReturnResponse,
@@ -64,6 +67,13 @@ def _to_response(request: ReturnRequest) -> ReturnResponse:
         reason=request.reason,
         status=request.status,
         resolution_comment=request.resolution_comment,
+        warehouse_type=(
+            order_item.order_shop.warehouse_type
+            if order_item is not None and order_item.order_shop is not None
+            else None
+        ),
+        received_at=request.received_at,
+        restocked=request.restocked,
         created_at=request.created_at,
     )
 
@@ -74,6 +84,7 @@ def _with_relations():
         selectinload(ReturnRequest.order_item)
         .selectinload(OrderItem.product)
         .selectinload(Product.translations),
+        selectinload(ReturnRequest.order_item).selectinload(OrderItem.order_shop),
         selectinload(ReturnRequest.user),
     )
 
@@ -295,11 +306,10 @@ async def approve_return(
     _=Depends(require_permissions(Perm.RETURNS_MANAGE)),
 ):
     """
-    Подтвердить возврат.
+    Подтвердить возврат: платформа согласна принять товар назад.
 
-    Это утверждение платформы, что товар у неё, поэтому здесь же он возвращается
-    на склад — магазинам со складским учётом. Иначе возвращённый товар остался
-    бы проданным, и остаток врал бы на количество возвратов.
+    Остаток здесь не меняется — товар ещё у покупателя. Он возвращается в
+    остаток, когда его получат и осмотрят (PATCH /returns/{id}/receive).
     """
     request = await _load(db, request_id)
     if request is None:
@@ -309,19 +319,7 @@ async def approve_return(
 
     request.status = ReturnStatus.approved
     request.resolution_comment = payload.resolution_comment or None
-
-    # Загружаем строку заказа вместе со связями, а не через db.get: возврат на
-    # склад читает и часть заказа (там снимок типа склада), и товар (единицу
-    # измерения). Ленивая подгрузка в async-сессии запрещена и падает
-    # MissingGreenlet уже внутри записи операции.
-    item_result = await db.execute(
-        select(OrderItem)
-        .options(selectinload(OrderItem.order_shop), selectinload(OrderItem.product))
-        .where(OrderItem.id == request.order_item_id)
-    )
-    order_item = item_result.scalar_one_or_none()
-    if order_item is not None:
-        await record_return_from_customer(db, order_item, request.quantity)
+    order_item = request.order_item
 
     await notify(
         db,
@@ -330,8 +328,7 @@ async def approve_return(
         entity_id=request.id,
         comment=request.resolution_comment,
     )
-    # И владельцу: подтверждённый возврат вернул товар на его склад, а при
-    # складском учёте это прямо меняет остаток.
+    # И владельцу: товар едет назад. Магазину FBS его получать самому.
     if order_item is not None and order_item.product is not None:
         await notify_shop_owner(
             db,
@@ -341,6 +338,59 @@ async def approve_return(
         )
     await db.commit()
 
+    return _to_response(await _load(db, request_id))
+
+
+@router.patch("/{request_id}/receive", response_model=ReturnResponse)
+async def receive_return(
+    request_id: int,
+    payload: ReturnReceiveRequest,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Товар по одобренному возврату получен назад.
+
+    Получает тот, у кого товар хранится: часть FBS — продавец, часть FBO —
+    склад Postshop (сотрудник). restock=true — товар цел и возвращается в
+    остаток; false — брак, остаток не меняется.
+    """
+    request = await _load(db, request_id)
+    if request is None:
+        raise HTTPException(status_code=404, detail="Return request not found")
+    if request.status != ReturnStatus.approved:
+        raise HTTPException(status_code=400, detail="Only an approved return can be received")
+    if request.received_at is not None:
+        raise HTTPException(status_code=400, detail="Return is already received")
+
+    item_result = await db.execute(
+        select(OrderItem)
+        .options(selectinload(OrderItem.order_shop), selectinload(OrderItem.product))
+        .where(OrderItem.id == request.order_item_id)
+    )
+    order_item = item_result.scalar_one_or_none()
+    if order_item is None or order_item.order_shop is None:
+        raise HTTPException(status_code=404, detail="Purchase of this return not found")
+
+    is_staff_user = has_permission(current_user, Perm.RETURNS_MANAGE)
+    if order_item.order_shop.warehouse_type == WarehouseType.fbo:
+        if not is_staff_user:
+            raise HTTPException(
+                status_code=403,
+                detail="FBO returns are received by the Postshop warehouse",
+            )
+    elif not is_staff_user:
+        await ensure_can_manage_shop(
+            order_item.order_shop.shop_base_id, current_user, db,
+            staff_codes=STAFF_ORDERS,
+            detail="You can only receive returns of your own shops",
+        )
+
+    if payload.restock:
+        await record_return_from_customer(db, order_item, request.quantity)
+    request.received_at = datetime.now(timezone.utc)
+    request.restocked = payload.restock
+    await db.commit()
     return _to_response(await _load(db, request_id))
 
 
