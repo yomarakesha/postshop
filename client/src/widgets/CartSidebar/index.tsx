@@ -43,9 +43,13 @@ export const CartSidebar = ({ loginModalRef }: CartSidebarProps) => {
     hasStockProblem,
     canCheckout,
     isLoading,
+    isMounted,
     clearCart,
   } = useCartData()
-  const hasItems = items.length > 0
+  // До монтирования корзина неизвестна (см. useCartData): ни корзины, ни
+  // значка с числом, ни кнопки очистки — иначе первый рендер в браузере
+  // разошёлся бы с серверным. Вместо «Корзина пуста» — заглушка ниже.
+  const hasItems = isMounted && items.length > 0
   const confirmClearRef = useRef<ConfirmDialogRef>(null)
 
   const cartContent = ({ onClose }: { onClose?: () => void } = {}) => (
@@ -74,7 +78,13 @@ export const CartSidebar = ({ loginModalRef }: CartSidebarProps) => {
         </div>
       </div>
 
-      {hasItems ? (
+      {!isMounted ? (
+        <div className="flex flex-col gap-3 p-4">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div key={i} className="h-16 animate-pulse rounded-base bg-gray-200" />
+          ))}
+        </div>
+      ) : hasItems ? (
         <>
           {/* Прокручивается список, а не панель целиком: иначе до кнопки с
               суммой приходилось докручивать. */}

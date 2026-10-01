@@ -1,8 +1,9 @@
 import { Link } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { X } from 'lucide-react'
-import type { NotificationResponse } from '#/shared/openapi/requests'
+import type { NotificationResponse, OrderStatusCode } from '#/shared/openapi/requests'
 import { NotificationKind } from '#/shared/openapi/requests'
+import { orderStatusKey } from '#/shared/lib/orderStatus'
 import { cn } from '#/shared/utils/cn'
 import { formatDate } from '#/shared/utils/formatDate'
 
@@ -32,9 +33,11 @@ export const NotificationRow = ({ notification, href, onRead, onDismiss, classNa
   const { t, i18n } = useTranslation()
 
   // Код статуса заказа переводим, текст модератора показываем как есть.
+  // Способа получения в уведомлении нет, поэтому подпись нейтральная:
+  // «Готов к получению», а не «Ждёт в пункте выдачи» или «Передан в доставку».
   const detail = notification.comment
     ? STATUS_KINDS.has(notification.kind)
-      ? t(`orders.status.${notification.comment}`)
+      ? t(orderStatusKey(notification.comment as OrderStatusCode))
       : notification.comment
     : null
 

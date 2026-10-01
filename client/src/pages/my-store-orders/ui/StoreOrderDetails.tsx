@@ -1,13 +1,12 @@
 import { useEffect, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
-import { getStatusColor, getStatusIcon } from '../model/statusMeta'
+import { getStatusColor, getStatusIcon, sellerOrderStatus } from '../model/statusMeta'
 import type { OrderResponse } from '#/shared/openapi/requests/types.gen'
 import type { ModalRef } from '#/shared/ui/Modal'
 import {
   LocalOrderStatusCode,
   OrderStatusCode,
   PaymentType,
-  WarehouseType,
 } from '#/shared/openapi/requests/types.gen'
 import { Button } from '#/shared/ui/Button'
 import { Modal } from '#/shared/ui/Modal'
@@ -52,15 +51,18 @@ export const StoreOrderDetails = ({
 
   const statusCode = order.order_status.code
   const isOrderApproved = statusCode === OrderStatusCode.APPROVED
-  const shopPart = order.order_shops?.find((os) => os.shop_base_id === storeId)
-  const shopStatus = shopPart?.status
   // Часть заказа со склада Postshop (FBO) собирают и выдают сотрудники
   // платформы: товар лежит у них, а не у продавца. Сервер на смену статуса
   // такой части отвечает продавцу 403, поэтому кнопок «Принять», «Отклонить»
-  // и «Готов к выдаче» здесь нет — вместо них короткое пояснение.
-  const isFboPart = shopPart?.warehouse_type === WarehouseType.FBO
+  // и «Собран» здесь нет — вместо них короткое пояснение.
+  const {
+    part: shopPart,
+    isFboPart,
+    code: displayStatus,
+    labelKey,
+  } = sellerOrderStatus(order, storeId)
+  const shopStatus = shopPart?.status
   const canAct = isOrderApproved && !isFboPart
-  const displayStatus = shopStatus ?? statusCode
   const StatusIcon = getStatusIcon(displayStatus)
   const storeItems = order.items.filter((item) => item.product.shop_base_id === storeId)
   const subtotal = storeItems.reduce(
@@ -118,11 +120,12 @@ export const StoreOrderDetails = ({
             <span className={getStatusColor(displayStatus)}>
               <StatusIcon width={40} height={40} />
             </span>
-            <p className={`p2 font-semibold ${getStatusColor(displayStatus)}`}>
-              {t(`storeOrders.status.${displayStatus}`)}
-            </p>
+            <p className={`p2 font-semibold ${getStatusColor(displayStatus)}`}>{t(labelKey)}</p>
 
-            {!isOrderApproved && (
+            {/* Только пока оператор не принял заказ. Раньше условие было «не
+                одобрен», и собранный, переданный в доставку и даже полученный
+                заказ продолжал обещать продавцу, что действия скоро появятся. */}
+            {statusCode === OrderStatusCode.PENDING && (
               <p className="p3 text-passive2 text-center">{t('storeOrders.notApproved')}</p>
             )}
 
@@ -161,7 +164,7 @@ export const StoreOrderDetails = ({
                 disabled={isUpdating}
                 onClick={() => onStatusUpdate(order.id, LocalOrderStatusCode.READY_TO_TAKE)}
               >
-                {isUpdating ? '...' : t('storeOrders.readyToPickup')}
+                {isUpdating ? '...' : t('storeOrders.markPacked')}
               </Button>
             )}
           </div>

@@ -5,11 +5,14 @@ import { useInfiniteQuery, useQueryClient } from '@tanstack/react-query'
 import { AnimatePresence, motion } from 'motion/react'
 import { ClipboardList, X } from 'lucide-react'
 import { StoreOrderDetails } from './ui/StoreOrderDetails'
-import { getStatusColor, getStatusIcon } from './model/statusMeta'
+import { getStatusColor, getStatusIcon, sellerOrderStatus } from './model/statusMeta'
 import type { LocalOrderStatusCode, OrderResponse } from '#/shared/openapi/requests/types.gen'
 import { EmptyState } from '#/shared/ui/EmptyState'
 import { useUpdateShopOrderStatusOrdersOrderIdShopShopIdStatusPatch } from '#/shared/openapi/queries'
-import { useGetShopOrdersOrdersShopShopIdGetKey } from '#/shared/openapi/queries/common'
+import {
+  useGetShopAttentionCountOrdersShopShopIdAttentionCountGetKey,
+  useGetShopOrdersOrdersShopShopIdGetKey,
+} from '#/shared/openapi/queries/common'
 import { OrderCard } from '#/widgets/OrderCard'
 import { ORDERS_PAGE_SIZE } from '#/shared/constants/pagination'
 import { getShopOrdersOrdersShopShopIdGet } from '#/shared/openapi/requests'
@@ -91,6 +94,11 @@ export const OrdersPage = () => {
   } = useUpdateShopOrderStatusOrdersOrderIdShopShopIdStatusPatch(undefined, {
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [useGetShopOrdersOrdersShopShopIdGetKey] })
+      // Принятый или собранный заказ больше не ждёт продавца — счётчик в меню
+      // должен уменьшиться сразу, а не через минуту.
+      void queryClient.invalidateQueries({
+        queryKey: [useGetShopAttentionCountOrdersShopShopIdAttentionCountGetKey],
+      })
     },
   })
 
@@ -151,10 +159,10 @@ export const OrdersPage = () => {
                 {t(`orders.months.${group.monthKey}`)} {group.year}
               </p>
               {group.items.map((order) => {
-                const shopStatus = order.order_shops?.find(
-                  (os) => os.shop_base_id === Number(storeId),
-                )?.status
-                const displayStatus = shopStatus ?? order.order_status.code
+                // Та же подпись, что и в подробностях: раньше список показывал
+                // часть магазина, и заказ, уже полученный покупателем, висел
+                // здесь «Готов к выдаче».
+                const { code: displayStatus, labelKey } = sellerOrderStatus(order, Number(storeId))
                 const StatusIcon = getStatusIcon(displayStatus)
                 return (
                   <OrderCard
@@ -163,7 +171,7 @@ export const OrdersPage = () => {
                     price={calcSubtotal(order)}
                     date={formatNumericDateTime(order.created_at)}
                     icon={<StatusIcon size={20} />}
-                    label={t(`storeOrders.status.${displayStatus}`)}
+                    label={t(labelKey)}
                     colorClass={getStatusColor(displayStatus)}
                     isActive={selectedId === order.id}
                     onClick={() => {

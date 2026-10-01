@@ -54,10 +54,10 @@ interface Props {
   isCancelling?: boolean
   cancelError?: string | null
   /**
-   * Подпись статуса с сервера. Три разных состояния — «подтверждён»,
-   * «готов к выдаче» и «готов к доставке» — показывались покупателю одним
-   * «Готовится», хотя переводы статусов сервер отдаёт. Иконка по-прежнему
-   * общая для «в работе»: их у нас четыре, а состояний шесть.
+   * Подпись статуса заказа (см. orderStatusKey). Три разных состояния —
+   * «подтверждён», «готов к выдаче» и «готов к доставке» — показывались
+   * покупателю одним «Готовится». Иконка по-прежнему общая для «в работе»: их
+   * у нас четыре, а состояний шесть.
    */
   statusLabel?: string
   /**
@@ -78,6 +78,8 @@ interface Props {
    * человек точно помнит, что именно он покупал.
    */
   renderProductAction?: (product: OrderProduct) => ReactNode
+  /** Подсказка над списком товаров — например, как вернуть товар. */
+  itemsNotice?: ReactNode
 }
 
 const statusIcons: Record<OrderStatus, React.ReactNode> = {
@@ -111,6 +113,7 @@ export const OrderDetails = ({
   isCancelling,
   cancelError,
   renderProductAction,
+  itemsNotice,
 }: Props) => {
   const { t } = useTranslation()
   const cancelModalRef = useRef<ModalRef>(null)
@@ -178,6 +181,10 @@ export const OrderDetails = ({
               </Button>
             )}
           </div>
+
+          {itemsNotice && (
+            <p className="t1 mt-4 rounded-base bg-blue1 px-3 py-2 text-blue-main">{itemsNotice}</p>
+          )}
 
           {/* Store Sections */}
           <div className="mt-4 flex flex-col gap-1.5">

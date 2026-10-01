@@ -16,7 +16,7 @@ import {
   useGetProductsProductsGetKey,
   useUpdateProductProductsProductIdPut,
 } from '#/shared/openapi/queries'
-import { DiscountType } from '#/shared/openapi/requests/types.gen'
+import { DiscountType, ProductStatus } from '#/shared/openapi/requests/types.gen'
 import { Input } from '#/shared/ui/Input'
 import { TextArea } from '#/shared/ui/TextArea'
 import { PRODUCT_DESCRIPTION_RECOMMENDED } from '#/shared/constants/product'
@@ -213,10 +213,18 @@ export const EditProductPage = () => {
 
       if (result?.data) {
         await queryClient.resetQueries({ queryKey: [useGetProductsProductsGetKey] })
-        toast.success(t('editProduct.moderationTitle'), {
-          description: t('editProduct.moderationDescription'),
-          duration: 6000,
-        })
+        // Раньше тост всегда говорил «отправлен на модерацию», даже когда
+        // менялась только цена. Сервер теперь отправляет товар на проверку
+        // лишь при правке содержимого (название, описание, фото, категория…),
+        // и что произошло, видно по статусу в ответе.
+        if (result.data.status === ProductStatus.PENDING) {
+          toast.success(t('editProduct.moderationTitle'), {
+            description: t('editProduct.moderationDescription'),
+            duration: 6000,
+          })
+        } else {
+          toast.success(t('editProduct.saved'))
+        }
         navigate({ to: '/my-store/$storeId/products', params: { storeId } })
       }
     },

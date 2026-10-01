@@ -21,6 +21,13 @@ import { cn } from '#/shared/utils/cn'
 import { Spinner } from '#/shared/ui/Spinner'
 import { useProfileStore } from '#/shared/stores/profileStore'
 import { RegistrationStatus, WarehouseType } from '#/shared/openapi/requests'
+import { useGetShopAttentionCountOrdersShopShopIdAttentionCountGet } from '#/shared/openapi/queries'
+
+/** Как часто перечитывать счётчик заказов: заказ одобряет оператор, само оно не всплывёт. */
+const ATTENTION_REFETCH_MS = 60_000
+
+/** Число на значке: больше двух цифр в кружок не помещается. */
+const badgeText = (count: number) => (count > 99 ? '99+' : String(count))
 
 export const StoreSidebar = () => {
   const { t } = useTranslation()
@@ -50,6 +57,18 @@ export const StoreSidebar = () => {
   // открытие магазина — действие созидательное, а не опасное.
   const isClosed = Boolean(shop && !shop.is_active)
 
+  // Сколько заказов ждут продавца. Раньше узнать, что заказ требует работы,
+  // было нельзя ниоткуда, кроме самого списка: продавец, не заходивший в
+  // «Мои заказы», не видел, что оператор уже одобрил заказ и его пора собирать.
+  const { data: attention } = useGetShopAttentionCountOrdersShopShopIdAttentionCountGet<{
+    count: number
+  }>({ path: { shop_id: Number(storeId) } }, undefined, {
+    enabled: Number.isFinite(Number(storeId)),
+    refetchInterval: ATTENTION_REFETCH_MS,
+    refetchOnWindowFocus: true,
+  })
+  const attentionCount = attention?.count ?? 0
+
   const logoUrl = shopAdditional?.logo_path
     ? shopAdditional.logo_path.startsWith('http')
       ? shopAdditional.logo_path
@@ -66,6 +85,7 @@ export const StoreSidebar = () => {
       title: t('storeSidebar.orders'),
       href: `/my-store/${storeId}/orders`,
       icon: BoxIcon,
+      badge: attentionCount,
     },
     {
       title: t('storeSidebar.products'),
@@ -172,15 +192,22 @@ export const StoreSidebar = () => {
                   item.isBlue && 'text-blue-main',
                 )}
               >
-                <item.icon
-                  width={20}
-                  height={20}
-                  className={cn(
-                    isActive && !item.isRed ? 'text-blue-main' : 'text-passive2',
-                    item.isRed && 'text-failure',
-                    item.isBlue && 'text-blue-main',
+                <span className="relative">
+                  <item.icon
+                    width={20}
+                    height={20}
+                    className={cn(
+                      isActive && !item.isRed ? 'text-blue-main' : 'text-passive2',
+                      item.isRed && 'text-failure',
+                      item.isBlue && 'text-blue-main',
+                    )}
+                  />
+                  {'badge' in item && !!item.badge && (
+                    <span className="absolute -top-1.5 -right-2 min-w-4 rounded-full bg-failure px-1 text-center text-[10px] leading-4 font-bold text-white">
+                      {badgeText(item.badge)}
+                    </span>
                   )}
-                />
+                </span>
                 <span className="t2 font-medium text-center leading-tight">{item.title}</span>
               </Link>
             )
@@ -235,6 +262,11 @@ export const StoreSidebar = () => {
                 )}
               />
               <p className="p3 font-medium">{item.title}</p>
+              {'badge' in item && !!item.badge && (
+                <span className="ml-auto min-w-5 rounded-full bg-failure px-1.5 text-center t2 leading-5 font-bold text-white">
+                  {badgeText(item.badge)}
+                </span>
+              )}
             </Link>
           )
         })}

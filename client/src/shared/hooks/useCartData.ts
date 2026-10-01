@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useQueries, useQueryClient } from '@tanstack/react-query'
 import { useCartStore } from '#/shared/stores/cartStore'
@@ -56,6 +56,16 @@ export const useCartData = () => {
   const profile = useProfileStore((s) => s.profile)
   const isGuest = !profile
   const queryClient = useQueryClient()
+
+  // Корзина гостя живёт в localStorage, а вход — в токене оттуда же: на
+  // сервере нет ни того, ни другого. Сервер рисовал «Корзина пуста», браузер
+  // сразу — товары, и React перерисовывал панель после гидрации: корзина
+  // мигала пустой. Содержимое показываем только после монтирования, до него
+  // экраны корзины рисуют заглушку — одинаково на сервере и в браузере.
+  const [isMounted, setIsMounted] = useState(false)
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // --- Guest cart (localStorage) ---
   const localItems = useCartStore((s) => s.items)
@@ -316,6 +326,7 @@ export const useCartData = () => {
     hasStockProblem,
     canCheckout,
     isLoading,
+    isMounted,
     clearCart,
   }
 }

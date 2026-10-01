@@ -23,12 +23,15 @@ export const CartPage = () => {
     hasStockProblem,
     canCheckout,
     isLoading,
+    isMounted,
     clearCart,
   } = useCartData()
   const hasItems = items.length > 0
   const confirmClearRef = useRef<ConfirmDialogRef>(null)
 
-  if (isLoading) {
+  // До монтирования — та же заглушка, что и при загрузке: иначе сервер
+  // отдавал «Корзина пуста», а браузер сразу подменял её товарами.
+  if (!isMounted || isLoading) {
     return (
       <div className="flex flex-col gap-4">
         {Array.from({ length: 3 }).map((_, i) => (

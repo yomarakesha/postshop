@@ -1,8 +1,19 @@
+import { useRef, useState } from 'react'
 import { useParams } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
 import { PackageX } from 'lucide-react'
-import { useListShopReturnsReturnsShopShopIdGet } from '#/shared/openapi/queries'
-import { ReturnStatus } from '#/shared/openapi/requests'
+import type { ReturnResponse } from '#/shared/openapi/requests'
+import type { ConfirmDialogRef } from '#/shared/ui/ConfirmDialog'
+import {
+  useListShopReturnsReturnsShopShopIdGet,
+  useReceiveReturnReturnsRequestIdReceivePatch,
+} from '#/shared/openapi/queries'
+import { useListShopReturnsReturnsShopShopIdGetKey } from '#/shared/openapi/queries/common'
+import { ReturnStatus, WarehouseType } from '#/shared/openapi/requests'
+import { Button } from '#/shared/ui/Button'
+import { ConfirmDialog } from '#/shared/ui/ConfirmDialog'
 import { EmptyState } from '#/shared/ui/EmptyState'
 import { ListSkeleton } from '#/shared/ui/ListSkeleton'
 import { cn } from '#/shared/utils/cn'
@@ -23,18 +34,76 @@ const statusClass = {
  * какому товару, ни по какой причине. На панели показателей при этом висел
  * счётчик «Возвращали» — число без единой подробности.
  *
- * Экран только для чтения: решение по заявке принимает платформа, и кнопок,
- * которые продавцу ничего не дадут, здесь нет.
+ * Решение по заявке принимает платформа — его кнопок здесь нет. Но одобрение
+ * больше не возвращает товар в остаток само: раньше остаток рос в момент
+ * одобрения, когда товар ещё ехал обратно, и его успевали продать второй раз.
+ * Теперь продавец FBS отмечает здесь, что товар доехал, и решает: цел — в
+ * продажу, брак — остаток не трогаем. Возврат по части FBO принимает склад
+ * Postshop (продавцу сервер ответит 403), поэтому там только пояснение.
  */
 export const MyStoreReturnsPage = () => {
   const { t, i18n } = useTranslation()
+  const queryClient = useQueryClient()
   const { storeId } = useParams({ from: '/my-store/$storeId' })
+  const defectiveDialogRef = useRef<ConfirmDialogRef>(null)
+  // Какой возврат ждёт подтверждения «брак»: диалог один на страницу.
+  const [defectiveId, setDefectiveId] = useState<number | null>(null)
 
   const { data: requests, isLoading } = useListShopReturnsReturnsShopShopIdGet({
     path: { shop_id: Number(storeId) },
   })
 
+  const receive = useReceiveReturnReturnsRequestIdReceivePatch(undefined, {
+    onSuccess: () => {
+      toast.success(t('storeReturns.receivedSaved'))
+      void queryClient.invalidateQueries({ queryKey: [useListShopReturnsReturnsShopShopIdGetKey] })
+    },
+  })
+
+  const markReceived = (requestId: number, restock: boolean) =>
+    receive.mutate({ path: { request_id: requestId }, body: { restock } })
+
   const items = requests ?? []
+
+  /** Что делать продавцу с одобренным возвратом — или что с ним уже сделано. */
+  const renderReceipt = (request: ReturnResponse) => {
+    if (request.status !== ReturnStatus.APPROVED) return null
+
+    if (request.received_at) {
+      return (
+        <p className="t1 mt-3 font-medium text-passive2">
+          {t(request.restocked ? 'storeReturns.restocked' : 'storeReturns.defective')}
+          {' · '}
+          {formatDate(request.received_at, i18n.language)}
+        </p>
+      )
+    }
+
+    if (request.warehouse_type === WarehouseType.FBO) {
+      return <p className="t1 mt-3 text-passive2">{t('storeReturns.fboWarehouse')}</p>
+    }
+
+    const busy = receive.isPending && receive.variables.path.request_id === request.id
+    return (
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Button size="sm" disabled={busy} onClick={() => markReceived(request.id, true)}>
+          {t('storeReturns.receiveRestock')}
+        </Button>
+        <Button
+          size="sm"
+          variant="tertiary"
+          className="text-failure"
+          disabled={busy}
+          onClick={() => {
+            setDefectiveId(request.id)
+            defectiveDialogRef.current?.open()
+          }}
+        >
+          {t('storeReturns.receiveDefective')}
+        </Button>
+      </div>
+    )
+  }
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -100,6 +169,8 @@ export const MyStoreReturnsPage = () => {
               </p>
             )}
 
+            {renderReceipt(request)}
+
             {request.created_at && (
               <p className="t2 mt-3 text-passive1">
                 {formatDate(request.created_at, i18n.language)}
@@ -108,6 +179,19 @@ export const MyStoreReturnsPage = () => {
           </li>
         ))}
       </ul>
+
+      {/* Брак — без возврата в продажу и без отмены: переспрашиваем. */}
+      <ConfirmDialog
+        ref={defectiveDialogRef}
+        title={t('storeReturns.defectiveTitle')}
+        text={t('storeReturns.defectiveText')}
+        confirmLabel={t('storeReturns.defectiveConfirm')}
+        destructive
+        busy={receive.isPending}
+        onConfirm={() => {
+          if (defectiveId !== null) markReceived(defectiveId, false)
+        }}
+      />
     </div>
   )
 }

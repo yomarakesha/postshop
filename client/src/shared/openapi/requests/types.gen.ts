@@ -1649,6 +1649,17 @@ export type OrderResponse = {
      */
     updated_at: string | null;
     /**
+     * Delivery Method
+     *
+     * Как покупатель получает заказ.
+     *
+     * От этого зависят названия шагов: при самовывозе после сборки заказ
+     * «ждёт в пункте выдачи», а не «передан в доставку». Коды статусов одни
+     * для обоих способов, а админка и витрина показывали «Готов к доставке»
+     * и заказу из пункта выдачи.
+     */
+    delivery_method: 'pickup' | 'delivery';
+    /**
      * Total
      *
      * Полная стоимость заказа (все позиции, включая отклонённые магазины).
@@ -2286,6 +2297,16 @@ export type ReturnCreateRequest = {
 };
 
 /**
+ * ReturnReceiveRequest
+ */
+export type ReturnReceiveRequest = {
+    /**
+     * Restock
+     */
+    restock: boolean;
+};
+
+/**
  * ReturnRejectRequest
  */
 export type ReturnRejectRequest = {
@@ -2354,6 +2375,15 @@ export type ReturnResponse = {
      * Resolution Comment
      */
     resolution_comment?: string | null;
+    warehouse_type?: WarehouseType | null;
+    /**
+     * Received At
+     */
+    received_at?: string | null;
+    /**
+     * Restocked
+     */
+    restocked?: boolean | null;
     /**
      * Created At
      */
@@ -8705,6 +8735,36 @@ export type ApproveReturnReturnsRequestIdApprovePatchResponses = {
 
 export type ApproveReturnReturnsRequestIdApprovePatchResponse = ApproveReturnReturnsRequestIdApprovePatchResponses[keyof ApproveReturnReturnsRequestIdApprovePatchResponses];
 
+export type ReceiveReturnReturnsRequestIdReceivePatchData = {
+    body: ReturnReceiveRequest;
+    path: {
+        /**
+         * Request Id
+         */
+        request_id: number;
+    };
+    query?: never;
+    url: '/returns/{request_id}/receive';
+};
+
+export type ReceiveReturnReturnsRequestIdReceivePatchErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ReceiveReturnReturnsRequestIdReceivePatchError = ReceiveReturnReturnsRequestIdReceivePatchErrors[keyof ReceiveReturnReturnsRequestIdReceivePatchErrors];
+
+export type ReceiveReturnReturnsRequestIdReceivePatchResponses = {
+    /**
+     * Successful Response
+     */
+    200: ReturnResponse;
+};
+
+export type ReceiveReturnReturnsRequestIdReceivePatchResponse = ReceiveReturnReturnsRequestIdReceivePatchResponses[keyof ReceiveReturnReturnsRequestIdReceivePatchResponses];
+
 export type RejectReturnReturnsRequestIdRejectPatchData = {
     body: ReturnRejectRequest;
     path: {
@@ -10084,6 +10144,48 @@ export type CreateOrderOrdersPostResponses = {
 };
 
 export type CreateOrderOrdersPostResponse = CreateOrderOrdersPostResponses[keyof CreateOrderOrdersPostResponses];
+
+export type GetPendingOrdersCountOrdersPendingCountGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/orders/pending/count';
+};
+
+export type GetPendingOrdersCountOrdersPendingCountGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type GetShopAttentionCountOrdersShopShopIdAttentionCountGetData = {
+    body?: never;
+    path: {
+        /**
+         * Shop Id
+         */
+        shop_id: number;
+    };
+    query?: never;
+    url: '/orders/shop/{shop_id}/attention-count';
+};
+
+export type GetShopAttentionCountOrdersShopShopIdAttentionCountGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetShopAttentionCountOrdersShopShopIdAttentionCountGetError = GetShopAttentionCountOrdersShopShopIdAttentionCountGetErrors[keyof GetShopAttentionCountOrdersShopShopIdAttentionCountGetErrors];
+
+export type GetShopAttentionCountOrdersShopShopIdAttentionCountGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
 
 export type GetMyOrdersOrdersMyGetData = {
     body?: never;

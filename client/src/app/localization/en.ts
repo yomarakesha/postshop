@@ -322,11 +322,6 @@ export const en = {
       12: 'December',
     },
     status: {
-      approved: 'Approved',
-      ready_to_take: 'Ready for pickup',
-      ready_to_deliver: 'Ready for delivery',
-      completed: 'Completed',
-      rejected: 'Cancelled',
       done: 'Completed',
       cancelled: 'Cancelled',
       pending: 'Pending',
@@ -349,6 +344,42 @@ export const en = {
     },
     empty: 'You have no orders yet',
   },
+  orderStatus: {
+    pending: 'Awaiting confirmation',
+    approved: 'Accepted',
+    ready_to_take: 'Packed',
+    ready_to_deliver: 'Ready to receive',
+    completed: 'Completed',
+    rejected: 'Cancelled',
+    pickup: {
+      ready_to_deliver: 'Waiting at the pickup point',
+      completed: 'Picked up',
+    },
+    delivery: {
+      ready_to_deliver: 'Out for delivery',
+      completed: 'Delivered',
+    },
+  },
+  storeWarehouse: {
+    title: 'Warehouse type: {{type}}',
+    fbs: {
+      meaning: 'The goods are stored with you.',
+      intake: 'Goods arrived — record them in <link>"Goods intake"</link>',
+      stock: 'Recounted a shelf — correct it in <link>"Stock"</link>',
+      orders:
+        '<link>New order</link> — accept it and mark it "Packed", the operator will pick it up',
+      returns: 'Return — once the item is back, mark it in <link>"Returns"</link>',
+    },
+    fbo: {
+      meaning: 'The goods are stored at the Postshop warehouse.',
+      shipments: 'Send goods to the warehouse: <link>"Warehouse" → "Shipments to warehouse"</link>',
+      stock: 'Stock at the warehouse — <link>"Warehouse" → "Stock at warehouse"</link>',
+      orders:
+        '<link>Orders</link> are packed and handed over by the Postshop warehouse — nothing is required from you',
+      returns: '<link>Returns</link> are received by the Postshop warehouse',
+    },
+    changeNote: 'Only Postshop can change the warehouse type — write to <link>support</link>.',
+  },
   storeOrders: {
     empty: 'No orders yet',
     customer: 'Customer',
@@ -359,19 +390,15 @@ export const en = {
     reject: 'Reject',
     fboNote: 'The Postshop warehouse is fulfilling this order — nothing is required from you.',
     notApproved: 'Order actions will be available once an operator accepts the order.',
-    readyToPickup: 'Ready for pickup',
-    readyToDeliver: 'Ready to deliver',
-    complete: 'Complete',
+    markPacked: 'Packed',
     rejectConfirmTitle: 'Reject order',
     rejectConfirmSubtitle: 'Are you sure you want to reject this order?',
     rejectConfirmButton: 'Yes, reject',
     status: {
-      pending: 'New',
-      approved: 'Accepted',
-      rejected: 'Rejected',
-      ready_to_take: 'Ready for pickup',
-      ready_to_deliver: 'Ready to deliver',
-      completed: 'Completed',
+      pending: 'New — accept the order',
+      approved: 'Accepted — pack it',
+      ready_to_take: 'Packed — hand it to the operator',
+      rejected: 'You rejected it',
     },
   },
   header: {
@@ -681,6 +708,7 @@ export const en = {
     moderationTitle: 'Product sent for moderation',
     moderationDescription:
       'Our operators will review your product and it will be available to customers after approval.',
+    saved: 'Changes saved',
   },
 
   checkout: {
@@ -856,12 +884,13 @@ export const en = {
     dismiss: 'Dismiss notification',
     loadMore: 'Show more',
     kind: {
-      order_created: 'New order in your shop',
+      order_created: 'New order — open it: if the item is with you, accept and pack it',
       order_cancelled: 'The customer cancelled an order',
       receipt_confirmed: 'Receipt confirmed, stock updated',
       product_out_of_stock: 'A product has run out — replenish it or take it off sale',
       review_received: 'New review of your product',
-      return_received: 'A return of your product was approved',
+      return_received:
+        'Return approved — the item is coming back to you. Once you receive it, mark it in "Returns"',
       shop_blocked: 'The shop was closed by the platform',
       product_approved: 'Product passed the review',
       product_declined: 'Product did not pass the review',
@@ -878,7 +907,18 @@ export const en = {
 
   storeReturns: {
     title: 'Returns',
-    subtitle: 'Returns for your store products. The platform makes the decision.',
+    subtitle:
+      'Returns for your store products. Postshop makes the decision; when an approved return reaches you, mark it here.',
+    fboWarehouse: 'The Postshop warehouse will receive this return',
+    receiveRestock: 'Received — back on sale',
+    receiveDefective: 'Received — defective',
+    defectiveTitle: 'Did the item come back defective?',
+    defectiveText:
+      'The return will be marked as received, but the item will not go back on sale — stock stays the same.',
+    defectiveConfirm: 'Yes, defective',
+    restocked: 'Received, back on sale',
+    defective: 'Received, defective',
+    receivedSaved: 'Return marked as received',
   },
   returns: {
     title: 'My returns',
@@ -892,6 +932,7 @@ export const en = {
     cancelTitle: 'Withdraw the request?',
     cancelText: 'It will disappear from the list. You can file a new one for this purchase again.',
     action: 'Return',
+    hint: 'Item didn\'t suit you? Press "Return" next to it — Postshop will review the request',
     createTitle: 'Return request',
     purchased: 'purchased: {{count}}',
     quantity: 'How many you return',

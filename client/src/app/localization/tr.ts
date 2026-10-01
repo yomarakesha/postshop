@@ -321,11 +321,6 @@ export const tr = {
       12: 'Aralık',
     },
     status: {
-      approved: 'Onaylandı',
-      ready_to_take: 'Teslim almaya hazır',
-      ready_to_deliver: 'Teslimata hazır',
-      completed: 'Tamamlandı',
-      rejected: 'İptal edildi',
       done: 'Tamamlandı',
       cancelled: 'İptal edildi',
       pending: 'Beklemede',
@@ -348,6 +343,42 @@ export const tr = {
     },
     empty: 'Henüz siparişiniz yok',
   },
+  orderStatus: {
+    pending: 'Onay bekliyor',
+    approved: 'Kabul edildi',
+    ready_to_take: 'Hazırlandı',
+    ready_to_deliver: 'Teslim almaya hazır',
+    completed: 'Tamamlandı',
+    rejected: 'İptal edildi',
+    pickup: {
+      ready_to_deliver: 'Teslim noktasında bekliyor',
+      completed: 'Teslim alındı',
+    },
+    delivery: {
+      ready_to_deliver: 'Teslimata verildi',
+      completed: 'Teslim edildi',
+    },
+  },
+  storeWarehouse: {
+    title: 'Depo türü: {{type}}',
+    fbs: {
+      meaning: 'Ürünler sizde saklanır.',
+      intake: 'Ürün geldi — <link>«Ürün kabulü»</link> bölümünde işaretleyin',
+      stock: 'Rafı yeniden saydınız — <link>«Stok»</link> bölümünde düzeltin',
+      orders:
+        '<link>Yeni sipariş</link> — kabul edin ve «Hazırlandı» olarak işaretleyin, operatör teslim alacak',
+      returns: 'İade — ürün geri geldiğinde <link>«İadeler»</link> bölümünde işaretleyin',
+    },
+    fbo: {
+      meaning: 'Ürünler Postshop deposunda saklanır.',
+      shipments: 'Ürünleri depoya gönderin: <link>«Depo» → «Depoya gönderim»</link>',
+      stock: 'Depodaki stok — <link>«Depo» → «Depodaki stok»</link>',
+      orders:
+        '<link>Siparişleri</link> Postshop deposu hazırlar ve teslim eder — sizden bir şey gerekmez',
+      returns: '<link>İadeleri</link> Postshop deposu teslim alır',
+    },
+    changeNote: 'Depo türünü yalnızca Postshop değiştirebilir — <link>desteğe</link> yazın.',
+  },
   storeOrders: {
     empty: 'Sipariş yok',
     customer: 'Müşteri',
@@ -358,19 +389,15 @@ export const tr = {
     reject: 'Reddet',
     fboNote: 'Bu siparişi Postshop deposu hazırlıyor — sizden bir şey yapmanız gerekmiyor.',
     notApproved: 'Operatör siparişi kabul ettikten sonra sipariş işlemleri kullanılabilir olacak.',
-    readyToPickup: 'Teslim almaya hazır',
-    readyToDeliver: 'Teslimata hazır',
-    complete: 'Tamamla',
+    markPacked: 'Hazırlandı',
     rejectConfirmTitle: 'Siparişi reddet',
     rejectConfirmSubtitle: 'Bu siparişi reddetmek istediğinizden emin misiniz?',
     rejectConfirmButton: 'Evet, reddet',
     status: {
-      pending: 'Yeni',
-      approved: 'Kabul edildi',
-      rejected: 'Reddedildi',
-      ready_to_take: 'Teslim almaya hazır',
-      ready_to_deliver: 'Teslimata hazır',
-      completed: 'Tamamlandı',
+      pending: 'Yeni — siparişi kabul edin',
+      approved: 'Kabul edildi — hazırlayın',
+      ready_to_take: 'Hazırlandı — operatöre teslim edin',
+      rejected: 'Reddettiniz',
     },
   },
   header: {
@@ -681,6 +708,7 @@ export const tr = {
     moderationTitle: 'Ürün moderasyona gönderildi',
     moderationDescription:
       'Operatörlerimiz ürününüzü inceleyecek ve onaylandıktan sonra müşterilere sunulacaktır.',
+    saved: 'Değişiklikler kaydedildi',
   },
 
   checkout: {
@@ -856,12 +884,13 @@ export const tr = {
     dismiss: 'Bildirimi kaldır',
     loadMore: 'Daha fazla göster',
     kind: {
-      order_created: 'Mağazanızda yeni sipariş',
+      order_created: 'Yeni sipariş — açın: ürün sizdeyse kabul edip hazırlayın',
       order_cancelled: 'Müşteri siparişi iptal etti',
       receipt_confirmed: 'Kabul onaylandı, stok güncellendi',
       product_out_of_stock: 'Ürün tükendi — yeniden tedarik edin ya da satıştan kaldırın',
       review_received: 'Ürününüze yeni yorum',
-      return_received: 'Ürününüz için iade onaylandı',
+      return_received:
+        'İade onaylandı — ürün size geri dönecek. Teslim aldığınızda «İadeler» bölümünde işaretleyin',
       shop_blocked: 'Mağaza platform tarafından kapatıldı',
       product_approved: 'Ürün kontrolü geçti',
       product_declined: 'Ürün kontrolü geçemedi',
@@ -878,7 +907,18 @@ export const tr = {
 
   storeReturns: {
     title: 'İadeler',
-    subtitle: 'Mağazanızın ürünleri için iadeler. Kararı platform verir.',
+    subtitle:
+      'Mağazanızın ürünleri için iadeler. Kararı Postshop verir; onaylanan iade size ulaştığında burada işaretleyin.',
+    fboWarehouse: 'Bu iadeyi Postshop deposu teslim alacak',
+    receiveRestock: 'Teslim alındı — satışa geri koy',
+    receiveDefective: 'Teslim alındı — kusurlu',
+    defectiveTitle: 'Ürün kusurlu mu geldi?',
+    defectiveText:
+      'İade teslim alındı olarak işaretlenecek, ancak ürün satışa dönmeyecek — stok değişmez.',
+    defectiveConfirm: 'Evet, kusurlu',
+    restocked: 'Teslim alındı, satışa geri kondu',
+    defective: 'Teslim alındı, kusurlu',
+    receivedSaved: 'İade teslim alındı olarak işaretlendi',
   },
   returns: {
     title: 'İadelerim',
@@ -892,6 +932,7 @@ export const tr = {
     cancelTitle: 'Talep geri çekilsin mi?',
     cancelText: 'Listeden kaybolur. Bu satın alma için yenisini tekrar açabilirsiniz.',
     action: 'İade et',
+    hint: 'Ürün uymadı mı? Yanındaki «İade et» düğmesine basın — talebi Postshop inceleyecek',
     createTitle: 'İade talebi',
     purchased: 'satın alınan: {{count}}',
     quantity: 'Kaç adet iade ediyorsunuz',

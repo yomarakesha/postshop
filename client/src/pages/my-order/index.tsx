@@ -24,10 +24,10 @@ import { OrderDetails } from '#/widgets/OrderDetails'
 import { Button } from '#/shared/ui/Button'
 import { cn } from '#/shared/utils/cn'
 import { getImageUrl } from '#/shared/utils/getImageUrl'
-import { getTranslatedName } from '#/shared/utils/getTranslatedName'
 import { getMyOrdersOrdersMyGet } from '#/shared/openapi/requests'
 import { Spinner } from '#/shared/ui/Spinner'
 import { formatNumericDateTime, getZonedParts } from '#/shared/utils/formatDate'
+import { orderStatusKey } from '#/shared/lib/orderStatus'
 
 // Отмену сервер разрешает до того, как заказ собран: «ожидает» и
 // «подтверждён» (CUSTOMER_CANCELLABLE_STATUSES в app/routers/orders.py).
@@ -54,12 +54,10 @@ const isPartiallyRejected = (order: OrderResponse) =>
   order.has_rejected_shops && !order.all_shops_rejected
 
 /**
- * Подпись статуса заказа.
+ * Цвет и значок статуса заказа. Подпись — отдельно, см. orderStatusKey.
  *
  * Раньше три разных состояния — «подтверждён», «готов к выдаче» и «готов к
- * доставке» — показывались покупателю одним «Готовится». Переводы статусов
- * сервер отдавать умеет, но в базе они пустые, поэтому серверная подпись
- * берётся только если она есть, иначе своя по коду статуса.
+ * доставке» — показывались покупателю одним «Готовится».
  */
 const statusMap: Record<OrderStatusCode, OrderStatus> = {
   [OrderStatusCode.PENDING]: 'pending',
@@ -88,7 +86,7 @@ const groupByMonth = (orders: Array<OrderResponse>) => {
 }
 
 export const OrdersPage = () => {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
 
   const reviewModalRef = useRef<ReviewModalRef>(null)
   const returnModalRef = useRef<ReturnModalRef>(null)
@@ -167,19 +165,18 @@ export const OrdersPage = () => {
     }
   }
 
-  const statusLabel = (
-    status: {
-      code: OrderStatusCode
-      translations: Array<{ language: string; name: string }>
-    },
-    // Подпись с сервера принадлежит общему статусу. Когда показываемый статус
-    // от него отличается (все магазины отказались), серверная подпись соврала
-    // бы — берём перевод по выведенному коду.
-    effectiveCode: OrderStatusCode = status.code,
-  ) =>
-    effectiveCode === status.code
-      ? getTranslatedName(status.translations, i18n.language) || t(`orders.status.${status.code}`)
-      : t(`orders.status.${effectiveCode}`)
+  // Кнопка «Вернуть» стоит у каждого товара, но тестировщик её не нашёл: мелкая
+  // красная надпись рядом с «Оценить» не читается как путь к возврату. Над
+  // товарами завершённого заказа теперь прямо сказано, где она и что дальше.
+  const itemsNotice = (order: OrderResponse) =>
+    order.order_status.code === OrderStatusCode.COMPLETED ? t('returns.hint') : undefined
+
+  // Подпись статуса — своя, по коду и способу получения. Раньше она бралась с
+  // сервера, если там был перевод, а переводы в базе звучат языком оператора:
+  // заказ с самовывозом показывался покупателю «Готов к доставке». Код
+  // берётся выведенный (все магазины отказались — «Отклонён»), а не общий.
+  const statusLabel = (order: OrderResponse) =>
+    t(orderStatusKey(buyerStatusCode(order), order.delivery_method))
   const queryClient = useQueryClient()
   const [selectedId, setSelectedId] = useState<number | null>(null)
   const [isDrawerOpen, setIsDrawerOpen] = useState(false)
@@ -355,7 +352,7 @@ export const OrdersPage = () => {
                   price={calcSubtotal(order)}
                   date={formatNumericDateTime(order.created_at)}
                   status={statusMap[buyerStatusCode(order)]}
-                  label={statusLabel(order.order_status, buyerStatusCode(order))}
+                  label={statusLabel(order)}
                   isActive={selectedId === order.id}
                   onClick={() => {
                     setSelectedId(order.id)
@@ -383,7 +380,7 @@ export const OrdersPage = () => {
               key={selectedOrder.id}
               id={selectedOrder.id}
               status={statusMap[buyerStatusCode(selectedOrder)]}
-              statusLabel={statusLabel(selectedOrder.order_status, buyerStatusCode(selectedOrder))}
+              statusLabel={statusLabel(selectedOrder)}
               canCancel={CANCELLABLE.includes(buyerStatusCode(selectedOrder))}
               partiallyRejected={isPartiallyRejected(selectedOrder)}
               stores={buildStores(selectedOrder)}
@@ -398,6 +395,7 @@ export const OrdersPage = () => {
               isCancelling={isCancelling}
               cancelError={cancelError}
               renderProductAction={renderProductActions(selectedOrder)}
+              itemsNotice={itemsNotice(selectedOrder)}
             />
           </div>
         )}
@@ -440,10 +438,7 @@ export const OrdersPage = () => {
                 key={selectedOrder.id}
                 id={selectedOrder.id}
                 status={statusMap[buyerStatusCode(selectedOrder)]}
-                statusLabel={statusLabel(
-                  selectedOrder.order_status,
-                  buyerStatusCode(selectedOrder),
-                )}
+                statusLabel={statusLabel(selectedOrder)}
                 canCancel={CANCELLABLE.includes(buyerStatusCode(selectedOrder))}
                 partiallyRejected={isPartiallyRejected(selectedOrder)}
                 stores={buildStores(selectedOrder)}
@@ -458,6 +453,7 @@ export const OrdersPage = () => {
                 isCancelling={isCancelling}
                 cancelError={cancelError}
                 renderProductAction={renderProductActions(selectedOrder)}
+                itemsNotice={itemsNotice(selectedOrder)}
               />
             </div>
           </motion.div>

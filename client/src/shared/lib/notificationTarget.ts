@@ -52,6 +52,8 @@ export function notificationTarget(
     case NotificationKind.RECEIPT_CONFIRMED:
       return store('/warehouse?tab=shipments')
     // Раньше вести было некуда — экрана возвратов у продавца не существовало.
+    // Теперь уведомление приходит, когда возврат одобрен, и продавцу там же
+    // отмечать, что товар до него доехал.
     case NotificationKind.RETURN_RECEIVED:
       return store('/returns')
     case NotificationKind.PRODUCT_APPROVED:
@@ -71,9 +73,8 @@ export function notificationTarget(
     case NotificationKind.SHOP_REJECTED:
       return '/profile'
 
-    // Отзывы и полученные продавцом возвраты: страниц, на которых их видно, в
-    // витрине нет. Ссылка в пустоту хуже её отсутствия — такие уведомления
-    // остаются просто текстом.
+    // Отзывы: страницы, на которой продавцу их видно, в витрине нет. Ссылка в
+    // пустоту хуже её отсутствия — такие уведомления остаются просто текстом.
     default:
       return null
   }

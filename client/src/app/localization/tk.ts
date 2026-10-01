@@ -322,11 +322,6 @@ export const tk = {
       12: 'Dekabr',
     },
     status: {
-      approved: 'Tassyklandy',
-      ready_to_take: 'Almaga taýýar',
-      ready_to_deliver: 'Eltip bermäge taýýar',
-      completed: 'Tamamlandy',
-      rejected: 'Ýatyryldy',
       done: 'Taýýar',
       cancelled: 'Ýatyryldy',
       pending: 'Garaşylýar',
@@ -349,6 +344,42 @@ export const tk = {
     },
     empty: 'Sargytlaryňyz ýok',
   },
+  orderStatus: {
+    pending: 'Tassyklanmagyna garaşýar',
+    approved: 'Kabul edildi',
+    ready_to_take: 'Ýygnaldy',
+    ready_to_deliver: 'Almaga taýýar',
+    completed: 'Tamamlandy',
+    rejected: 'Ýatyryldy',
+    pickup: {
+      ready_to_deliver: 'Bermek nokadynda garaşýar',
+      completed: 'Alyndy',
+    },
+    delivery: {
+      ready_to_deliver: 'Eltip bermäge tabşyryldy',
+      completed: 'Eltip berildi',
+    },
+  },
+  storeWarehouse: {
+    title: 'Ammar görnüşi: {{type}}',
+    fbs: {
+      meaning: 'Haryt sizde saklanýar.',
+      intake: 'Haryt geldi — <link>«Haryt kabul etmek»</link> bölüminde belläň',
+      stock: 'Tekjäni täzeden sanadyňyz — <link>«Galyndylar»</link> bölüminde düzediň',
+      orders:
+        '<link>Täze sargyt</link> — kabul ediň we «Ýygnaldy» diýip belläň, operator ony alyp gider',
+      returns: 'Gaýtarma — haryt yzyna gelende, <link>«Yzyna gaýtarmalar»</link> bölüminde belläň',
+    },
+    fbo: {
+      meaning: 'Haryt Postshop ammarynda saklanýar.',
+      shipments: 'Harydy ammara ugradyň: <link>«Ammar» → «Ammara ugratmak»</link>',
+      stock: 'Ammardaky galyndylar — <link>«Ammar» → «Ammardaky galyndylar»</link>',
+      orders:
+        '<link>Sargytlary</link> Postshop ammary ýygnaýar we berýär — sizden hiç zat talap edilmeýär',
+      returns: '<link>Gaýtarmalary</link> Postshop ammary kabul edýär',
+    },
+    changeNote: 'Ammar görnüşini diňe Postshop üýtgedýär — <link>goldaw gullugyna</link> ýazyň.',
+  },
   storeOrders: {
     empty: 'Sargytlar ýok',
     customer: 'Alyjy',
@@ -360,19 +391,15 @@ export const tk = {
     fboNote: 'Sargydy Postshop ammary ýygnaýar — sizden hiç zat talap edilmeýär.',
     notApproved:
       'Operator sargydy kabul edenden soň, sargyt bilen baglanyşykly hereketler elýeterli bolar.',
-    readyToPickup: 'Almaga taýýar',
-    readyToDeliver: 'Eltip bermäge taýýar',
-    complete: 'Tamamlamak',
+    markPacked: 'Ýygnaldy',
     rejectConfirmTitle: 'Sargydy ret etmek',
     rejectConfirmSubtitle: 'Bu sargydy ret etmek isleýärsiňizmi?',
     rejectConfirmButton: 'Hawa, ret etmek',
     status: {
-      pending: 'Täze',
-      approved: 'Kabul edildi',
-      rejected: 'Ret edildi',
-      ready_to_take: 'Almaga taýýar',
-      ready_to_deliver: 'Eltip bermäge taýýar',
-      completed: 'Tamamlandy',
+      pending: 'Täze — sargydy kabul ediň',
+      approved: 'Kabul edildi — ýygnaň',
+      ready_to_take: 'Ýygnaldy — operatora tabşyryň',
+      rejected: 'Siz ret etdiňiz',
     },
   },
   header: {
@@ -683,6 +710,7 @@ export const tk = {
     moderationTitle: 'Haryt moderasiýa üçin iberildi',
     moderationDescription:
       'Operatorlarymyz harydyňyzy barlar we tassyklandan soň müşderilere elýeterli bolar.',
+    saved: 'Üýtgeşmeler saklandy',
   },
 
   checkout: {
@@ -857,12 +885,13 @@ export const tk = {
     dismiss: 'Habarnamany aýyrmak',
     loadMore: 'Ýene görkez',
     kind: {
-      order_created: 'Dükanyňyzda täze sargyt',
+      order_created: 'Täze sargyt — açyň: haryt sizde bolsa, kabul ediň we ýygnaň',
       order_cancelled: 'Alyjy sargydy ýatyrdy',
       receipt_confirmed: 'Kabul ediliş tassyklandy, haryt galyndyda',
       product_out_of_stock: 'Haryt gutardy — ony täzeden getiriň ýa-da satuwdan aýryň',
       review_received: 'Harydyňyz barada täze syn',
-      return_received: 'Harydyňyz boýunça gaýtarma tassyklandy',
+      return_received:
+        'Gaýtarma tassyklandy — haryt size gaýdyp geler. Alanyňyzda, muny «Yzyna gaýtarmalar» bölüminde belläň',
       shop_blocked: 'Dükan platforma tarapyndan ýapyldy',
       product_approved: 'Haryt barlagdan geçdi',
       product_declined: 'Haryt barlagdan geçmedi',
@@ -879,7 +908,18 @@ export const tk = {
 
   storeReturns: {
     title: 'Yzyna gaýtarmalar',
-    subtitle: 'Dükanyňyzyň harytlary boýunça yzyna gaýtarmalar. Karary platforma kabul edýär.',
+    subtitle:
+      'Dükanyňyzyň harytlary boýunça yzyna gaýtarmalar. Karary Postshop kabul edýär; tassyklanan gaýtarma size gelende, ony şu ýerde belläň.',
+    fboWarehouse: 'Gaýtarmany Postshop ammary kabul eder',
+    receiveRestock: 'Alyndy — satuwa gaýtarmak',
+    receiveDefective: 'Alyndy — kemçilikli',
+    defectiveTitle: 'Haryt kemçilikli geldimi?',
+    defectiveText:
+      'Gaýtarma alnan diýip bellener, ýöne haryt satuwa gaýtarylmaz — galyndy üýtgemez.',
+    defectiveConfirm: 'Hawa, kemçilikli',
+    restocked: 'Alyndy, satuwa gaýtaryldy',
+    defective: 'Alyndy, kemçilikli',
+    receivedSaved: 'Gaýtarma alnan diýip bellendi',
   },
   returns: {
     title: 'Gaýtarmalarym',
@@ -893,6 +933,7 @@ export const tk = {
     cancelTitle: 'Arzany yzyna almalymy?',
     cancelText: 'Arza sanawdan aýrylar. Bu satyn alyş boýunça täzesini ýene berip bolar.',
     action: 'Yzyna gaýtar',
+    hint: 'Haryt gelişmedimi? Onuň ýanyndaky «Yzyna gaýtar» düwmesine basyň — arzany Postshop gözden geçirer',
     createTitle: 'Yzyna gaýtarmak arzasy',
     purchased: 'satyn alnan: {{count}}',
     quantity: 'Näçesini gaýtarýarsyňyz',

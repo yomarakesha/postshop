@@ -326,11 +326,6 @@ export const ru = {
       12: 'Декабрь',
     },
     status: {
-      approved: 'Подтверждён',
-      ready_to_take: 'Готов к выдаче',
-      ready_to_deliver: 'Готов к доставке',
-      completed: 'Выполнен',
-      rejected: 'Отменён',
       done: 'Выполнен',
       cancelled: 'Отменён',
       pending: 'Ожидает',
@@ -353,6 +348,40 @@ export const ru = {
     },
     empty: 'У вас пока нет заказов',
   },
+  orderStatus: {
+    pending: 'Ждёт подтверждения',
+    approved: 'Принят',
+    ready_to_take: 'Собран',
+    ready_to_deliver: 'Готов к получению',
+    completed: 'Завершён',
+    rejected: 'Отменён',
+    pickup: {
+      ready_to_deliver: 'Ждёт в пункте выдачи',
+      completed: 'Получен',
+    },
+    delivery: {
+      ready_to_deliver: 'Передан в доставку',
+      completed: 'Доставлен',
+    },
+  },
+  storeWarehouse: {
+    title: 'Тип склада: {{type}}',
+    fbs: {
+      meaning: 'Товар хранится у вас.',
+      intake: 'Пришёл товар — отметьте в <link>«Приёме товара»</link>',
+      stock: 'Пересчитали полку — исправьте в <link>«Остатках»</link>',
+      orders: '<link>Новый заказ</link> — примите и отметьте «Собран», оператор заберёт его',
+      returns: 'Возврат — когда товар вернётся, отметьте в <link>«Возвратах»</link>',
+    },
+    fbo: {
+      meaning: 'Товар хранится на складе Postshop.',
+      shipments: 'Отправляйте товар на склад: <link>«Склад» → «Отправка на склад»</link>',
+      stock: 'Остатки на складе — <link>«Склад» → «Остатки на складе»</link>',
+      orders: '<link>Заказы</link> собирает и выдаёт склад Postshop — от вас ничего не требуется',
+      returns: '<link>Возвраты</link> принимает склад Postshop',
+    },
+    changeNote: 'Тип склада меняет только Postshop — напишите в <link>поддержку</link>.',
+  },
   storeOrders: {
     empty: 'Нет заказов',
     customer: 'Покупатель',
@@ -363,19 +392,15 @@ export const ru = {
     reject: 'Отклонить',
     fboNote: 'Заказ собирает склад Postshop — от вас ничего не требуется.',
     notApproved: 'Действия с заказом станут доступны после того, как оператор примет заказ.',
-    readyToPickup: 'Готов к выдаче',
-    readyToDeliver: 'Готов к доставке',
-    complete: 'Завершить',
+    markPacked: 'Собран',
     rejectConfirmTitle: 'Отклонить заказ',
     rejectConfirmSubtitle: 'Вы уверены, что хотите отклонить этот заказ?',
     rejectConfirmButton: 'Да, отклонить',
     status: {
-      pending: 'Новый',
-      approved: 'Принят',
-      rejected: 'Отклонён',
-      ready_to_take: 'Готов к выдаче',
-      ready_to_deliver: 'Готов к доставке',
-      completed: 'Завершён',
+      pending: 'Новый — примите заказ',
+      approved: 'Принят — соберите',
+      ready_to_take: 'Собран — передайте оператору',
+      rejected: 'Вы отклонили',
     },
   },
   header: {
@@ -687,6 +712,7 @@ export const ru = {
     moderationTitle: 'Товар отправлен на модерацию',
     moderationDescription:
       'Наши операторы проверят ваш товар и после одобрения он станет доступен покупателям.',
+    saved: 'Изменения сохранены',
   },
 
   checkout: {
@@ -861,12 +887,13 @@ export const ru = {
     dismiss: 'Убрать уведомление',
     loadMore: 'Показать ещё',
     kind: {
-      order_created: 'Новый заказ в вашем магазине',
+      order_created: 'Новый заказ — откройте его: если товар у вас, примите и соберите',
       order_cancelled: 'Покупатель отменил заказ',
       receipt_confirmed: 'Приёмка подтверждена, товар в остатке',
       product_out_of_stock: 'Товар закончился — пополните его или снимите с продажи',
       review_received: 'Новый отзыв о вашем товаре',
-      return_received: 'Возврат по вашему товару подтверждён',
+      return_received:
+        'Одобрен возврат — товар вернётся к вам. Когда получите, отметьте это в «Возвратах»',
       shop_blocked: 'Магазин закрыт платформой',
       product_approved: 'Товар прошёл проверку',
       product_declined: 'Товар не прошёл проверку',
@@ -883,7 +910,18 @@ export const ru = {
 
   storeReturns: {
     title: 'Возвраты',
-    subtitle: 'Возвраты по товарам вашего магазина. Решение принимает платформа.',
+    subtitle:
+      'Возвраты по товарам вашего магазина. Решение принимает Postshop; когда одобренный возврат приедет к вам, отметьте его здесь.',
+    fboWarehouse: 'Возврат примет склад Postshop',
+    receiveRestock: 'Получен — вернуть в продажу',
+    receiveDefective: 'Получен — брак',
+    defectiveTitle: 'Товар пришёл с браком?',
+    defectiveText:
+      'Возврат отметится полученным, но в продажу товар не вернётся — остаток не изменится.',
+    defectiveConfirm: 'Да, брак',
+    restocked: 'Получен, возвращён в продажу',
+    defective: 'Получен, брак',
+    receivedSaved: 'Возврат отмечен полученным',
   },
   returns: {
     title: 'Мои возвраты',
@@ -897,6 +935,7 @@ export const ru = {
     cancelTitle: 'Отозвать заявку?',
     cancelText: 'Заявка исчезнет из списка. Подать новую по этой покупке можно будет заново.',
     action: 'Вернуть',
+    hint: 'Не подошёл товар? Нажмите «Вернуть» рядом с ним — заявку рассмотрит Postshop',
     createTitle: 'Заявка на возврат',
     purchased: 'куплено: {{count}}',
     quantity: 'Сколько возвращаете',
