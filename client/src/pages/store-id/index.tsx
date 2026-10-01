@@ -18,6 +18,7 @@ import ApprovedIcon from '#/shared/assets/icons/approved.svg?react'
 import InfoIcon from '#/shared/assets/icons/info.svg?react'
 import { ProductCardSkeleton } from '#/widgets/ProductCard/ui/ProductCardSkeleton'
 import { getTranslatedName } from '#/shared/utils/getTranslatedName'
+import { useOutOfStock } from '#/shared/hooks/useStockAvailability'
 
 interface StoreIdPageProps {
   storeId: string
@@ -45,6 +46,8 @@ export const StoreIdPage = ({ storeId }: StoreIdPageProps) => {
       price_to: priceRange.priceTo,
     },
   })
+
+  const isOutOfStockProduct = useOutOfStock(products)
 
   const storeName = shopAdditional?.name ?? ''
   const storeLogo = getImageUrl(shopAdditional?.logo_path)
@@ -77,8 +80,14 @@ export const StoreIdPage = ({ storeId }: StoreIdPageProps) => {
             <div className="h-20 animate-pulse rounded-base bg-gray-200" />
           ) : (
             <div className="p-3 rounded-base flex gap-4" style={{ backgroundColor: storeColor }}>
-              <div className="bg-white rounded-base overflow-hidden">
-                <img src={storeLogo} alt={storeName} className="w-16 h-16 object-contain" />
+              {/* Высота постоянная, ширина по пропорциям логотипа: в квадрате
+                  64×64 широкий логотип сжимался в тонкую полоску посередине. */}
+              <div className="flex shrink-0 items-center overflow-hidden rounded-base bg-white">
+                <img
+                  src={storeLogo}
+                  alt={storeName}
+                  className="h-16 w-auto min-w-16 max-w-40 object-contain"
+                />
               </div>
               <div className="flex flex-1 items-center justify-between">
                 <div className="flex flex-col gap-3">
@@ -124,6 +133,7 @@ export const StoreIdPage = ({ storeId }: StoreIdPageProps) => {
                   store={storeName}
                   discount={discountPercent}
                   name={getTranslatedName(product.translations, i18n.language)}
+                  outOfStock={isOutOfStockProduct(product)}
                   currencyCode={product.currency?.code}
                   rating={product.rating_avg}
                   ratingCount={product.rating_count}

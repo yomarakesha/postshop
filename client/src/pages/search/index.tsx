@@ -10,6 +10,7 @@ import { EmptyState } from '#/shared/ui/EmptyState'
 import { Breadcrumbs } from '#/shared/ui/Breadcrumbs'
 import { ProductCard } from '#/widgets/ProductCard'
 import { ProductCardSkeleton } from '#/widgets/ProductCard/ui/ProductCardSkeleton'
+import { useOutOfStock } from '#/shared/hooks/useStockAvailability'
 import { useCityStore } from '#/shared/stores/cityStore'
 import { useGetCitiesCitiesGet } from '#/shared/openapi/queries'
 import { REFERENCE_LIST_LIMIT } from '#/shared/constants/pagination'
@@ -98,6 +99,7 @@ export const SearchPage = ({ query }: SearchPageProps) => {
 
   const pages = data?.pages ?? []
   const products = pages.flatMap((page) => page?.products ?? [])
+  const isOutOfStockProduct = useOutOfStock(products)
 
   const handleObserver = useCallback(
     (entries: Array<IntersectionObserverEntry>) => {
@@ -157,6 +159,7 @@ export const SearchPage = ({ query }: SearchPageProps) => {
                   store=""
                   discount={discountPercent}
                   name={name}
+                  outOfStock={isOutOfStockProduct(product)}
                   deliveryFrom={
                     mounted && product.shop_city_id != null && product.shop_city_id !== cityId
                       ? cityNameById.get(product.shop_city_id)

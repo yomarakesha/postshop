@@ -4,6 +4,7 @@ import { X } from 'lucide-react'
 import type { NotificationResponse } from '#/shared/openapi/requests'
 import { NotificationKind } from '#/shared/openapi/requests'
 import { cn } from '#/shared/utils/cn'
+import { formatDate } from '#/shared/utils/formatDate'
 
 /**
  * Виды, где comment — это код статуса заказа, а не текст человека. Его надо
@@ -29,10 +30,6 @@ interface Props {
  */
 export const NotificationRow = ({ notification, href, onRead, onDismiss, className }: Props) => {
   const { t, i18n } = useTranslation()
-  const dateFormat = new Intl.DateTimeFormat(i18n.language, {
-    dateStyle: 'short',
-    timeStyle: 'short',
-  })
 
   // Код статуса заказа переводим, текст модератора показываем как есть.
   const detail = notification.comment
@@ -46,7 +43,12 @@ export const NotificationRow = ({ notification, href, onRead, onDismiss, classNa
       <p className="t1 font-medium">{t(`notifications.kind.${notification.kind}`)}</p>
       {detail && <p className="t2 text-passive2">{detail}</p>}
       {notification.created_at && (
-        <p className="t2 text-passive1">{dateFormat.format(new Date(notification.created_at))}</p>
+        <p className="t2 text-passive1">
+          {formatDate(notification.created_at, i18n.language, {
+            dateStyle: 'short',
+            timeStyle: 'short',
+          })}
+        </p>
       )}
     </>
   )

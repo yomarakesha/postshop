@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
+import { toast } from 'sonner'
 import { Link } from '@tanstack/react-router'
 import { cn } from '#/shared/utils/cn'
 import { FALLBACK_CURRENCY } from '#/shared/constants/locale'
@@ -23,6 +24,9 @@ interface CartProduct {
   quantity: number
   currencyCode?: string
   isAvailable?: boolean
+  stockLeft?: number
+  outOfStock?: boolean
+  notEnoughStock?: boolean
 }
 
 export const ProductItem = ({ product }: { product: CartProduct }) => {
@@ -79,6 +83,16 @@ export const ProductItem = ({ product }: { product: CartProduct }) => {
   const handleUpdate = (newQuantity: number) => {
     if (newQuantity <= 0) {
       scheduleRemoval()
+      return
+    }
+    // Больше остатка не даём: гостевую корзину сервер не проверяет вовсе, а
+    // для вошедшего отказ приходил служебным английским текстом.
+    if (
+      product.stockLeft !== undefined &&
+      newQuantity > product.quantity &&
+      newQuantity > product.stockLeft
+    ) {
+      toast.error(t('cart.notEnough'))
       return
     }
     if (profile) {
@@ -142,7 +156,11 @@ export const ProductItem = ({ product }: { product: CartProduct }) => {
           )}
         >
           {isUnavailable ? (
-            <p className="t1 text-failure font-medium">{t('cart.unavailable')}</p>
+            <p className="t1 text-failure font-medium">
+              {/* Закончившийся товар не «больше не продаётся»: его могут
+                  пополнить, и подпись не должна говорить обратное. */}
+              {product.outOfStock ? t('products.outOfStock') : t('cart.unavailable')}
+            </p>
           ) : (
             <>
               {/* Валюта была голым текстом в разметке, тогда как карточки
@@ -196,6 +214,9 @@ export const ProductItem = ({ product }: { product: CartProduct }) => {
           />
         )}
       </div>
+      {product.notEnoughStock && !pendingRemoval && (
+        <p className="t2 text-failure">{t('cart.onlyLeft', { count: product.stockLeft ?? 0 })}</p>
+      )}
     </div>
   )
 }

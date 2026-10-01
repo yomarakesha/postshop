@@ -7,6 +7,7 @@ import { useGetShopSummaryOrdersShopShopIdSummaryGet } from '#/shared/openapi/qu
 import { SummaryPeriod } from '#/shared/openapi/requests'
 import { cn } from '#/shared/utils/cn'
 import { EmptyState } from '#/shared/ui/EmptyState'
+import { formatDate } from '#/shared/utils/formatDate'
 
 const PERIODS = [SummaryPeriod.WEEK, SummaryPeriod.MONTH, SummaryPeriod.QUARTER] as const
 
@@ -85,9 +86,10 @@ export const SummaryStats = () => {
   const previous = data?.previous
   const isEmpty = !isLoading && current?.orders_count === 0 && previous?.orders_count === 0
 
-  const dayFormat = new Intl.DateTimeFormat(i18n.language, { day: '2-digit', month: '2-digit' })
+  // Точка графика — календарный день («2026-09-23»), а не момент: общий
+  // форматтер показывает его как есть, без сдвига по часам того, кто рендерит.
   const chartData = (data?.points ?? []).map((point) => ({
-    name: dayFormat.format(new Date(point.date)),
+    name: formatDate(point.date, i18n.language, { day: '2-digit', month: '2-digit' }),
     value: Number(point.total_revenue),
   }))
   const maxValue = Math.max(...chartData.map((d) => d.value), 0)

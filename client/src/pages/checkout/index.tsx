@@ -25,7 +25,16 @@ const INSUFFICIENT_STOCK_RE = /Insufficient stock\. product (\d+):/
 export const CheckoutPage = () => {
   const { t } = useTranslation()
   const router = useRouter()
-  const { stores, total, discount, grandTotal, hasUnavailable, isLoading } = useCartData()
+  const {
+    stores,
+    total,
+    discount,
+    grandTotal,
+    hasUnavailable,
+    hasStockProblem,
+    canCheckout,
+    isLoading,
+  } = useCartData()
 
   const [deliveryMethod, setDeliveryMethod] = useState<'pickup' | 'delivery'>('pickup')
   const [deliveryAddress, setDeliveryAddress] = useState('')
@@ -224,9 +233,12 @@ export const CheckoutPage = () => {
             {hasUnavailable && (
               <p className="t2 text-failure text-center">{t('cart.hasUnavailable')}</p>
             )}
+            {hasStockProblem && (
+              <p className="t2 text-failure text-center">{t('cart.hasStockProblem')}</p>
+            )}
 
             <Button
-              disabled={isPending || hasUnavailable}
+              disabled={isPending || !canCheckout}
               onClick={handleConfirm}
               className="justify-center whitespace-nowrap t1"
             >

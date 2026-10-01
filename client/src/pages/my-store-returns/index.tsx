@@ -6,6 +6,7 @@ import { ReturnStatus } from '#/shared/openapi/requests'
 import { EmptyState } from '#/shared/ui/EmptyState'
 import { ListSkeleton } from '#/shared/ui/ListSkeleton'
 import { cn } from '#/shared/utils/cn'
+import { formatDate } from '#/shared/utils/formatDate'
 
 const statusClass = {
   [ReturnStatus.PENDING]: 'bg-gray2 text-passive2',
@@ -33,7 +34,6 @@ export const MyStoreReturnsPage = () => {
     path: { shop_id: Number(storeId) },
   })
 
-  const dateFormat = new Intl.DateTimeFormat(i18n.language, { dateStyle: 'medium' })
   const items = requests ?? []
 
   return (
@@ -102,7 +102,7 @@ export const MyStoreReturnsPage = () => {
 
             {request.created_at && (
               <p className="t2 mt-3 text-passive1">
-                {dateFormat.format(new Date(request.created_at))}
+                {formatDate(request.created_at, i18n.language)}
               </p>
             )}
           </li>

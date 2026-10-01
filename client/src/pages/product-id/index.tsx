@@ -26,6 +26,7 @@ import { getImageUrl } from '#/shared/utils/getImageUrl'
 import { getTranslatedName } from '#/shared/utils/getTranslatedName'
 import { getDiscountInfo } from '#/shared/utils/discount'
 import { FALLBACK_CURRENCY } from '#/shared/constants/locale'
+import { isOutOfStock, useOutOfStock } from '#/shared/hooks/useStockAvailability'
 
 interface ProductIdPageProps {
   productId: string
@@ -121,8 +122,11 @@ export const ProductIdPage = ({ productId, storeId }: ProductIdPageProps) => {
   const availability = availabilityData?.[0]
   // «Нет в наличии» — это не только надпись: класть такой товар в корзину
   // нельзя, иначе отказ приходит в конце оформления.
-  const outOfStock = Boolean(availability?.tracked) && Number(availability?.available ?? 0) <= 0
+  const outOfStock = isOutOfStock(availability)
   const filteredRelated = similarProducts?.slice(0, 5)
+  // Похожие товары — такие же карточки с «+», и правило для них то же, что
+  // в каталоге: раньше здесь проверялась только активность товара.
+  const isOutOfStockProduct = useOutOfStock(filteredRelated)
 
   if (isProductLoading) {
     return (
@@ -235,11 +239,16 @@ export const ProductIdPage = ({ productId, storeId }: ProductIdPageProps) => {
 
           <div className="bg-white p-3 rounded-base flex gap-4 items-center border border-stroke">
             {/* Знак проверенного магазина стоял у логотипа, будто относится к
-                картинке. Перенесён к названию — он говорит о магазине. */}
+                картинке. Перенесён к названию — он говорит о магазине.
+
+                Логотип вписывается, а не обрезается: квадрат с object-cover
+                срезал у широких логотипов края вместе с названием магазина.
+                Высота постоянная, ширина по пропорциям, но не шире max-w-30 —
+                иначе длинная надпись отняла бы место у названия. */}
             <img
               src={storeLogo}
               alt={storeName}
-              className="size-12.5 shrink-0 rounded-lg object-cover"
+              className="h-12.5 w-auto max-w-30 shrink-0 rounded-lg object-contain"
             />
             <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
               {/* Название ведёт на витрину магазина: раньше отсюда можно было
@@ -326,7 +335,7 @@ export const ProductIdPage = ({ productId, storeId }: ProductIdPageProps) => {
                   ratingCount={p.rating_count}
                   to={storeId ? `/stores/${storeId}/${p.id}` : `/${p.id}`}
                   storeTo={`/stores/${p.shop_base_id}`}
-                  outOfStock={!p.is_active}
+                  outOfStock={isOutOfStockProduct(p)}
                 />
               )
             })}

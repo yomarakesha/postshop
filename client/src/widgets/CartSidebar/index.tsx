@@ -33,8 +33,18 @@ export const CartSidebar = ({ loginModalRef }: CartSidebarProps) => {
     }
   }
 
-  const { items, stores, total, discount, grandTotal, hasUnavailable, isLoading, clearCart } =
-    useCartData()
+  const {
+    items,
+    stores,
+    total,
+    discount,
+    grandTotal,
+    hasUnavailable,
+    hasStockProblem,
+    canCheckout,
+    isLoading,
+    clearCart,
+  } = useCartData()
   const hasItems = items.length > 0
   const confirmClearRef = useRef<ConfirmDialogRef>(null)
 
@@ -111,14 +121,15 @@ export const CartSidebar = ({ loginModalRef }: CartSidebarProps) => {
                 приглушённее. Так выгода видна там же, где итог, и над кнопкой
                 не остаётся двух почти одинаковых чисел. */}
             {hasUnavailable && <p className="t1 text-failure">{t('cart.hasUnavailable')}</p>}
+            {hasStockProblem && <p className="t1 text-failure">{t('cart.hasStockProblem')}</p>}
             <Button
-              disabled={hasUnavailable}
+              disabled={!canCheckout}
               onClick={handleConfirm}
               /* group ставится только на живой кнопке: у отключённой наведение
                  не должно обещать действие, которого не будет. */
               className={cn(
                 'p3 justify-center font-bold whitespace-nowrap',
-                !hasUnavailable && 'group',
+                canCheckout && 'group',
               )}
             >
               {/* Под курсором сумма уступает место действию: пока человек

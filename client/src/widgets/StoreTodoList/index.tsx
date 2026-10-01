@@ -118,7 +118,7 @@ export const StoreTodoList = ({
   // Тип склада — выбор между FBS и FBO. Пока склад платформы выключен
   // (FBO_ENABLED=false), выбирать нечего: платформа товар не хранит, и
   // магазин может работать только по FBS. Шаг скрыт, а профиль создаётся с FBS.
-  const { fboEnabled } = useFeatures()
+  const { fboEnabled, isLoading: isFeaturesLoading } = useFeatures()
   const createShopAdditional = useCreateShopAdditionalShopAdditionalsPost()
 
   const { data: additional, isLoading, refetch } = useShopAdditional(storeId)
@@ -142,6 +142,13 @@ export const StoreTodoList = ({
       ? todos
       : todos.filter((todo) => todo.id !== 'warehouse_type')
 
+  // Выбранный тип склада продавец сменить не может: сервер отвечает 403, тип
+  // меняет только сотрудник платформы. Раньше шаг оставался живым и после
+  // выбора — модалка открывалась, а сохранение падало ошибкой прав. Теперь
+  // шаг с выбранным типом — выполненный и некликабельный, как в информации о
+  // магазине.
+  const warehouseTypeLocked = disableWarehouseType || !!additional?.warehouse_type
+
   const completedCount = visibleTodos.filter((todo) => completed[todo.id]).length
   const totalCount = visibleTodos.length
   const allCompleted = completedCount === totalCount
@@ -158,7 +165,12 @@ export const StoreTodoList = ({
   }
 
   const handleTodoClick = async (id: string) => {
-    if (id === 'warehouse_type' && disableWarehouseType) return
+    if (id === 'warehouse_type' && warehouseTypeLocked) return
+    // Пока флаг склада платформы не пришёл, выбор типа делать нельзя: флаг на
+    // время загрузки читается как «выключен», и быстрый клик создавал магазин
+    // FBS даже там, где FBO включён. Список и так показан только после флага
+    // (см. спиннер ниже) — это страховка.
+    if (isFeaturesLoading) return
 
     // Профиля ещё нет — а создать его без типа склада нельзя. Раньше он
     // создавался молча с прошитым FBS, каким бы шагом ни начинали. Теперь любой
@@ -202,7 +214,9 @@ export const StoreTodoList = ({
     refreshProfile()
   }
 
-  if (isLoading) {
+  // Ждём и профиль, и флаг склада: от флага зависит, есть ли шаг выбора типа и
+  // каким типом создаётся профиль (см. handleTodoClick).
+  if (isLoading || isFeaturesLoading) {
     return (
       <div className="flex justify-center py-20">
         <Spinner />
@@ -243,11 +257,11 @@ export const StoreTodoList = ({
             todo={todo}
             completed={completed[todo.id]}
             showStatus={showStatus}
-            disabled={todo.id === 'warehouse_type' && disableWarehouseType}
+            disabled={todo.id === 'warehouse_type' && warehouseTypeLocked}
             description={
-              // Выбранный тип после активации меняет только администратор —
-              // вместо призыва «выберите» показываем, что выбрано.
-              todo.id === 'warehouse_type' && disableWarehouseType && additional?.warehouse_type
+              // Выбранный тип меняет только сотрудник платформы — вместо
+              // призыва «выберите» показываем, что выбрано.
+              todo.id === 'warehouse_type' && additional?.warehouse_type
                 ? t('storeActivate.todos.warehouseTypeLocked', {
                     type: t(`storeActivate.warehouseTypeModal.${additional.warehouse_type}.name`),
                   })

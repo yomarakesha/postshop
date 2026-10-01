@@ -164,7 +164,24 @@ export const en = {
       'A store cannot be deleted on your own: orders and documents remain attached to it. Contact support and we will delete it after a review.',
     deleteLink: 'Contact support',
   },
+  upload: {
+    processing: 'Preparing photos…',
+    notImage: 'This is not an image — choose a JPG, PNG or WebP photo',
+    unreadable: 'The image could not be processed — choose another file (JPG, PNG or WebP)',
+  },
+
+  productBarcode: {
+    vendorLabel: 'Manufacturer barcode',
+    vendorPlaceholder: 'For example, 4600000000000',
+    vendorHint: 'Optional. 8, 12, 13 or 14 digits from the package',
+    invalid: 'A manufacturer barcode has 8, 12, 13 or 14 digits',
+    duplicate: 'Your shop already has a product with this manufacturer barcode',
+    platformLabel: 'Postshop barcode',
+    platformHint: 'Assigned automatically and cannot be changed',
+  },
+
   errors: {
+    uploadInterrupted: 'The upload was interrupted — the connection is too weak. Please try again',
     network: 'No connection to the server. Check your network and try again',
     server: 'Server error. Please try again later',
     badRequest: 'Could not complete the action',
@@ -340,6 +357,7 @@ export const en = {
     comment: 'Comment',
     approve: 'Approve',
     reject: 'Reject',
+    fboNote: 'The Postshop warehouse is fulfilling this order — nothing is required from you.',
     notApproved: 'Order actions will be available once an operator accepts the order.',
     readyToPickup: 'Ready for pickup',
     readyToDeliver: 'Ready to deliver',
@@ -678,10 +696,11 @@ export const en = {
     insufficientStockGeneric:
       'One of the items in your cart is out of stock. Please check the quantities.',
     deliveryMethod: 'Delivery method',
-    pickup: 'Pickup from warehouse',
+    pickup: 'Pickup point',
     delivery: 'Delivery',
     addressPlaceholder: 'Ashgabat, Magtymguly avenue, building 1',
-    noPickupPoints: 'No pickup points available in the selected city',
+    noPickupPoints:
+      'There are no pickup points in your city yet — choose delivery or change the city',
     showOnMap: 'Show on map',
     pickupPointsOnMap: 'Pickup points',
     mapUnavailable: 'The map is unavailable: no map server is configured.',
@@ -733,6 +752,9 @@ export const en = {
     unavailableName: 'Product unavailable',
     remove: 'Remove',
     hasUnavailable: 'Remove the unavailable products to place the order',
+    hasStockProblem:
+      'Some products are not in stock in the quantity you chose — remove them or lower the quantity to place the order',
+    onlyLeft: 'Only {{count}} left in stock — lower the quantity',
 
     restore: 'Undo',
     goToCart: 'To cart',
@@ -837,7 +859,7 @@ export const en = {
       order_created: 'New order in your shop',
       order_cancelled: 'The customer cancelled an order',
       receipt_confirmed: 'Receipt confirmed, stock updated',
-      product_out_of_stock: 'A product has run out — restock it or remove it from sale',
+      product_out_of_stock: 'A product has run out — replenish it or take it off sale',
       review_received: 'New review of your product',
       return_received: 'A return of your product was approved',
       shop_blocked: 'The shop was closed by the platform',
@@ -996,11 +1018,11 @@ export const en = {
         title: '3. Orders and Payments',
         p1: 'All product prices are displayed in Turkmen manat (TMT) and include applicable taxes unless otherwise stated. Prices are set by individual sellers and may change without prior notice.',
         p2: 'An order is considered confirmed once you receive an order confirmation. PostShop reserves the right to cancel orders due to pricing errors, product unavailability, or suspected fraud.',
-        p3: 'Payment can be made by cash, bank card terminal, or a combination of both upon delivery or pickup. All payment obligations must be fulfilled at the time of receipt.',
+        p3: 'Payment can be made by cash, bank card terminal, or a combination of both upon delivery or at the pickup point. All payment obligations must be fulfilled at the time of receipt.',
       },
       delivery: {
-        title: '4. Delivery and Pickup',
-        p1: 'Products can be received via warehouse pickup or delivery to a specified address. Delivery availability and timeframes may vary by region and product.',
+        title: '4. Delivery and Pickup Points',
+        p1: 'Products can be received at a pickup point or delivered to a specified address. Delivery availability and timeframes may vary by region and product.',
         p2: 'PostShop partners with Turkmenpost for delivery services. While we strive to meet estimated delivery times, delays may occur due to circumstances beyond our control.',
         p3: 'Upon delivery, you are responsible for inspecting the products. Any damage or discrepancies must be reported within 24 hours of receipt.',
       },

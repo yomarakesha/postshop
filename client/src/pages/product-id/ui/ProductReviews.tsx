@@ -23,6 +23,7 @@ import { Button } from '#/shared/ui/Button'
 import { TextArea } from '#/shared/ui/TextArea'
 import { settled } from '#/shared/lib/settled'
 import { cn } from '#/shared/utils/cn'
+import { formatDate } from '#/shared/utils/formatDate'
 
 const STARS = [1, 2, 3, 4, 5] as const
 
@@ -96,7 +97,6 @@ export const ProductReviews = ({ productId }: Props) => {
 
   const count = summary?.rating_count ?? 0
   const breakdown = summary?.breakdown ?? {}
-  const dateFormat = new Intl.DateTimeFormat(i18n.language, { dateStyle: 'medium' })
 
   return (
     <div className="flex flex-col gap-4">
@@ -230,9 +230,7 @@ export const ProductReviews = ({ productId }: Props) => {
                   <RatingStars value={review.rating} />
                 </div>
                 {review.created_at && (
-                  <p className="t2 text-passive2">
-                    {dateFormat.format(new Date(review.created_at))}
-                  </p>
+                  <p className="t2 text-passive2">{formatDate(review.created_at, i18n.language)}</p>
                 )}
               </div>
               {review.text && <p className="p3 whitespace-pre-line">{review.text}</p>}

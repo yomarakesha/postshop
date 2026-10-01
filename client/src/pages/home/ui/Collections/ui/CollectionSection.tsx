@@ -4,6 +4,7 @@ import type { CollectionResponse, ProductResponse } from '#/shared/openapi/reque
 import { ProductCard } from '@/widgets/ProductCard'
 import { Button } from '#/shared/ui/Button'
 import { getDiscountInfo } from '#/shared/utils/discount'
+import { useOutOfStock } from '#/shared/hooks/useStockAvailability'
 
 const getCollectionName = (translations: CollectionResponse['translations'], language: string) => {
   return translations.find((t) => t.language === language)?.name ?? translations[0]?.name
@@ -25,6 +26,9 @@ export const CollectionSection = ({
   const { t } = useTranslation()
   const products = collection.products
   const navigate = useNavigate()
+  // Своим запросом на каждую подборку: подборки на главной независимы, и
+  // пустая (return null ниже) не должна ничего спрашивать заранее.
+  const isOutOfStockProduct = useOutOfStock(products)
 
   if (products.length === 0) return null
 
@@ -50,7 +54,7 @@ export const CollectionSection = ({
               store={shopNamesMap.get(product.shop_base_id) ?? ''}
               storeTo={`/stores/${product.shop_base_id}`}
               discount={discountPercent}
-              outOfStock={!product.is_active}
+              outOfStock={isOutOfStockProduct(product)}
               currencyCode={product.currency?.code}
               rating={product.rating_avg}
               ratingCount={product.rating_count}

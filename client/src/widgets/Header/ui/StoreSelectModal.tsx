@@ -48,10 +48,12 @@ export const StoreSelectModal = ({ shops, className }: StoreSelectModalProps) =>
               className="flex items-center gap-3 p-3 bg-white rounded-base cursor-pointer hover:bg-gray-50 transition-colors"
             >
               {shop.logo_path ? (
+                // Вписываем, а не обрезаем: у широкого логотипа квадрат с
+                // object-cover оставлял середину надписи.
                 <img
                   src={getImageUrl(shop.logo_path)}
                   alt={shop.name ?? ''}
-                  className="size-10 rounded-sm object-cover"
+                  className="h-10 w-auto max-w-24 shrink-0 rounded-sm object-contain"
                 />
               ) : (
                 <div className="size-10 rounded-full bg-blue-50 flex items-center justify-center">

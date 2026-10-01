@@ -5,6 +5,7 @@ import { EmptyState } from '#/shared/ui/EmptyState'
 import { REFERENCE_LIST_LIMIT } from '#/shared/constants/pagination'
 import { ProductCard } from '@/widgets/ProductCard'
 import { ProductCardSkeleton } from '#/widgets/ProductCard/ui/ProductCardSkeleton'
+import { useOutOfStock } from '#/shared/hooks/useStockAvailability'
 import { useFavoritesContext } from '#/app/providers/FavoritesProvider'
 import { useGetShopAdditionalsShopAdditionalsGet } from '#/shared/openapi/queries'
 import { getDiscountInfo } from '#/shared/utils/discount'
@@ -25,6 +26,8 @@ export const FavoritesPage = () => {
     }
     return map
   }, [shopAdditionals])
+
+  const isOutOfStockProduct = useOutOfStock(favorites?.map((fav) => fav.product))
 
   if (!favorites) {
     return (
@@ -72,7 +75,7 @@ export const FavoritesPage = () => {
             store={shopNamesMap.get(product.shop_base_id) ?? ''}
             storeTo={`/stores/${product.shop_base_id}`}
             discount={discountPercent}
-            outOfStock={!product.is_active}
+            outOfStock={isOutOfStockProduct(product)}
             currencyCode={product.currency?.code}
             rating={product.rating_avg}
             ratingCount={product.rating_count}

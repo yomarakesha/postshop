@@ -26,6 +26,10 @@ import { BrandModal } from '#/shared/ui/BrandModal'
 import { CategoryModal } from '#/pages/my-store-products-add/ui/CategoryModal'
 import { Spinner } from '#/shared/ui/Spinner'
 import { settled } from '#/shared/lib/settled'
+import { getProductSaveErrorMessage } from '#/shared/lib/apiError'
+import { compressImage, imageErrorKey } from '#/shared/utils/compressImage'
+import { isValidVendorBarcode, normalizeBarcode } from '#/shared/utils/barcode'
+import { VendorBarcodeInput } from '#/pages/my-store-products-add/ui/VendorBarcodeInput'
 
 type ExistingImage = { type: 'existing'; url: string }
 type NewImage = { type: 'new'; file: File; preview: string }
@@ -38,7 +42,13 @@ export const EditProductPage = () => {
   })
   const navigate = useNavigate()
   const queryClient = useQueryClient()
-  const updateProduct = useUpdateProductProductsProductIdPut()
+  // Свой текст ошибки: штрихкод (409/422) и обрыв загрузки фото иначе
+  // приходили служебным английским текстом или «Нет связи с сервером».
+  // Фото уходят только если их меняли — тогда и обрыв называем обрывом загрузки.
+  const imagesChangedRef = useRef(false)
+  const updateProduct = useUpdateProductProductsProductIdPut(undefined, {
+    onError: (err) => toast.error(getProductSaveErrorMessage(err, imagesChangedRef.current)),
+  })
   const { data: measureUnits } = useGetMeasureUnitsMeasureUnitsGet({
     query: { limit: REFERENCE_LIST_LIMIT },
   })
@@ -76,17 +86,31 @@ export const EditProductPage = () => {
   const entries: Array<ImageEntry> =
     imageEntries ?? product?.images?.map((url) => ({ type: 'existing' as const, url })) ?? []
 
-  const handleAddImages = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [isProcessingImages, setIsProcessingImages] = useState(false)
+
+  // Как и при добавлении: фото ужимаются в браузере (см. compressImage), а
+  // нечитаемый файл отклоняется сразу.
+  const handleAddImages = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? [])
-    const remaining = 5 - entries.length
-    const toAdd = files.slice(0, remaining)
-    const newEntries: Array<ImageEntry> = toAdd.map((f) => ({
-      type: 'new',
-      file: f,
-      preview: URL.createObjectURL(f),
-    }))
-    setImageEntries([...entries, ...newEntries])
     if (fileInputRef.current) fileInputRef.current.value = ''
+    const toAdd = files.slice(0, 5 - entries.length)
+    if (toAdd.length === 0) return
+    setIsProcessingImages(true)
+    const results = await Promise.allSettled(toAdd.map((file) => compressImage(file)))
+    setIsProcessingImages(false)
+    const newEntries: Array<ImageEntry> = []
+    for (const result of results) {
+      if (result.status === 'fulfilled') {
+        newEntries.push({
+          type: 'new',
+          file: result.value,
+          preview: URL.createObjectURL(result.value),
+        })
+      } else {
+        toast.error(t(imageErrorKey(result.reason)))
+      }
+    }
+    if (newEntries.length > 0) setImageEntries([...entries, ...newEntries].slice(0, 5))
   }
 
   const handleRemoveImage = (index: number) => {
@@ -119,10 +143,15 @@ export const EditProductPage = () => {
       measureUnitId: product?.measure_unit_id ? String(product.measure_unit_id) : '',
       discountType: product?.discount_type ?? '',
       discount: product?.discount ?? '',
+      vendorBarcode: product?.vendor_barcode ?? '',
     },
     onSubmit: async ({ value }) => {
       if (!value.name || !value.description || !value.price || Number(value.price) <= 0) {
         setError(t('editProduct.error'))
+        return
+      }
+      if (!isValidVendorBarcode(value.vendorBarcode)) {
+        setError(t('productBarcode.invalid'))
         return
       }
       setError('')
@@ -134,6 +163,18 @@ export const EditProductPage = () => {
       ])
 
       const imagesChanged = imageEntries !== null
+      imagesChangedRef.current = imagesChanged
+
+      // Штрихкод шлём, только если его поменяли. Стёртый — флагом
+      // remove_vendor_barcode: пустое поле формы FastAPI считает непереданным,
+      // и пустая строка штрихкод не убирала.
+      const vendorBarcode = normalizeBarcode(value.vendorBarcode)
+      const vendorBarcodeChanged = vendorBarcode !== (product?.vendor_barcode ?? '')
+      const vendorBarcodeFields = !vendorBarcodeChanged
+        ? {}
+        : vendorBarcode
+          ? { vendor_barcode: vendorBarcode }
+          : { remove_vendor_barcode: true }
       const imagesToSend = imagesChanged
         ? await Promise.all(
             entries.map(async (e): Promise<File> => {
@@ -165,6 +206,7 @@ export const EditProductPage = () => {
                 }
               : { remove_discount: true }),
             images: imagesToSend as unknown as Array<string> | undefined,
+            ...vendorBarcodeFields,
           },
         }),
       )
@@ -244,11 +286,14 @@ export const EditProductPage = () => {
               {entries.length < 5 && (
                 <button
                   type="button"
+                  disabled={isProcessingImages}
                   onClick={() => fileInputRef.current?.click()}
                   className="size-24 rounded-xl border-2 border-dashed border-stroke flex flex-col items-center justify-center gap-1 text-passive2"
                 >
                   <Upload size={20} />
-                  <span className="t2">{t('editProduct.imagesAdd')}</span>
+                  <span className="t2">
+                    {isProcessingImages ? t('upload.processing') : t('editProduct.imagesAdd')}
+                  </span>
                 </button>
               )}
             </div>
@@ -400,6 +445,29 @@ export const EditProductPage = () => {
           </form.Field>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <form.Field name="vendorBarcode">
+              {(field) => (
+                <VendorBarcodeInput value={field.state.value} onChange={field.handleChange} />
+              )}
+            </form.Field>
+
+            {/* Свой штрихкод платформа присваивает сама, и продавец его не
+                правит — но видеть должен: по нему товар ищут и принимают на
+                склад. Поэтому поле только для чтения, а не скрыто. */}
+            {product.barcode && (
+              <div className="flex flex-col gap-1">
+                <Input
+                  label={t('productBarcode.platformLabel')}
+                  value={product.barcode}
+                  readOnly
+                  className="bg-gray2 text-passive2"
+                />
+                <p className="t2 text-passive2">{t('productBarcode.platformHint')}</p>
+              </div>
+            )}
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <form.Field name="discountType">
               {(field) => (
                 <Select
@@ -443,7 +511,7 @@ export const EditProductPage = () => {
 
           <form.Subscribe selector={(s) => s.isSubmitting}>
             {(isSubmitting) => (
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" disabled={isSubmitting || isProcessingImages}>
                 {isSubmitting ? t('editProduct.submitting') : t('editProduct.submit')}
               </Button>
             )}

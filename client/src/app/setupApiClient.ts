@@ -16,7 +16,16 @@ client.setConfig({
 // Код ответа в выброшенное значение сам по себе не попадает — бросается только
 // тело. Без кода нельзя ни выбрать текст сообщения, ни решить, повторять ли
 // запрос, поэтому приводим ошибку к общему виду прямо здесь.
-client.interceptors.error.use((error, response) => toApiError(error, response.status))
+//
+// Ответа может не быть вовсе: запрос оборвался по дороге (слабая связь, сеть
+// пропала посреди загрузки). Тогда перехватчик зовётся без ответа, и
+// `response.status` бросал TypeError уже здесь, подменяя настоящую причину.
+// Такую ошибку отдаём как есть — getErrorMessage покажет «нет связи».
+// Тип обещает ответ всегда, но сгенерированный клиент передаёт сюда
+// `undefined as any` — отсюда явное приведение.
+client.interceptors.error.use((error, response: Response | undefined) =>
+  response ? toApiError(error, response.status) : error,
+)
 
 let refreshPromise: Promise<boolean> | null = null
 
@@ -38,11 +47,24 @@ async function refreshToken(): Promise<boolean> {
   }
 }
 
+/**
+ * Нетронутые копии запросов с телом — для повтора после обновления токена.
+ *
+ * Тело запроса — поток, и fetch вычитывает его при отправке. Повтор раньше
+ * отправлял тот же самый Request с уже прочитанным телом, fetch бросал
+ * TypeError, и после истечения токена любая отправка формы — а загрузка
+ * логотипа или фото товара особенно — заканчивалась «Нет связи с сервером».
+ * Копия снимается до отправки, пока тело ещё целое.
+ */
+const pristine = new WeakMap<Request, Request>()
+
 client.interceptors.request.use((request) => {
   const token = useProfileStore.getState().token
   if (token && !request.headers.has('Authorization')) {
     request.headers.set('Authorization', `Bearer ${token}`)
   }
+  // Без тела запрос можно отправить повторно как есть — копия не нужна.
+  if (request.body !== null) pristine.set(request, request.clone())
   return request
 })
 
@@ -90,8 +112,10 @@ client.interceptors.response.use(async (response, request, opts) => {
   }
 
   const token = useProfileStore.getState().token
-  request.headers.set('Authorization', `Bearer ${token}`)
+  const retry = pristine.get(request) ?? request
+  retry.headers.set('Authorization', `Bearer ${token}`)
   retried.add(request)
+  retried.add(retry)
   const _fetch = opts.fetch ?? globalThis.fetch
-  return _fetch(request)
+  return _fetch(retry)
 })

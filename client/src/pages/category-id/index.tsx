@@ -9,6 +9,7 @@ import { REFERENCE_LIST_LIMIT } from '#/shared/constants/pagination'
 import { Breadcrumbs } from '#/shared/ui/Breadcrumbs'
 import { ProductCard } from '#/widgets/ProductCard'
 import { ProductCardSkeleton } from '#/widgets/ProductCard/ui/ProductCardSkeleton'
+import { useOutOfStock } from '#/shared/hooks/useStockAvailability'
 import {
   useGetCategoryCategoriesCategoryIdGet,
   useGetProductsProductsGet,
@@ -137,6 +138,8 @@ export const CategoryIdPage = ({ categoryId }: CategoryIdPageProps) => {
   const recommended = (suggestions ?? [])
     .filter((product) => !shownIds.has(product.id))
     .slice(0, SUGGESTIONS_SIZE)
+  // Одним списком и лента раздела, и подборка под ней: карточки одни и те же.
+  const isOutOfStockProduct = useOutOfStock([...(products ?? []), ...recommended])
 
   const renderCard = (product: ProductResponse, to: string) => {
     const { price, discountPercent, oldPrice } = getDiscountInfo(
@@ -156,6 +159,7 @@ export const CategoryIdPage = ({ categoryId }: CategoryIdPageProps) => {
         storeTo={`/stores/${product.shop_base_id}`}
         discount={discountPercent}
         name={getTranslatedName(product.translations, i18n.language)}
+        outOfStock={isOutOfStockProduct(product)}
         currencyCode={product.currency?.code}
         rating={product.rating_avg}
         ratingCount={product.rating_count}

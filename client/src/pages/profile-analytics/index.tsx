@@ -10,6 +10,7 @@ import {
 import { useProfileStore } from '#/shared/stores/profileStore'
 import { getImageUrl } from '#/shared/utils/getImageUrl'
 import { getTranslatedName } from '#/shared/utils/getTranslatedName'
+import { formatNumericDate } from '#/shared/utils/formatDate'
 
 /**
  * Сводная аналитика по всем магазинам владельца.
@@ -105,8 +106,8 @@ export const ProfileAnalyticsPage = () => {
         <p className="t1 mt-0.5 text-passive1">
           {period
             ? t('analytics.period', {
-                from: formatDate(period.period_start),
-                to: formatDate(period.period_end),
+                from: formatNumericDate(period.period_start),
+                to: formatNumericDate(period.period_end),
               })
             : t('analytics.subtitle')}
         </p>
@@ -174,10 +175,4 @@ export const ProfileAnalyticsPage = () => {
       </div>
     </div>
   )
-}
-
-const formatDate = (iso: string) => {
-  const d = new Date(iso)
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()}`
 }

@@ -6,6 +6,8 @@ import { Modal } from '#/shared/ui/Modal'
 import { Button } from '#/shared/ui/Button'
 import { useUpdateShopAdditionalShopAdditionalsShopAdditionalIdPut } from '#/shared/openapi/queries'
 import { settled } from '#/shared/lib/settled'
+import { getUploadErrorMessage } from '#/shared/lib/apiError'
+import { LOGO_IMAGE_MAX_SIZE, compressImage, imageErrorKey } from '#/shared/utils/compressImage'
 
 interface LogoModalProps {
   shopAdditionalId: number
@@ -21,8 +23,14 @@ export const LogoModal = forwardRef<ModalRef, LogoModalProps>(
     const [file, setFile] = useState<File | null>(null)
     const [preview, setPreview] = useState<string | null>(null)
     const [error, setError] = useState<string | null>(null)
+    const [isProcessing, setIsProcessing] = useState(false)
 
-    const updateShopAdditional = useUpdateShopAdditionalShopAdditionalsShopAdditionalIdPut()
+    // Свой текст на обрыв: логотип — файл, и «Нет связи с сервером» на слабой
+    // мобильной связи читалось как «сайт не работает», а не «попробуйте ещё».
+    const updateShopAdditional = useUpdateShopAdditionalShopAdditionalsShopAdditionalIdPut(
+      undefined,
+      { onError: (err) => setError(getUploadErrorMessage(err)) },
+    )
 
     useImperativeHandle(ref, () => ({
       open: () => {
@@ -34,12 +42,23 @@ export const LogoModal = forwardRef<ModalRef, LogoModalProps>(
       close: () => modalRef.current?.close(),
     }))
 
-    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    // Логотип ужимается до 1024 px прямо в браузере: фото с телефона весило
+    // мегабайты и на слабой связи не доходило до сервера (см. compressImage).
+    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
       const selected = e.target.files?.[0]
+      if (fileInputRef.current) fileInputRef.current.value = ''
       if (!selected) return
-      setFile(selected)
-      setPreview(URL.createObjectURL(selected))
       setError(null)
+      setIsProcessing(true)
+      try {
+        const prepared = await compressImage(selected, { maxSize: LOGO_IMAGE_MAX_SIZE })
+        setFile(prepared)
+        setPreview(URL.createObjectURL(prepared))
+      } catch (err) {
+        setError(t(imageErrorKey(err)))
+      } finally {
+        setIsProcessing(false)
+      }
     }
 
     const handleRemove = () => {
@@ -58,6 +77,7 @@ export const LogoModal = forwardRef<ModalRef, LogoModalProps>(
         setError(t('storeActivate.logoModal.error'))
         return
       }
+      setError(null)
 
       const result = await settled(
         updateShopAdditional.mutateAsync({
@@ -118,10 +138,12 @@ export const LogoModal = forwardRef<ModalRef, LogoModalProps>(
 
           {error && <p className="t2 text-(--failure) text-center">{error}</p>}
 
-          <Button type="submit" disabled={!file || updateShopAdditional.isPending}>
-            {updateShopAdditional.isPending
-              ? t('storeActivate.logoModal.saving')
-              : t('storeActivate.logoModal.save')}
+          <Button type="submit" disabled={!file || isProcessing || updateShopAdditional.isPending}>
+            {isProcessing
+              ? t('upload.processing')
+              : updateShopAdditional.isPending
+                ? t('storeActivate.logoModal.saving')
+                : t('storeActivate.logoModal.save')}
           </Button>
         </form>
       </Modal>

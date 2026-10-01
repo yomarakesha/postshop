@@ -163,7 +163,24 @@ export const tr = {
       'Mağaza kendi başınıza silinemez: siparişler ve belgeler ona bağlı kalır. Destek ekibine yazın, inceleme sonrası sileriz.',
     deleteLink: 'Desteğe yaz',
   },
+  upload: {
+    processing: 'Fotoğraflar hazırlanıyor…',
+    notImage: 'Bu bir görsel değil — JPG, PNG veya WebP formatında bir fotoğraf seçin',
+    unreadable: 'Görsel işlenemedi — başka bir dosya seçin (JPG, PNG veya WebP)',
+  },
+
+  productBarcode: {
+    vendorLabel: 'Üretici barkodu',
+    vendorPlaceholder: 'Örneğin, 4600000000000',
+    vendorHint: 'İsteğe bağlı. Ambalajdaki 8, 12, 13 veya 14 hane',
+    invalid: 'Üretici barkodu 8, 12, 13 veya 14 haneden oluşur',
+    duplicate: 'Mağazanızda bu üretici barkoduna sahip bir ürün zaten var',
+    platformLabel: 'Postshop barkodu',
+    platformHint: 'Otomatik atanır, değiştirilemez',
+  },
+
   errors: {
+    uploadInterrupted: 'Yükleme yarıda kesildi — bağlantı çok zayıf. Lütfen tekrar deneyin',
     network: 'Sunucuya bağlantı yok. Bağlantınızı kontrol edip tekrar deneyin',
     server: 'Sunucu hatası. Daha sonra tekrar deneyin',
     badRequest: 'İşlem tamamlanamadı',
@@ -339,6 +356,7 @@ export const tr = {
     comment: 'Yorum',
     approve: 'Onayla',
     reject: 'Reddet',
+    fboNote: 'Bu siparişi Postshop deposu hazırlıyor — sizden bir şey yapmanız gerekmiyor.',
     notApproved: 'Operatör siparişi kabul ettikten sonra sipariş işlemleri kullanılabilir olacak.',
     readyToPickup: 'Teslim almaya hazır',
     readyToDeliver: 'Teslimata hazır',
@@ -678,10 +696,11 @@ export const tr = {
     insufficientStockGeneric:
       'Sepetinizdeki ürünlerden biri stokta yeterli değil. Lütfen miktarları kontrol edin.',
     deliveryMethod: 'Teslimat yöntemi',
-    pickup: 'Depodan teslim al',
+    pickup: 'Teslim alma noktası',
     delivery: 'Teslimat',
     addressPlaceholder: 'Aşkabat, Mahtumkulu bulvarı, bina 1',
-    noPickupPoints: 'Seçilen şehirde teslim alma noktası bulunmuyor',
+    noPickupPoints:
+      'Şehrinizde henüz teslim alma noktası yok — teslimatı seçin veya şehri değiştirin',
     showOnMap: 'Haritada göster',
     pickupPointsOnMap: 'Teslim alma noktaları',
     mapUnavailable: 'Harita kullanılamıyor: harita sunucusu yapılandırılmamış.',
@@ -733,6 +752,9 @@ export const tr = {
     unavailableName: 'Ürün kullanılamıyor',
     remove: 'Kaldır',
     hasUnavailable: 'Siparişi vermek için kullanılamayan ürünleri kaldırın',
+    hasStockProblem:
+      'Bazı ürünler seçtiğiniz miktarda stokta yok — siparişi vermek için onları kaldırın veya miktarı azaltın',
+    onlyLeft: 'Stokta yalnızca {{count}} adet var — miktarı azaltın',
 
     restore: 'Geri al',
     goToCart: 'Sepete',
@@ -837,7 +859,7 @@ export const tr = {
       order_created: 'Mağazanızda yeni sipariş',
       order_cancelled: 'Müşteri siparişi iptal etti',
       receipt_confirmed: 'Kabul onaylandı, stok güncellendi',
-      product_out_of_stock: 'Ürün tükendi — stoku yenileyin ya da satıştan kaldırın',
+      product_out_of_stock: 'Ürün tükendi — yeniden tedarik edin ya da satıştan kaldırın',
       review_received: 'Ürününüze yeni yorum',
       return_received: 'Ürününüz için iade onaylandı',
       shop_blocked: 'Mağaza platform tarafından kapatıldı',
@@ -1000,7 +1022,7 @@ export const tr = {
       },
       delivery: {
         title: '4. Teslimat ve Teslim Alma',
-        p1: 'Ürünler depodan teslim alınarak veya belirtilen adrese teslimat yoluyla alınabilir. Teslimat imkânı ve süreleri bölgeye ve ürüne göre değişebilir.',
+        p1: 'Ürünler bir teslim alma noktasından veya belirtilen adrese teslimat yoluyla alınabilir. Teslimat imkânı ve süreleri bölgeye ve ürüne göre değişebilir.',
         p2: 'PostShop, teslimat hizmetleri için Türkmenpoçta ile ortaklık kurmaktadır. Tahmini teslimat sürelerine uymaya çalışsak da kontrolümüz dışındaki durumlar nedeniyle gecikmeler yaşanabilir.',
         p3: 'Teslimat sırasında ürünleri incelemeniz sizin sorumluluğunuzdadır. Herhangi bir hasar veya tutarsızlık teslim alındıktan sonra 24 saat içinde bildirilmelidir.',
       },

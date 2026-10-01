@@ -322,6 +322,18 @@ export const Body_create_product_products__postSchema = {
             ],
             title: 'Hashtag'
         },
+        vendor_barcode: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Vendor Barcode',
+            description: 'Заводской штрихкод: 8, 12, 13 или 14 цифр'
+        },
         price: {
             anyOf: [
                 {
@@ -513,6 +525,24 @@ export const Body_update_product_products__product_id__putSchema = {
                 }
             ],
             title: 'Hashtag'
+        },
+        vendor_barcode: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Vendor Barcode',
+            description: 'Заводской штрихкод (8, 12, 13 или 14 цифр)'
+        },
+        remove_vendor_barcode: {
+            type: 'boolean',
+            title: 'Remove Vendor Barcode',
+            description: 'Убрать заводской штрихкод',
+            default: false
         },
         price: {
             anyOf: [
@@ -2930,6 +2960,16 @@ export const OrderShopResponseSchema = {
         status: {
             $ref: '#/components/schemas/LocalOrderStatusCode'
         },
+        warehouse_type: {
+            anyOf: [
+                {
+                    $ref: '#/components/schemas/WarehouseType'
+                },
+                {
+                    type: 'null'
+                }
+            ]
+        },
         comment: {
             anyOf: [
                 {
@@ -3559,6 +3599,39 @@ export const ProductResponseSchema = {
                 }
             ],
             title: 'Hashtag'
+        },
+        barcode: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Barcode'
+        },
+        vendor_barcode: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Vendor Barcode'
+        },
+        shop_name: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Shop Name'
         },
         images: {
             items: {
@@ -7142,6 +7215,16 @@ export const OrderShopResponseWritableSchema = {
         status: {
             $ref: '#/components/schemas/LocalOrderStatusCode'
         },
+        warehouse_type: {
+            anyOf: [
+                {
+                    $ref: '#/components/schemas/WarehouseType'
+                },
+                {
+                    type: 'null'
+                }
+            ]
+        },
         comment: {
             anyOf: [
                 {
@@ -7242,6 +7325,39 @@ export const ProductResponseWritableSchema = {
                 }
             ],
             title: 'Hashtag'
+        },
+        barcode: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Barcode'
+        },
+        vendor_barcode: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Vendor Barcode'
+        },
+        shop_name: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Shop Name'
         },
         images: {
             items: {

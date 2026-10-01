@@ -11,6 +11,7 @@ import {
 import { ProductCard } from '@/widgets/ProductCard'
 import { CategoriesSidebar } from '@/widgets/CategoriesSidebar'
 import { ProductCardSkeleton } from '#/widgets/ProductCard/ui/ProductCardSkeleton'
+import { useOutOfStock } from '#/shared/hooks/useStockAvailability'
 import { getDiscountInfo } from '#/shared/utils/discount'
 
 const getCollectionName = (translations: CollectionResponse['translations'], language: string) => {
@@ -39,6 +40,8 @@ export const CollectionIdPage = ({ collectionId }: { collectionId: string }) => 
     }
     return map
   }, [shopAdditionals])
+
+  const isOutOfStockProduct = useOutOfStock(collection?.products)
 
   return (
     <>
@@ -93,7 +96,7 @@ export const CollectionIdPage = ({ collectionId }: { collectionId: string }) => 
                       store={shopNamesMap.get(product.shop_base_id) ?? ''}
                       storeTo={`/stores/${product.shop_base_id}`}
                       discount={discountPercent}
-                      outOfStock={!product.is_active}
+                      outOfStock={isOutOfStockProduct(product)}
                       currencyCode={product.currency?.code}
                       rating={product.rating_avg}
                       ratingCount={product.rating_count}

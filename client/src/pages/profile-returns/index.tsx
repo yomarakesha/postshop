@@ -15,6 +15,7 @@ import { ConfirmDialog } from '#/shared/ui/ConfirmDialog'
 import { ListSkeleton } from '#/shared/ui/ListSkeleton'
 import { EmptyState } from '#/shared/ui/EmptyState'
 import { cn } from '#/shared/utils/cn'
+import { formatDate } from '#/shared/utils/formatDate'
 
 const statusClass = {
   [ReturnStatus.PENDING]: 'bg-gray2 text-passive2',
@@ -44,8 +45,6 @@ export const ProfileReturnsPage = () => {
       void queryClient.invalidateQueries({ queryKey: [useListOwnReturnsReturnsMyGetKey] })
     },
   })
-
-  const dateFormat = new Intl.DateTimeFormat(i18n.language, { dateStyle: 'medium' })
 
   return (
     <div className="flex w-full flex-col gap-4">
@@ -107,9 +106,7 @@ export const ProfileReturnsPage = () => {
 
             <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
               {request.created_at && (
-                <p className="t2 text-passive1">
-                  {dateFormat.format(new Date(request.created_at))}
-                </p>
+                <p className="t2 text-passive1">{formatDate(request.created_at, i18n.language)}</p>
               )}
               {/* Отозвать можно только нерассмотренную: подтверждённая уже
                   изменила склад, отклонённая должна остаться видимой. */}

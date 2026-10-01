@@ -11,6 +11,7 @@ import {
   useUpdateCartItemCartProductIdPut,
 } from '#/shared/openapi/queries'
 import { useGetCartCartGetKey } from '#/shared/openapi/queries/common'
+import { fetchStockLeft } from '#/shared/hooks/useStockAvailability'
 
 export const useCounter = (productId: number) => {
   const profile = useProfileStore((s) => s.profile)
@@ -46,6 +47,21 @@ export const useCounter = (productId: number) => {
 
   const quantity = profile ? serverQuantity : localQuantity
 
+  /**
+   * Хватит ли остатка на `wanted` штук — только для гостя.
+   *
+   * Корзину вошедшего проверяет сервер при каждом добавлении. Гостевая живёт в
+   * localStorage, и раньше в неё ложилось что угодно: товар с нулевым остатком
+   * добавлялся без слова, а отказ приходил уже после входа или в самом конце
+   * оформления. Теперь спрашиваем остаток перед добавлением и перед каждым «+».
+   */
+  const guestCanTake = async (wanted: number) => {
+    const left = await fetchStockLeft(queryClient, productId)
+    if (left === null || left >= wanted) return true
+    toast.error(i18n.t(left <= 0 ? 'products.outOfStock' : 'cart.notEnough'))
+    return false
+  }
+
   const add = () => {
     if (profile) {
       addToCart.mutate(
@@ -53,7 +69,9 @@ export const useCounter = (productId: number) => {
         { onSuccess: invalidateCart },
       )
     } else {
-      addItemLocal(productId)
+      void guestCanTake(localQuantity + 1).then((ok) => {
+        if (ok) addItemLocal(productId)
+      })
     }
   }
 
@@ -67,6 +85,11 @@ export const useCounter = (productId: number) => {
           { onSuccess: invalidateCart },
         )
       }
+    } else if (newQuantity > localQuantity) {
+      // Уменьшать можно всегда, проверка нужна только на рост.
+      void guestCanTake(newQuantity).then((ok) => {
+        if (ok) updateQuantityLocal(productId, newQuantity)
+      })
     } else {
       updateQuantityLocal(productId, newQuantity)
     }

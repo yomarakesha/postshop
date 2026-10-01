@@ -164,7 +164,24 @@ export const tk = {
       'Dükany özbaşdak pozmak bolmaýar: oňa sargytlar we resminamalar bagly. Goldaw gullugyna ýazyň — barlagdan soň pozarys.',
     deleteLink: 'Goldawa ýazmak',
   },
+  upload: {
+    processing: 'Suratlar taýýarlanýar…',
+    notImage: 'Bu surat däl — JPG, PNG ýa-da WebP görnüşli surat saýlaň',
+    unreadable: 'Suraty işläp bolmady — başga faýl saýlaň (JPG, PNG ýa-da WebP)',
+  },
+
+  productBarcode: {
+    vendorLabel: 'Öndürijiniň ştrih-kody',
+    vendorPlaceholder: 'Mysal üçin, 4600000000000',
+    vendorHint: 'Hökmany däl. Gaplamadaky 8, 12, 13 ýa-da 14 san',
+    invalid: 'Öndürijiniň ştrih-kody 8, 12, 13 ýa-da 14 sandan ybarat',
+    duplicate: 'Dükanyňyzda bu ştrih-kodly haryt eýýäm bar',
+    platformLabel: 'Postshop ştrih-kody',
+    platformHint: 'Awtomatik berilýär, üýtgedip bolmaýar',
+  },
+
   errors: {
+    uploadInterrupted: 'Ýüklemek kesildi — aragatnaşyk gaty gowşak. Täzeden synanyşyň',
     network: 'Serwer bilen aragatnaşyk ýok. Birikmäni barlaň we gaýtadan synanyşyň',
     server: 'Serwerde ýalňyşlyk. Soňra synanyşyň',
     badRequest: 'Ýerine ýetirmek başartmady',
@@ -340,6 +357,7 @@ export const tk = {
     comment: 'Teswir',
     approve: 'Kabul etmek',
     reject: 'Ret etmek',
+    fboNote: 'Sargydy Postshop ammary ýygnaýar — sizden hiç zat talap edilmeýär.',
     notApproved:
       'Operator sargydy kabul edenden soň, sargyt bilen baglanyşykly hereketler elýeterli bolar.',
     readyToPickup: 'Almaga taýýar',
@@ -679,10 +697,11 @@ export const tk = {
     insufficientStock: '«{{product}}» harydy skladda ýeterlik däl. Sebetdäki mukdaryny azaldyň.',
     insufficientStockGeneric: 'Sebetdäki harytlaryň biri skladda ýeterlik däl. Mukdaryny barlaň.',
     deliveryMethod: 'Almak usuly',
-    pickup: 'Ammardan özüň al',
+    pickup: 'Alyş nokady',
     delivery: 'Eltip bermek',
     addressPlaceholder: 'Aşgabat, Magtymguly şaýoly, jaý 1',
-    noPickupPoints: 'Saýlanan şäherde alyş nokady ýok',
+    noPickupPoints:
+      'Siziň şäheriňizde entek alyş nokady ýok — eltip bermegi saýlaň ýa-da şäheri üýtgediň',
     showOnMap: 'Kartada görkez',
     pickupPointsOnMap: 'Alyş nokatlary',
     mapUnavailable: 'Karta elýeterli däl: karta serweri düzülmedik.',
@@ -734,6 +753,9 @@ export const tk = {
     unavailableName: 'Haryt elýeterli däl',
     remove: 'Aýyrmak',
     hasUnavailable: 'Sargyt etmek üçin elýeterli däl harytlary aýyryň',
+    hasStockProblem:
+      'Käbir harytlar gerekli mukdarda ýok — sargyt etmek üçin olary aýyryň ýa-da mukdaryny azaldyň',
+    onlyLeft: 'Diňe {{count}} sany bar — mukdaryny azaldyň',
 
     restore: 'Yzyna getir',
     goToCart: 'Sebede',
@@ -838,7 +860,7 @@ export const tk = {
       order_created: 'Dükanyňyzda täze sargyt',
       order_cancelled: 'Alyjy sargydy ýatyrdy',
       receipt_confirmed: 'Kabul ediliş tassyklandy, haryt galyndyda',
-      product_out_of_stock: 'Haryt gutardy — galyndyny dolduryň ýa-da satuwdan aýryň',
+      product_out_of_stock: 'Haryt gutardy — ony täzeden getiriň ýa-da satuwdan aýryň',
       review_received: 'Harydyňyz barada täze syn',
       return_received: 'Harydyňyz boýunça gaýtarma tassyklandy',
       shop_blocked: 'Dükan platforma tarapyndan ýapyldy',
@@ -1001,7 +1023,7 @@ export const tk = {
       },
       delivery: {
         title: '4. Eltip bermek we özüň almak',
-        p1: 'Harytlary ammardan özüň alyp ýa-da görkezilen salga eltip bermek arkaly alyp bolýar. Eltip bermegiň elýeterliligi we möhletleri sebite we haryda görä üýtgäp biler.',
+        p1: 'Harytlary alyş nokadyndan ýa-da görkezilen salga eltip bermek arkaly alyp bolýar. Eltip bermegiň elýeterliligi we möhletleri sebite we haryda görä üýtgäp biler.',
         p2: 'PostShop eltip bermek hyzmatlaryny bermek üçin «Türkmenpoçta» bilen hyzmatdaşlyk edýär. Çak edilýän eltip bermek möhletlerini berjaý etmäge çalyşýarys, ýöne biziň gözegçiligimizden daşary ýagdaýlar sebäpli gijä galyp biler.',
         p3: 'Harydy alanyňyzda ony barlamak borjuňyzdyr. Islendik zeper ýa-da tapawutlyklyk barada alnan wagtyndan 24 sagadyň dowamynda habar bermeli.',
       },

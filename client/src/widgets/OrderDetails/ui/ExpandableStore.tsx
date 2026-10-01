@@ -55,10 +55,12 @@ export const ExpandableStore = ({
                 Строка магазина отделена от товаров линией снизу (см. класс
                 триггера): без неё магазин и товар читались как однородные
                 строки одного списка. */}
+            {/* Логотип вписывается по высоте, а не обрезается квадратом:
+                object-cover срезал у широких логотипов края. */}
             <img
               src={store.logo}
               alt={store.name}
-              className="size-16 shrink-0 rounded-lg object-cover"
+              className="h-16 w-auto max-w-32 shrink-0 rounded-lg object-contain"
             />
             <p className="p3 font-semibold">{store.name}</p>
           </div>

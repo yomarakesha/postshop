@@ -11,6 +11,7 @@ import { UseGetProductsProductsGetKeyFn } from '#/shared/openapi/queries/common'
 import { getProductsProductsGet } from '#/shared/openapi/requests/sdk.gen'
 import { getImageUrl } from '#/shared/utils/getImageUrl'
 import { ProductCardSkeleton } from '#/widgets/ProductCard/ui/ProductCardSkeleton'
+import { useOutOfStock } from '#/shared/hooks/useStockAvailability'
 import { getDiscountInfo } from '#/shared/utils/discount'
 import { getTranslatedName } from '#/shared/utils/getTranslatedName'
 
@@ -63,6 +64,7 @@ export const BrandIdPage = ({ brandId }: BrandIdPageProps) => {
   })
 
   const products = data?.pages.flat()
+  const isOutOfStockProduct = useOutOfStock(products)
   const brandName = brand?.name ?? ''
   const brandImage = getImageUrl(brand?.image_path)
 
@@ -123,6 +125,7 @@ export const BrandIdPage = ({ brandId }: BrandIdPageProps) => {
                   store={brandName}
                   discount={discountPercent}
                   name={getTranslatedName(product.translations, i18n.language)}
+                  outOfStock={isOutOfStockProduct(product)}
                   currencyCode={product.currency?.code}
                   rating={product.rating_avg}
                   ratingCount={product.rating_count}

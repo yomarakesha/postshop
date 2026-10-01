@@ -13,8 +13,18 @@ import TrashIcon from '#/shared/assets/icons/trash.svg?react'
 export const CartPage = () => {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { items, stores, total, discount, grandTotal, hasUnavailable, isLoading, clearCart } =
-    useCartData()
+  const {
+    items,
+    stores,
+    total,
+    discount,
+    grandTotal,
+    hasUnavailable,
+    hasStockProblem,
+    canCheckout,
+    isLoading,
+    clearCart,
+  } = useCartData()
   const hasItems = items.length > 0
   const confirmClearRef = useRef<ConfirmDialogRef>(null)
 
@@ -95,10 +105,11 @@ export const CartPage = () => {
         {/* С недоступной позицией сервер всё равно откажет: лучше объяснить
             причину здесь, чем показать ошибку после нажатия. */}
         {hasUnavailable && <p className="t1 text-failure">{t('cart.hasUnavailable')}</p>}
+        {hasStockProblem && <p className="t1 text-failure">{t('cart.hasStockProblem')}</p>}
         {/* Кнопка ведёт на оформление, поэтому так и называется. «В корзину»
             на странице корзины ничего не объясняло — и в разделе Китая на том
             же месте стоит «Оформить заказ». */}
-        <Button disabled={hasUnavailable} onClick={() => navigate({ to: '/checkout' })}>
+        <Button disabled={!canCheckout} onClick={() => navigate({ to: '/checkout' })}>
           {t('checkout.placeOrder')}
         </Button>
       </div>

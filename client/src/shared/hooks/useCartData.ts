@@ -14,6 +14,7 @@ import { getImageUrl } from '#/shared/utils/getImageUrl'
 import { getDiscountInfo } from '#/shared/utils/discount'
 import { getTranslatedName } from '#/shared/utils/getTranslatedName'
 import { FALLBACK_CURRENCY } from '#/shared/constants/locale'
+import { useStockAvailability } from '#/shared/hooks/useStockAvailability'
 
 export interface CartProductData {
   id: number
@@ -29,6 +30,15 @@ export interface CartProductData {
   // Позицию не убираем — иначе непонятно, куда пропал товар и почему не
   // оформляется заказ, — но в итоги она не входит и заказ не пропустит.
   isAvailable: boolean
+  /**
+   * Сколько штук можно купить, если магазин ведёт остаток; `undefined` —
+   * остаток покупку не ограничивает или ещё не пришёл.
+   */
+  stockLeft?: number
+  /** Остатка нет совсем: позиция недоступна, как и снятый с продажи товар. */
+  outOfStock: boolean
+  /** Остаток есть, но меньше, чем лежит в корзине. */
+  notEnoughStock: boolean
 }
 
 export interface CartStoreData {
@@ -118,7 +128,7 @@ export const useCartData = () => {
   // --- Build stores ---
   const isLoading = isGuest ? guestProductQueries.some((q) => q.isLoading) : isAuthLoading
 
-  const stores = useMemo(() => {
+  const rawStores = useMemo((): Array<CartStoreData> => {
     if (isGuest) {
       const shopMap = new Map(
         guestShopQueries.filter((q) => q.data).map((q) => [q.data!.shop_base_id, q.data!]),
@@ -148,6 +158,8 @@ export const useCartData = () => {
             quantity: cartItem.quantity,
             currencyCode: FALLBACK_CURRENCY,
             isAvailable: false,
+            outOfStock: false,
+            notEnoughStock: false,
           })
           return
         }
@@ -177,6 +189,8 @@ export const useCartData = () => {
           quantity: cartItem.quantity,
           currencyCode: product.currency?.code ?? FALLBACK_CURRENCY,
           isAvailable: true,
+          outOfStock: false,
+          notEnoughStock: false,
         })
       })
 
@@ -210,11 +224,48 @@ export const useCartData = () => {
             quantity: item.quantity,
             currencyCode: item.product.currency?.code ?? FALLBACK_CURRENCY,
             isAvailable: item.is_available ?? true,
+            outOfStock: false,
+            notEnoughStock: false,
           }
         }),
       }
     })
   }, [isGuest, guestProductQueries, localItems, guestShopQueries, cart, authShopQueries])
+
+  // --- Остаток ---
+  // Корзина раньше про остаток не знала вовсе: товар, который закончился,
+  // выглядел обычной позицией, входил в сумму, и отказ приходил только после
+  // нажатия «Оформить». Спрашиваем остаток за все позиции одним запросом и
+  // помечаем строки прямо здесь, чтобы корзина, боковая корзина и оформление
+  // видели одно и то же.
+  const cartProductIds = useMemo(
+    () => rawStores.flatMap((store) => store.products.map((product) => product.id)),
+    [rawStores],
+  )
+  const availability = useStockAvailability(cartProductIds)
+
+  const stores = useMemo(
+    () =>
+      rawStores.map((store) => ({
+        ...store,
+        products: store.products.map((product) => {
+          const row = availability.get(product.id)
+          if (!product.isAvailable || !row?.tracked) return product
+          const stockLeft = Math.max(0, Number(row.available))
+          const outOfStock = stockLeft <= 0
+          const notEnoughStock = !outOfStock && stockLeft < product.quantity
+          return {
+            ...product,
+            stockLeft,
+            outOfStock,
+            notEnoughStock,
+            // Без остатка позиция в сумму не входит, как и снятый товар.
+            isAvailable: !outOfStock,
+          }
+        }),
+      })),
+    [rawStores, availability],
+  )
 
   const items = useMemo(() => {
     if (isGuest) return localItems
@@ -238,7 +289,15 @@ export const useCartData = () => {
     0,
   )
   const grandTotal = total - discount
-  const hasUnavailable = stores.some((store) => store.products.some((p) => !p.isAvailable))
+  // Снятый с продажи товар и закончившийся — разные причины, и совет разный:
+  // первый только убрать, второй можно дождаться или взять меньше.
+  const hasUnavailable = stores.some((store) =>
+    store.products.some((p) => !p.isAvailable && !p.outOfStock),
+  )
+  const hasStockProblem = stores.some((store) =>
+    store.products.some((p) => p.outOfStock || p.notEnoughStock),
+  )
+  const canCheckout = !hasUnavailable && !hasStockProblem
 
   const clearCart = isGuest
     ? clearLocalCart
@@ -247,5 +306,16 @@ export const useCartData = () => {
         queryClient.invalidateQueries({ queryKey: [useGetCartCartGetKey] })
       }
 
-  return { items, stores, total, discount, grandTotal, hasUnavailable, isLoading, clearCart }
+  return {
+    items,
+    stores,
+    total,
+    discount,
+    grandTotal,
+    hasUnavailable,
+    hasStockProblem,
+    canCheckout,
+    isLoading,
+    clearCart,
+  }
 }

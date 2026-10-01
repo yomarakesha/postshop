@@ -7,6 +7,7 @@ import {
   LocalOrderStatusCode,
   OrderStatusCode,
   PaymentType,
+  WarehouseType,
 } from '#/shared/openapi/requests/types.gen'
 import { Button } from '#/shared/ui/Button'
 import { Modal } from '#/shared/ui/Modal'
@@ -51,7 +52,14 @@ export const StoreOrderDetails = ({
 
   const statusCode = order.order_status.code
   const isOrderApproved = statusCode === OrderStatusCode.APPROVED
-  const shopStatus = order.order_shops?.find((os) => os.shop_base_id === storeId)?.status
+  const shopPart = order.order_shops?.find((os) => os.shop_base_id === storeId)
+  const shopStatus = shopPart?.status
+  // Часть заказа со склада Postshop (FBO) собирают и выдают сотрудники
+  // платформы: товар лежит у них, а не у продавца. Сервер на смену статуса
+  // такой части отвечает продавцу 403, поэтому кнопок «Принять», «Отклонить»
+  // и «Готов к выдаче» здесь нет — вместо них короткое пояснение.
+  const isFboPart = shopPart?.warehouse_type === WarehouseType.FBO
+  const canAct = isOrderApproved && !isFboPart
   const displayStatus = shopStatus ?? statusCode
   const StatusIcon = getStatusIcon(displayStatus)
   const storeItems = order.items.filter((item) => item.product.shop_base_id === storeId)
@@ -118,7 +126,11 @@ export const StoreOrderDetails = ({
               <p className="p3 text-passive2 text-center">{t('storeOrders.notApproved')}</p>
             )}
 
-            {isOrderApproved && shopStatus === LocalOrderStatusCode.PENDING && (
+            {isOrderApproved && isFboPart && (
+              <p className="p3 text-passive2 text-center">{t('storeOrders.fboNote')}</p>
+            )}
+
+            {canAct && shopStatus === LocalOrderStatusCode.PENDING && (
               <div className="flex gap-3 w-full">
                 <Button
                   variant="primary"
@@ -141,7 +153,7 @@ export const StoreOrderDetails = ({
               </div>
             )}
 
-            {isOrderApproved && shopStatus === LocalOrderStatusCode.APPROVED && (
+            {canAct && shopStatus === LocalOrderStatusCode.APPROVED && (
               <Button
                 variant="primary"
                 size="md"

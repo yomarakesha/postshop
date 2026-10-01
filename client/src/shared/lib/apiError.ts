@@ -86,3 +86,34 @@ export const getErrorMessage = (error: unknown): string => {
   if (known) return error.detail ? `${known}: ${error.detail}` : known
   return error.detail ?? t('errors.unknown')
 }
+
+/**
+ * Текст ошибки для записи, которая отправляла файлы (фото, логотип).
+ *
+ * Без ответа сервера getErrorMessage говорит «Нет связи с сервером», и на
+ * слабой мобильной связи это сбивало с толку: связь-то есть, страница
+ * открыта, просто тяжёлая загрузка оборвалась посреди. Человеку нужно знать,
+ * что именно не дошло и что делать, — поэтому отдельный текст.
+ */
+export const getUploadErrorMessage = (error: unknown): string =>
+  isApiError(error) ? getErrorMessage(error) : i18n.t('errors.uploadInterrupted')
+
+/**
+ * Ошибка сохранения товара: штрихкод объясняем по-человечески.
+ *
+ * Сервер отвечает 422 «vendor_barcode: …» на неверный формат и 409, если такой
+ * заводской штрихкод уже есть у другого товара этого магазина. Показывать эти
+ * английские тексты продавцу бессмысленно.
+ */
+export const getProductSaveErrorMessage = (error: unknown, withUpload: boolean): string => {
+  if (isApiError(error)) {
+    if (error.status === 422 && error.detail?.startsWith('vendor_barcode')) {
+      return i18n.t('productBarcode.invalid')
+    }
+    if (error.status === 409 && error.detail?.includes('barcode')) {
+      return i18n.t('productBarcode.duplicate')
+    }
+    return getErrorMessage(error)
+  }
+  return withUpload ? getUploadErrorMessage(error) : getErrorMessage(error)
+}

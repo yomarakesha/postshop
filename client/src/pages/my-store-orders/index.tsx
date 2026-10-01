@@ -14,20 +14,19 @@ import { OrderCard } from '#/widgets/OrderCard'
 import { ORDERS_PAGE_SIZE } from '#/shared/constants/pagination'
 import { getShopOrdersOrdersShopShopIdGet } from '#/shared/openapi/requests'
 import { Spinner } from '#/shared/ui/Spinner'
+import { formatNumericDateTime, getZonedParts } from '#/shared/utils/formatDate'
 
-const formatDate = (iso: string) => {
-  const d = new Date(iso)
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${pad(d.getDate())}.${pad(d.getMonth() + 1)}.${d.getFullYear()} ${pad(d.getHours())}:${pad(d.getMinutes())}`
-}
-
+// Месяц заказа — по Ашхабаду, как и время в карточке: getMonth() брал часы
+// того, кто рендерит, и заказ в полночь 1-го числа уезжал в прошлый месяц.
 const groupByMonth = (orders: Array<OrderResponse>) => {
   const map = new Map<string, { monthKey: number; year: number; items: Array<OrderResponse> }>()
   for (const order of orders) {
-    const d = new Date(order.created_at)
-    const key = `${d.getFullYear()}-${d.getMonth() + 1}`
+    const parts = getZonedParts(order.created_at)
+    const year = parts?.year ?? 0
+    const month = parts?.month ?? 0
+    const key = `${year}-${month}`
     if (!map.has(key)) {
-      map.set(key, { monthKey: d.getMonth() + 1, year: d.getFullYear(), items: [] })
+      map.set(key, { monthKey: month, year, items: [] })
     }
     map.get(key)!.items.push(order)
   }
@@ -162,7 +161,7 @@ export const OrdersPage = () => {
                     key={order.id}
                     id={order.id}
                     price={calcSubtotal(order)}
-                    date={formatDate(order.created_at)}
+                    date={formatNumericDateTime(order.created_at)}
                     icon={<StatusIcon size={20} />}
                     label={t(`storeOrders.status.${displayStatus}`)}
                     colorClass={getStatusColor(displayStatus)}

@@ -790,7 +790,11 @@ export const createShopBaseShopBasesPost = <ThrowOnError extends boolean = false
 /**
  * Get All Shops Full
  */
-export const getAllShopsFullShopBasesFullGet = <ThrowOnError extends boolean = false>(options?: Options<GetAllShopsFullShopBasesFullGetData, ThrowOnError>) => (options?.client ?? client).get<GetAllShopsFullShopBasesFullGetResponses, GetAllShopsFullShopBasesFullGetErrors, ThrowOnError>({ url: '/shop-bases/full', ...options });
+export const getAllShopsFullShopBasesFullGet = <ThrowOnError extends boolean = false>(options?: Options<GetAllShopsFullShopBasesFullGetData, ThrowOnError>) => (options?.client ?? client).get<GetAllShopsFullShopBasesFullGetResponses, GetAllShopsFullShopBasesFullGetErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/shop-bases/full',
+    ...options
+});
 
 /**
  * Get Pending Shops Count
@@ -901,7 +905,11 @@ export const uploadShopDocumentsShopBasesShopIdDocumentsPost = <ThrowOnError ext
 /**
  * Get Shop Additionals
  */
-export const getShopAdditionalsShopAdditionalsGet = <ThrowOnError extends boolean = false>(options?: Options<GetShopAdditionalsShopAdditionalsGetData, ThrowOnError>) => (options?.client ?? client).get<GetShopAdditionalsShopAdditionalsGetResponses, GetShopAdditionalsShopAdditionalsGetErrors, ThrowOnError>({ url: '/shop-additionals/', ...options });
+export const getShopAdditionalsShopAdditionalsGet = <ThrowOnError extends boolean = false>(options?: Options<GetShopAdditionalsShopAdditionalsGetData, ThrowOnError>) => (options?.client ?? client).get<GetShopAdditionalsShopAdditionalsGetResponses, GetShopAdditionalsShopAdditionalsGetErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/shop-additionals/',
+    ...options
+});
 
 /**
  * Create Shop Additional
@@ -920,7 +928,11 @@ export const createShopAdditionalShopAdditionalsPost = <ThrowOnError extends boo
 /**
  * Get Shop Additional By Shop Base
  */
-export const getShopAdditionalByShopBaseShopAdditionalsByShopShopBaseIdGet = <ThrowOnError extends boolean = false>(options: Options<GetShopAdditionalByShopBaseShopAdditionalsByShopShopBaseIdGetData, ThrowOnError>) => (options.client ?? client).get<GetShopAdditionalByShopBaseShopAdditionalsByShopShopBaseIdGetResponses, GetShopAdditionalByShopBaseShopAdditionalsByShopShopBaseIdGetErrors, ThrowOnError>({ url: '/shop-additionals/by-shop/{shop_base_id}', ...options });
+export const getShopAdditionalByShopBaseShopAdditionalsByShopShopBaseIdGet = <ThrowOnError extends boolean = false>(options: Options<GetShopAdditionalByShopBaseShopAdditionalsByShopShopBaseIdGetData, ThrowOnError>) => (options.client ?? client).get<GetShopAdditionalByShopBaseShopAdditionalsByShopShopBaseIdGetResponses, GetShopAdditionalByShopBaseShopAdditionalsByShopShopBaseIdGetErrors, ThrowOnError>({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/shop-additionals/by-shop/{shop_base_id}',
+    ...options
+});
 
 /**
  * Delete Shop Additional

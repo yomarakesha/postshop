@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { toast } from 'sonner'
 import { ArrowLeft, ChevronRight, Trash2, Upload } from 'lucide-react'
 import { CategoryModal } from './ui/CategoryModal'
+import { VendorBarcodeInput } from './ui/VendorBarcodeInput'
 import type { ModalRef } from '#/shared/ui/Modal'
 import { REFERENCE_LIST_LIMIT } from '#/shared/constants/pagination'
 import { BrandModal } from '#/shared/ui/BrandModal'
@@ -20,12 +21,19 @@ import { PRODUCT_DESCRIPTION_RECOMMENDED } from '#/shared/constants/product'
 import { Select } from '#/shared/ui/Select'
 import { Button } from '#/shared/ui/Button'
 import { settled } from '#/shared/lib/settled'
+import { getProductSaveErrorMessage } from '#/shared/lib/apiError'
+import { compressImage, imageErrorKey } from '#/shared/utils/compressImage'
+import { isValidVendorBarcode, normalizeBarcode } from '#/shared/utils/barcode'
 
 export const AddProductPage = () => {
   const { t, i18n } = useTranslation()
   const { storeId } = useParams({ from: '/my-store/$storeId' })
   const navigate = useNavigate()
-  const createProduct = useCreateProductProductsPost()
+  // Ошибку объясняем сами: штрихкод (409/422) и обрыв загрузки фото иначе
+  // приходили служебным английским текстом или «Нет связи с сервером».
+  const createProduct = useCreateProductProductsPost(undefined, {
+    onError: (err) => toast.error(getProductSaveErrorMessage(err, true)),
+  })
   const { data: measureUnits } = useGetMeasureUnitsMeasureUnitsGet({
     query: { limit: REFERENCE_LIST_LIMIT },
   })
@@ -42,13 +50,27 @@ export const AddProductPage = () => {
   const categoryModalRef = useRef<ModalRef>(null)
   const brandModalRef = useRef<ModalRef>(null)
 
-  const handleAddImages = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const [isProcessingImages, setIsProcessingImages] = useState(false)
+
+  // Фото ужимаются в браузере до 1600 px (см. compressImage): снимок с
+  // телефона весил мегабайты, и на слабой связи товар с пятью фото не
+  // сохранялся вовсе. Файл, который не удалось прочитать, не добавляем и
+  // говорим об этом сразу, а не после долгой отправки формы.
+  const handleAddImages = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? [])
-    const remaining = 5 - images.length
-    const toAdd = files.slice(0, remaining)
-    setImages((prev) => [...prev, ...toAdd])
-    setPreviews((prev) => [...prev, ...toAdd.map((f) => URL.createObjectURL(f))])
     if (fileInputRef.current) fileInputRef.current.value = ''
+    const toAdd = files.slice(0, 5 - images.length)
+    if (toAdd.length === 0) return
+    setIsProcessingImages(true)
+    const results = await Promise.allSettled(toAdd.map((file) => compressImage(file)))
+    setIsProcessingImages(false)
+    const prepared: Array<File> = []
+    for (const result of results) {
+      if (result.status === 'fulfilled') prepared.push(result.value)
+      else toast.error(t(imageErrorKey(result.reason)))
+    }
+    setImages((prev) => [...prev, ...prepared].slice(0, 5))
+    setPreviews((prev) => [...prev, ...prepared.map((f) => URL.createObjectURL(f))].slice(0, 5))
   }
 
   const handleRemoveImage = (index: number) => {
@@ -69,6 +91,7 @@ export const AddProductPage = () => {
       measureUnitId: '',
       discountType: '',
       discount: '',
+      vendorBarcode: '',
     },
     onSubmit: async ({ value }) => {
       if (
@@ -81,6 +104,10 @@ export const AddProductPage = () => {
         images.length === 0
       ) {
         setError(t('addProduct.error'))
+        return
+      }
+      if (!isValidVendorBarcode(value.vendorBarcode)) {
+        setError(t('productBarcode.invalid'))
         return
       }
       setError('')
@@ -107,6 +134,7 @@ export const AddProductPage = () => {
             discount_type: value.discountType ? (value.discountType as DiscountType) : null,
             discount: value.discount ? Number(value.discount) : null,
             images: images.length > 0 ? (images as unknown as Array<string>) : undefined,
+            vendor_barcode: normalizeBarcode(value.vendorBarcode) || null,
           },
         }),
       )
@@ -175,11 +203,14 @@ export const AddProductPage = () => {
               {images.length < 5 && (
                 <button
                   type="button"
+                  disabled={isProcessingImages}
                   onClick={() => fileInputRef.current?.click()}
                   className="size-24 rounded-xl border-2 border-dashed border-stroke flex flex-col items-center justify-center gap-1 text-passive2"
                 >
                   <Upload size={20} />
-                  <span className="t2">{t('addProduct.imagesAdd')}</span>
+                  <span className="t2">
+                    {isProcessingImages ? t('upload.processing') : t('addProduct.imagesAdd')}
+                  </span>
                 </button>
               )}
             </div>
@@ -330,6 +361,12 @@ export const AddProductPage = () => {
             )}
           </form.Field>
 
+          <form.Field name="vendorBarcode">
+            {(field) => (
+              <VendorBarcodeInput value={field.state.value} onChange={field.handleChange} />
+            )}
+          </form.Field>
+
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <form.Field name="discountType">
               {(field) => (
@@ -367,7 +404,7 @@ export const AddProductPage = () => {
 
           <form.Subscribe selector={(s) => s.isSubmitting}>
             {(isSubmitting) => (
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" disabled={isSubmitting || isProcessingImages}>
                 {isSubmitting ? t('addProduct.submitting') : t('addProduct.submit')}
               </Button>
             )}

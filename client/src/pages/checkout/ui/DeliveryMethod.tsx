@@ -6,6 +6,7 @@ import { AddressPicker } from './AddressPicker'
 import { RadioCircle } from '#/shared/ui/RadioCircle'
 import { useGetPickupPointsPickupPointsGet } from '#/shared/openapi/queries'
 import { useCityStore } from '#/shared/stores/cityStore'
+import { cn } from '#/shared/utils/cn'
 
 type DeliveryOption = 'pickup' | 'delivery'
 
@@ -15,7 +16,8 @@ interface DeliveryMethodProps {
   address: string
   onAddressChange: (address: string) => void
   pickupPointId: number | null
-  onPickupPointChange: (id: number) => void
+  /** `null` — пункт сброшен: сменился город, или в нём нет ни одного пункта. */
+  onPickupPointChange: (id: number | null) => void
   /** Выбор адреса: из сохранённых или вручную (см. AddressPicker). */
   addressId: number
   onAddressIdChange: (id: number) => void
@@ -46,37 +48,77 @@ export const DeliveryMethod = ({
 }: DeliveryMethodProps) => {
   const { t } = useTranslation()
   const cityId = useCityStore((s) => s.cityId)
+  /**
+   * Пункты выдачи — сразу по городу покупателя и только работающие.
+   *
+   * Раньше запрос уходил без параметров: сервер отдавал первые 20 пунктов всех
+   * городов (включая закрытые), а город отбирался уже здесь. Пункты нужного
+   * города могли просто не попасть в эти 20, список оказывался пустым, но
+   * «самовывоз» оставался выбранным — и оформление упиралось в «Выберите пункт
+   * выдачи» без всякого выхода. Запрос идёт при любом способе: заранее
+   * знать, есть ли пункты, нужно, чтобы решить, можно ли их вообще выбрать.
+   */
   const { data: pickupPoints, isLoading: isLoadingPoints } = useGetPickupPointsPickupPointsGet(
-    {},
+    { query: { city_id: cityId, is_active: true, limit: 100 } },
     undefined,
-    { enabled: value === 'pickup' },
+    { enabled: cityId !== null },
   )
 
   const cityPickupPoints = useMemo(
+    // Фильтр по городу оставлен как страховка: сервер уже отбирает по city_id.
     () => pickupPoints?.filter((point) => point.city_id === cityId) ?? [],
     [pickupPoints, cityId],
   )
 
+  // Без города пунктов не может быть вовсе; с городом — ждём ответа, чтобы не
+  // перещёлкивать способ на время загрузки.
+  const noPickupPoints =
+    cityId === null ||
+    (!isLoadingPoints && pickupPoints !== undefined && cityPickupPoints.length === 0)
+
+  // В городе нет пунктов — «Пункт выдачи» выбрать нельзя, переключаемся на
+  // доставку сами, а не оставляем способ, с которым заказ не оформить.
   useEffect(() => {
-    if (cityPickupPoints[0] && pickupPointId === null) {
-      onPickupPointChange(cityPickupPoints[0].id)
-    }
-  }, [cityPickupPoints])
+    if (noPickupPoints && value === 'pickup') onChange('delivery')
+  }, [noPickupPoints, value])
+
+  // Выбранный пункт должен быть из текущего списка: после смены города старый
+  // пункт другого города уходил бы в заказ незаметно для покупателя.
+  useEffect(() => {
+    if (pickupPoints === undefined && cityId !== null) return
+    const stillListed = cityPickupPoints.some((point) => point.id === pickupPointId)
+    if (!stillListed) onPickupPointChange(cityPickupPoints[0]?.id ?? null)
+  }, [cityPickupPoints, cityId])
 
   return (
     <div className="bg-white p-4 rounded-base">
       <h2 className="p2 font-semibold mb-4">{t('checkout.deliveryMethod')}</h2>
       <div className="w-full">
-        {options.map((option) => (
-          <button
-            key={option.value}
-            onClick={() => onChange(option.value)}
-            className="w-full flex items-center justify-between py-4 bg-white cursor-pointer border-b border-stroke last:border-b-0"
-          >
-            <span className="p3 font-medium">{t(option.key)}</span>
-            <RadioCircle selected={value === option.value} />
-          </button>
-        ))}
+        {options.map((option) => {
+          const disabled = option.value === 'pickup' && noPickupPoints
+          return (
+            <button
+              key={option.value}
+              type="button"
+              disabled={disabled}
+              onClick={() => onChange(option.value)}
+              className="w-full flex items-center justify-between gap-3 py-4 bg-white cursor-pointer
+                         border-b border-stroke last:border-b-0 text-left disabled:cursor-not-allowed"
+            >
+              <span className="flex min-w-0 flex-col gap-0.5">
+                <span className={cn('p3 font-medium', disabled && 'text-passive2')}>
+                  {t(option.key)}
+                </span>
+                {/* Почему пункт выдачи не выбирается — прямо под ним, а не
+                    в пустом списке, который при доставке и не виден. */}
+                {disabled && (
+                  <span className="t2 text-passive2">{t('checkout.noPickupPoints')}</span>
+                )}
+              </span>
+              <RadioCircle selected={value === option.value} />
+            </button>
+          )
+        })}
       </div>
 
       {value === 'pickup' && (
