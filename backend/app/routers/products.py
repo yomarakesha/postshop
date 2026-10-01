@@ -540,7 +540,8 @@ async def update_product(
     translations:    Optional[str] = Form(None, description='JSON: [{"language":"ru","name":"...","description":"..."}]'),
     brand_id:        Optional[int] = Form(None),
     hashtag:         Optional[str] = Form(None),
-    vendor_barcode:  Optional[str] = Form(None, description="Заводской штрихкод; пустая строка — убрать"),
+    vendor_barcode:  Optional[str] = Form(None, description="Заводской штрихкод (8, 12, 13 или 14 цифр)"),
+    remove_vendor_barcode: bool = Form(False, description="Убрать заводской штрихкод"),
     price:           Optional[Decimal] = Form(None),
     currency_id:     Optional[int] = Form(None),
     discount_type:   Optional[DiscountType] = Form(None),
@@ -602,7 +603,11 @@ async def update_product(
 
     if hashtag is not None:
         product.hashtag = hashtag
-    if vendor_barcode is not None:
+    # Пустое поле формы FastAPI считает непереданным, поэтому «стереть» —
+    # отдельным флагом, как у скидки (remove_discount).
+    if remove_vendor_barcode:
+        product.vendor_barcode = None
+    elif vendor_barcode is not None:
         vendor_code = normalize_vendor_barcode(vendor_barcode)
         if vendor_code != product.vendor_barcode:
             await _ensure_vendor_barcode_free(db, product.shop_base_id, vendor_code, product.id)
