@@ -14,6 +14,11 @@ import { buildFileUrl } from '@/shared/lib/buildFileUrl'
 import { formatDate } from '@/shared/lib/formatDate'
 import { getTranslationName } from '@/shared/lib/getTranslationName'
 import {
+  orderActionLabel,
+  orderStatusBadgeVariant as statusBadgeVariant,
+  orderStatusLabel,
+} from '@/shared/lib/orderStatus'
+import {
   LocalOrderStatusCode,
   OrderStatusCode,
   PaymentType,
@@ -28,18 +33,6 @@ import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
 import { Textarea } from '@/shared/ui/textarea'
 import { WarehouseTypeBadge } from '@/widgets/WarehouseTypeBadge'
-
-const statusBadgeVariant: Record<
-  OrderStatusCode,
-  'warning' | 'info' | 'destructive' | 'success' | 'default'
-> = {
-  [OrderStatusCode.PENDING]: 'warning',
-  [OrderStatusCode.APPROVED]: 'info',
-  [OrderStatusCode.REJECTED]: 'destructive',
-  [OrderStatusCode.READY_TO_TAKE]: 'info',
-  [OrderStatusCode.READY_TO_DELIVER]: 'info',
-  [OrderStatusCode.COMPLETED]: 'success',
-}
 
 /**
  * Куда можно перевести часть заказа из её текущего статуса — те же правила,
@@ -96,7 +89,10 @@ export function OrderDetailPage() {
   const user = userData?.data
   const statusCode = order.order_status.code
 
-  const isDeliveryOrder = !order.pickup_point
+  // Способ получения считает сервер (delivery_method): по нему же выбираются
+  // подписи статусов и кнопок — у самовывоза «Готов к доставке» был бессмыслицей.
+  const deliveryMethod = order.delivery_method
+  const isDeliveryOrder = deliveryMethod === 'delivery'
 
   // onError здесь был лишним: MutationCache подавляет глобальный тост только
   // если onError объявлен в опциях самой мутации, а переданный в mutate()
@@ -139,7 +135,7 @@ export function OrderDetailPage() {
             </p>
           </div>
           <Badge variant={statusBadgeVariant[statusCode]} className="text-sm px-3 py-1">
-            {t(`orders.statusLabel.${statusCode}`)}
+            {orderStatusLabel(t, statusCode, deliveryMethod)}
           </Badge>
         </div>
 
@@ -193,7 +189,7 @@ export function OrderDetailPage() {
                     isLoading={updateStatus.isPending}
                     disabled={updateStatus.isPending || !order.all_active_shops_ready}
                   >
-                    {t('orders.readyToPickup')}
+                    {orderActionLabel(t, OrderStatusCode.READY_TO_TAKE)}
                   </Button>
                   {/* Отклонение заказа делалось одним кликом без вопроса, при том
                     что покупатель сразу видит отказ. */}
@@ -219,7 +215,7 @@ export function OrderDetailPage() {
                 isLoading={updateStatus.isPending}
                 disabled={updateStatus.isPending}
               >
-                {t('orders.readyToDeliver')}
+                {orderActionLabel(t, OrderStatusCode.READY_TO_DELIVER, deliveryMethod)}
               </Button>
             )}
 
@@ -230,7 +226,7 @@ export function OrderDetailPage() {
                 isLoading={updateStatus.isPending}
                 disabled={updateStatus.isPending}
               >
-                {t('orders.complete')}
+                {orderActionLabel(t, OrderStatusCode.COMPLETED, deliveryMethod)}
               </Button>
             )}
           </div>
@@ -348,7 +344,7 @@ export function OrderDetailPage() {
                       </div>
                       <div className="flex items-center gap-3 shrink-0">
                         <Badge variant={statusBadgeVariant[orderShop.status]}>
-                          {t(`orders.statusLabel.${orderShop.status}`)}
+                          {orderStatusLabel(t, orderShop.status)}
                         </Badge>
                         <p className="text-sm font-semibold tabular-nums w-20 text-right">
                           {parseFloat(orderShop.subtotal).toFixed(2)}
@@ -391,7 +387,7 @@ export function OrderDetailPage() {
                             isLoading={busy}
                             disabled={updatePartStatus.isPending}
                           >
-                            {t('orders.readyToPickup')}
+                            {orderActionLabel(t, LocalOrderStatusCode.READY_TO_TAKE)}
                           </Button>
                         )}
                         {actions.includes(LocalOrderStatusCode.REJECTED) && (

@@ -5,7 +5,8 @@ import { useTranslation } from 'react-i18next'
 import { useOrdersQuery } from '../model/useOrdersQuery'
 import { useRowNavigation } from '@/shared/hooks/useRowNavigation'
 import { formatDate } from '@/shared/lib/formatDate'
-import { OrderStatusCode, PaymentType } from '@/shared/openapi/requests'
+import { orderStatusBadgeVariant, orderStatusLabel } from '@/shared/lib/orderStatus'
+import { PaymentType } from '@/shared/openapi/requests'
 import { Badge } from '@/shared/ui/badge'
 import {
   InputGroup,
@@ -14,18 +15,6 @@ import {
   InputGroupText,
 } from '@/shared/ui/input-group'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table'
-
-const statusBadgeVariant: Record<
-  OrderStatusCode,
-  'warning' | 'info' | 'destructive' | 'success' | 'default'
-> = {
-  [OrderStatusCode.PENDING]: 'warning',
-  [OrderStatusCode.APPROVED]: 'info',
-  [OrderStatusCode.REJECTED]: 'destructive',
-  [OrderStatusCode.READY_TO_TAKE]: 'info',
-  [OrderStatusCode.READY_TO_DELIVER]: 'info',
-  [OrderStatusCode.COMPLETED]: 'success',
-}
 
 const paymentTypeKey: Record<string, string> = {
   [PaymentType.CASH]: 'orders.payment.cash',
@@ -97,8 +86,8 @@ export function OrdersPage() {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <Badge variant={statusBadgeVariant[order.order_status.code]}>
-                      {t(`orders.statusLabel.${order.order_status.code}`)}
+                    <Badge variant={orderStatusBadgeVariant[order.order_status.code]}>
+                      {orderStatusLabel(t, order.order_status.code, order.delivery_method)}
                     </Badge>
                   </TableCell>
                   <TableCell className="text-sm text-muted-foreground">

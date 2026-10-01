@@ -7,14 +7,16 @@ import { useNavigate } from 'react-router-dom'
 import { useApproveMutation } from '../model/useApproveMutation'
 import { useDeclineMutation } from '../model/useDeclineMutation'
 import { useModerationQueueQuery } from '../model/useModerationQueueQuery'
+import { moderatedProductId } from '@/shared/hooks/useModerateProductMutation'
+import type { ModerateProductVars } from '@/shared/hooks/useModerateProductMutation'
 import { formatDate } from '@/shared/lib/formatDate'
 import { productModerationKeys } from '@/shared/lib/productModeration'
 import type { ModerationDecision } from '@/shared/lib/productModeration'
 import { ProductStatus } from '@/shared/openapi/requests'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
-import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table'
+import { DeclineProductDialog } from '@/widgets/DeclineProductDialog'
 
 const statusVariant = {
   [ProductStatus.PENDING]: 'warning',
@@ -38,7 +40,7 @@ export function ProductModerationPage() {
   const busy = useMutationState({
     filters: { mutationKey: productModerationKeys.decideAll, status: 'pending' },
     select: (mutation) => ({
-      productId: mutation.state.variables as number,
+      productId: moderatedProductId(mutation.state.variables as ModerateProductVars),
       decision: mutation.options.mutationKey?.[2] as ModerationDecision,
     }),
   })
@@ -146,16 +148,12 @@ export function ProductModerationPage() {
         </Table>
       </div>
 
-      <ConfirmDialog
+      <DeclineProductDialog
         open={declineId !== null}
         onOpenChange={(open) => !open && setDeclineId(null)}
-        title={t('confirm.declineProductTitle')}
-        description={t('confirm.declineProductText')}
-        confirmLabel={t('moderation.decline')}
-        destructive
         busy={decline.isPending}
-        onConfirm={() => {
-          if (declineId !== null) decline.mutate(declineId)
+        onConfirm={(comment) => {
+          if (declineId !== null) decline.mutate({ productId: declineId, comment })
           setDeclineId(null)
         }}
       />

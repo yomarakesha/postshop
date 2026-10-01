@@ -13,5 +13,9 @@ export function useOrdersQuery(params?: GetOrdersOrdersGetData['query']) {
         query: { limit: ADMIN_LIST_LIMIT, ...params },
         throwOnError: true,
       }),
+    // Список не обновлялся сам: новый заказ появлялся только после ручной
+    // перезагрузки страницы, и оператор, державший её открытой, его не видел.
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
   })
 }

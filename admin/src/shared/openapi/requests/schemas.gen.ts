@@ -2894,6 +2894,16 @@ export const OrderResponseSchema = {
             ],
             title: 'Updated At'
         },
+        delivery_method: {
+            type: 'string',
+            enum: [
+                'pickup',
+                'delivery'
+            ],
+            title: 'Delivery Method',
+            description: 'Как покупатель получает заказ.\n\nОт этого зависят названия шагов: при самовывозе после сборки заказ\n«ждёт в пункте выдачи», а не «передан в доставку». Коды статусов одни\nдля обоих способов, а админка и витрина показывали «Готов к доставке»\nи заказу из пункта выдачи.',
+            readOnly: true
+        },
         total: {
             type: 'string',
             pattern: '^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$',
@@ -2935,6 +2945,7 @@ export const OrderResponseSchema = {
         'items',
         'created_at',
         'updated_at',
+        'delivery_method',
         'total',
         'effective_total',
         'has_rejected_shops',
@@ -4052,6 +4063,20 @@ export const ReturnCreateRequestSchema = {
     title: 'ReturnCreateRequest'
 } as const;
 
+export const ReturnReceiveRequestSchema = {
+    properties: {
+        restock: {
+            type: 'boolean',
+            title: 'Restock'
+        }
+    },
+    type: 'object',
+    required: [
+        'restock'
+    ],
+    title: 'ReturnReceiveRequest'
+} as const;
+
 export const ReturnRejectRequestSchema = {
     properties: {
         resolution_comment: {
@@ -4177,6 +4202,39 @@ export const ReturnResponseSchema = {
                 }
             ],
             title: 'Resolution Comment'
+        },
+        warehouse_type: {
+            anyOf: [
+                {
+                    $ref: '#/components/schemas/WarehouseType'
+                },
+                {
+                    type: 'null'
+                }
+            ]
+        },
+        received_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Received At'
+        },
+        restocked: {
+            anyOf: [
+                {
+                    type: 'boolean'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Restocked'
         },
         created_at: {
             anyOf: [

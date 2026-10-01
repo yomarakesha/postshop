@@ -20,6 +20,9 @@ export function useUpdateOrderStatusMutation(orderId: number) {
       }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['orders', orderId] })
+      // Префикс ['orders'] сбрасывает и список, и счётчик новых заказов в меню
+      // (pendingOrdersCountKey): принятый заказ сразу пропадает из счётчика,
+      // а не через полминуты опроса.
       void queryClient.invalidateQueries({ queryKey: ['orders'] })
     },
   })

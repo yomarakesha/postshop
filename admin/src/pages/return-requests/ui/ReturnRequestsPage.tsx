@@ -3,10 +3,12 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useReturnApproveMutation } from '../model/useReturnApproveMutation'
+import { useReturnReceiveMutation } from '../model/useReturnReceiveMutation'
 import { useReturnRejectMutation } from '../model/useReturnRejectMutation'
 import { useReturnsQuery } from '../model/useReturnsQuery'
 import { formatDate } from '@/shared/lib/formatDate'
-import { ReturnStatus } from '@/shared/openapi/requests'
+import { ReturnStatus, WarehouseType } from '@/shared/openapi/requests'
+import type { ReturnResponse } from '@/shared/openapi/requests'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import {
@@ -32,15 +34,24 @@ const TABS = [ReturnStatus.PENDING, ReturnStatus.APPROVED, ReturnStatus.REJECTED
 type Decision = { requestId: number; kind: 'approve' | 'reject' }
 
 /**
+ * Отметка о получении: restock выбран кнопкой в строке (FBO) или ещё не
+ * выбран (null) — сотрудник отмечает возврат FBS за продавца и решает в
+ * диалоге, цел товар или брак.
+ */
+type Receiving = { request: ReturnResponse; restock: boolean | null }
+
+/**
  * Заявки на возврат.
  *
  * Возврата не было вовсе: тип операции в журнале склада существовал, а завести
  * его было нечем. Товар физически возвращали, а в системе он оставался
  * проданным.
  *
- * Подтверждение — это утверждение, что товар у платформы: сервер тем же
- * действием возвращает его на склад. Поэтому спрашиваем подтверждение и здесь,
- * а не подтверждаем одним кликом из строки таблицы.
+ * Подтверждение только разрешает покупателю вернуть товар. Раньше сервер тем
+ * же действием возвращал товар в остаток — до того, как его кто-то увидел, и
+ * брак уходил обратно в продажу. Теперь остаток меняется в колонке
+ * «Получение»: часть FBO получает склад Postshop (сотрудник, здесь), часть
+ * FBS — продавец у себя; сотрудник может отметить её за него.
  */
 export function ReturnRequestsPage() {
   const { t } = useTranslation()
@@ -48,6 +59,8 @@ export function ReturnRequestsPage() {
   const { data, isLoading } = useReturnsQuery(tab)
   const approve = useReturnApproveMutation()
   const reject = useReturnRejectMutation()
+  const receive = useReturnReceiveMutation()
+  const [receiving, setReceiving] = useState<Receiving | null>(null)
 
   const [decision, setDecision] = useState<Decision | null>(null)
   const [comment, setComment] = useState('')
@@ -55,6 +68,18 @@ export function ReturnRequestsPage() {
   const requests = data?.data ?? []
   const isRejecting = decision?.kind === 'reject'
   const busy = approve.isPending || reject.isPending
+  // Получение бывает только у подтверждённых возвратов: на других вкладках
+  // колонка была бы пустой.
+  const showReceipt = tab === ReturnStatus.APPROVED
+  const columns = showReceipt ? 10 : 9
+
+  const submitReceive = (restock: boolean) => {
+    if (!receiving) return
+    receive.mutate(
+      { requestId: receiving.request.id, restock },
+      { onSuccess: () => setReceiving(null) },
+    )
+  }
 
   const close = () => {
     setDecision(null)
@@ -100,13 +125,14 @@ export function ReturnRequestsPage() {
               <TableHead>{t('returnRequests.reason')}</TableHead>
               <TableHead>{t('fields.status')}</TableHead>
               <TableHead>{t('fields.createdAt')}</TableHead>
+              {showReceipt && <TableHead>{t('returnRequests.receipt')}</TableHead>}
               <TableHead />
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={9} className="h-32 text-center">
+                <TableCell colSpan={columns} className="h-32 text-center">
                   <Loader2 className="mx-auto size-5 animate-spin text-muted-foreground" />
                 </TableCell>
               </TableRow>
@@ -151,6 +177,15 @@ export function ReturnRequestsPage() {
                   <TableCell className="text-muted-foreground tabular-nums">
                     {request.created_at ? formatDate(request.created_at) : '—'}
                   </TableCell>
+                  {showReceipt && (
+                    <TableCell>
+                      <ReceiptCell
+                        request={request}
+                        busy={receive.isPending}
+                        onReceive={(restock) => setReceiving({ request, restock })}
+                      />
+                    </TableCell>
+                  )}
                   <TableCell>
                     {/* Решение принимается один раз: у разобранной заявки
                         кнопок нет — сервер второе решение и не примет. */}
@@ -180,7 +215,7 @@ export function ReturnRequestsPage() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={9} className="h-32 text-center text-muted-foreground">
+                <TableCell colSpan={columns} className="h-32 text-center text-muted-foreground">
                   {t('noResults')}
                 </TableCell>
               </TableRow>
@@ -226,6 +261,124 @@ export function ReturnRequestsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={receiving !== null} onOpenChange={(open) => !open && setReceiving(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>{t('returnRequests.receiveTitle')}</DialogTitle>
+            <DialogDescription>
+              {t(
+                receiving?.restock == null
+                  ? 'returnRequests.receiveChooseText'
+                  : receiving.restock
+                    ? 'returnRequests.receiveRestockText'
+                    : 'returnRequests.receiveDefectiveText',
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setReceiving(null)}
+              disabled={receive.isPending}
+            >
+              {t('cancel')}
+            </Button>
+            {/* Брак — необратимое решение «не продавать», поэтому красная кнопка. */}
+            {receiving?.restock !== true && (
+              <Button
+                variant="destructive"
+                disabled={receive.isPending}
+                isLoading={receive.isPending && receive.variables?.restock === false}
+                onClick={() => submitReceive(false)}
+              >
+                {t(
+                  receiving?.restock === false
+                    ? 'returnRequests.receiveDefective'
+                    : 'returnRequests.defective',
+                )}
+              </Button>
+            )}
+            {receiving?.restock !== false && (
+              <Button
+                disabled={receive.isPending}
+                isLoading={receive.isPending && receive.variables?.restock === true}
+                onClick={() => submitReceive(true)}
+              >
+                {t(
+                  receiving?.restock === true
+                    ? 'returnRequests.receiveRestock'
+                    : 'returnRequests.toStock',
+                )}
+              </Button>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
+  )
+}
+
+/**
+ * Состояние получения подтверждённого возврата.
+ *
+ * Возврат FBO лежит на складе Postshop — получает сотрудник, кнопками здесь.
+ * Возврат FBS едет продавцу, и отмечает его продавец у себя; сотруднику
+ * оставлено скромное действие на случай, когда товар всё же у платформы.
+ */
+function ReceiptCell({
+  request,
+  busy,
+  onReceive,
+}: {
+  request: ReturnResponse
+  busy: boolean
+  onReceive: (restock: boolean | null) => void
+}) {
+  const { t } = useTranslation()
+
+  if (request.received_at) {
+    return (
+      <div className="space-y-1">
+        <Badge variant={request.restocked ? 'success' : 'destructive'}>
+          {t(
+            request.restocked
+              ? 'returnRequests.receivedRestocked'
+              : 'returnRequests.receivedDefective',
+          )}
+        </Badge>
+        <p className="text-xs text-muted-foreground tabular-nums">
+          {formatDate(request.received_at)}
+        </p>
+      </div>
+    )
+  }
+
+  if (request.warehouse_type === WarehouseType.FBO) {
+    return (
+      <div className="flex flex-wrap gap-2">
+        <Button size="sm" disabled={busy} onClick={() => onReceive(true)}>
+          {t('returnRequests.receiveRestock')}
+        </Button>
+        <Button size="sm" variant="outline" disabled={busy} onClick={() => onReceive(false)}>
+          {t('returnRequests.receiveDefective')}
+        </Button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-1">
+      <p className="text-sm text-muted-foreground">{t('returnRequests.sellerReceives')}</p>
+      <Button
+        size="xs"
+        variant="link"
+        className="px-0 text-muted-foreground"
+        disabled={busy}
+        onClick={() => onReceive(null)}
+      >
+        {t('returnRequests.receiveForSeller')}
+      </Button>
+    </div>
   )
 }

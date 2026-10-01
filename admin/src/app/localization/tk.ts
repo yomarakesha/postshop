@@ -417,15 +417,12 @@ export const tk = {
     actions: 'Hereketler',
     approve: 'Kabul etmek',
     reject: 'Ret etmek',
-    readyToPickup: 'Almaga taýyn',
-    readyToDeliver: 'Eltip bermäge taýyn',
-    complete: 'Tamamlamak',
     customer: 'Müşderi',
     itemsTitle: 'Harytlar',
     total: 'Jemi',
     grandTotal: 'Tölemeli',
     shopsTitle: 'Dükanlar',
-    notAllShopsReady: 'Ähli dükanlar almaga taýyn däl',
+    notAllShopsReady: 'Ähli dükanlar sargydyň öz bölegini ýygnamady',
     fboPartWaitsApproval:
       'Bu bölegiň ýagdaýyny Postshop ammary alyp barýar — sargyt kabul edilenden soň',
     rejectPartTitle: '«{{shop}}» dükanynyň sargyt bölegini ret etmelimi?',
@@ -448,12 +445,39 @@ export const tk = {
       cashAndCard: 'Nagt we kart',
     },
     statusLabel: {
-      pending: 'Garaşylýar',
-      approved: 'Tassyklanyldy',
+      pending: 'Tassyklanmagyna garaşýar',
+      approved: 'Kabul edildi',
       rejected: 'Ret edildi',
-      ready_to_take: 'Almaga taýyn',
-      ready_to_deliver: 'Eltip bermäge taýyn',
+      ready_to_take: 'Ýygnaldy',
+      ready_to_deliver: 'Bermek nokadynda ýa-da eltip berilýär',
       completed: 'Tamamlandy',
+    },
+    statusLabelBy: {
+      pickup: {
+        ready_to_deliver: 'Bermek nokadynda garaşýar',
+        completed: 'Alyja berildi',
+      },
+      delivery: {
+        ready_to_deliver: 'Eltip bermäge berildi',
+        completed: 'Eltip berildi',
+      },
+    },
+    action: {
+      approved: 'Kabul etmek',
+      rejected: 'Ret etmek',
+      ready_to_take: 'Ýygnaldy',
+      ready_to_deliver: 'Bermek nokadyna ýa-da eltip bermäge berildi',
+      completed: 'Tamamlamak',
+    },
+    actionBy: {
+      pickup: {
+        ready_to_deliver: 'Bermek nokadyna berildi',
+        completed: 'Alyja berildi',
+      },
+      delivery: {
+        ready_to_deliver: 'Eltip bermäge berildi',
+        completed: 'Eltip berildi',
+      },
     },
   },
 
@@ -468,6 +492,7 @@ export const tk = {
     price: 'Bahasy',
     approve: 'Tassyklamak',
     decline: 'Ret etmek',
+    declineReasonPlaceholder: 'Ret etmegiň sebäbi — ony satyjy görer',
     discount: 'Arzanladyş',
     measureUnit: 'Ölçeg birligi',
     brand: 'Brend',
@@ -504,11 +529,27 @@ export const tk = {
     reason: 'Alyjynyň sebäbi',
     approveTitle: 'Gaýtarmagy tassyklamalymy?',
     approveText:
-      'Tassyklamak harydyň platformada bolşuny aňladýar: ol dükanyň ammaryna gaýdyp geler.',
+      'Alyjy gaýtarmagyň kabul edilendigini biler we harydy getirer. Galyndy entek üýtgemeýär: haryt alnyp barlanandan soň satuwa gaýdyp geler — FBO üçin Postshop ammary, FBS üçin satyjy.',
     approvePlaceholder: 'Alyja teswir (hökmany däl)',
     rejectTitle: 'Gaýtarmakdan boýun gaçyrmalymy?',
     rejectText: 'Sebäbi alyjy görer — ony aýtmasaň, arza dymyp ýapylýar.',
     rejectPlaceholder: 'Gaýtarmak näme üçin mümkin däl',
+    receipt: 'Kabul edilişi',
+    receiveRestock: 'Ammara alyndy — satuwa',
+    receiveDefective: 'Alyndy — kemçilikli',
+    sellerReceives: 'Satyjy kabul edýär',
+    receiveForSeller: 'Satyjynyň ýerine bellemek',
+    receivedRestocked: 'Alyndy, satuwa',
+    receivedDefective: 'Alyndy, kemçilikli',
+    receiveTitle: 'Gaýtarylan haryt alyndy diýip bellemelimi?',
+    receiveRestockText:
+      'Haryt bitewi we dükanyň galyndysyna gaýdyp geler — ony ýene satyn alyp bolar. Muny yzyna gaýtaryp bolmaz.',
+    receiveDefectiveText:
+      'Haryt kemçilikli diýlip ykrar edildi: galyndysyna gaýdyp gelmez. Muny yzyna gaýtaryp bolmaz.',
+    receiveChooseText:
+      'FBS gaýtarmasyny adatça satyjy kabul edýär. Haryt sizde bolsa ýa-da satyjy kabul edendigini tassyklasa, onuň ýerine belläň. Muny yzyna gaýtaryp bolmaz.',
+    toStock: 'Satuwa',
+    defective: 'Kemçilikli',
   },
 
   reviewStatus: {

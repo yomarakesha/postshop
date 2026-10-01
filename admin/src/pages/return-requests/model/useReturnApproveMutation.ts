@@ -3,10 +3,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { approveReturnReturnsRequestIdApprovePatch } from '@/shared/openapi/requests'
 
 /**
- * Подтверждение возврата.
+ * Подтверждение возврата: покупатель может везти товар назад.
  *
- * Это утверждение платформы, что товар у неё: сервер тем же действием
- * возвращает товар на склад магазинам со складским учётом.
+ * Раньше тем же действием товар возвращался в остаток, хотя физически был ещё
+ * у покупателя. Теперь остаток меняет только получение
+ * (useReturnReceiveMutation), когда товар осмотрен.
  */
 export function useReturnApproveMutation() {
   const queryClient = useQueryClient()

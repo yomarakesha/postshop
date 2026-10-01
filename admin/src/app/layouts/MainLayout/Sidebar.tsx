@@ -36,6 +36,7 @@ import { useDraftReceiptsCountQuery } from '@/shared/hooks/useDraftReceiptsCount
 import { useFeatures } from '@/shared/hooks/useFeatures'
 import { useHasPermission } from '@/shared/hooks/useHasPermission'
 import { useModerationCountQuery } from '@/shared/hooks/useModerationCountQuery'
+import { usePendingOrdersCountQuery } from '@/shared/hooks/usePendingOrdersCountQuery'
 import { usePendingShopsCountQuery } from '@/shared/hooks/usePendingShopsCountQuery'
 import { useReturnsCountQuery } from '@/shared/hooks/useReturnsCountQuery'
 import { useReviewModerationCountQuery } from '@/shared/hooks/useReviewModerationCountQuery'
@@ -65,6 +66,12 @@ export const Sidebar = ({ headerHeight, open, onClose }: Props) => {
   const reviewCount = (reviewCountData?.data as { count: number } | undefined)?.count ?? 0
   const returnsCount = (returnsCountData?.data as { count: number } | undefined)?.count ?? 0
   const receiptsCount = draftReceipts ?? 0
+  // Счётчик новых заказов видит только тот, кто может их принять: ручка
+  // отвечает 403 без права менять статус заказа.
+  const { data: ordersCountData } = usePendingOrdersCountQuery(
+    hasPermission(PERMISSION_KEYS.ORDERS.updateStatus),
+  )
+  const ordersCount = (ordersCountData?.data as { count: number } | undefined)?.count ?? 0
 
   const renderSection = (
     title: string,
@@ -191,6 +198,7 @@ export const Sidebar = ({ headerHeight, open, onClose }: Props) => {
               icon: <ShoppingBag size={18} />,
               title: t('pages.orders'),
               permission: PERMISSION_KEYS.ORDERS.read,
+              badge: ordersCount,
             },
             {
               href: '/pickup-points',

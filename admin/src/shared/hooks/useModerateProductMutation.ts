@@ -15,6 +15,19 @@ import {
 } from '@/shared/openapi/requests'
 
 /**
+ * Что передаётся в mutate: id товара или id с причиной отказа.
+ *
+ * Причины не было вовсе: диалог отклонения обещал «Продавец увидит указанную
+ * причину», а поля для неё не было, и сервер получал пустой отказ. Голый id
+ * оставлен, чтобы одобрение и старые вызовы не менялись.
+ */
+export type ModerateProductVars = number | { productId: number; comment?: string | null }
+
+/** id товара из переменных мутации — для занятости строк в очереди. */
+export const moderatedProductId = (vars: ModerateProductVars) =>
+  typeof vars === 'number' ? vars : vars.productId
+
+/**
  * Одобрение или отклонение товара — общее для очереди и карточки.
  *
  * Список и карточка держали по своей копии этих хуков, и обе ошибались
@@ -31,8 +44,10 @@ export function useModerateProductMutation(
 
   return useMutation({
     mutationKey: productModerationKeys.decide(decision),
-    mutationFn: (productId: number) =>
-      runModerationDecision(
+    mutationFn: (vars: ModerateProductVars) => {
+      const productId = moderatedProductId(vars)
+      const comment = typeof vars === 'number' ? null : vars.comment?.trim() || null
+      return runModerationDecision(
         () =>
           decision === 'approved'
             ? approveProductProductsProductIdApprovePatch({
@@ -41,12 +56,14 @@ export function useModerateProductMutation(
               })
             : declineProductProductsProductIdDeclinePatch({
                 path: { product_id: productId },
+                body: { moderation_comment: comment },
                 throwOnError: true,
               }),
         decision,
-      ),
-    onSuccess: (outcome, productId) => {
-      removeFromModerationQueue(queryClient, productId)
+      )
+    },
+    onSuccess: (outcome, vars) => {
+      removeFromModerationQueue(queryClient, moderatedProductId(vars))
       if (outcome === 'already') {
         toast.info(
           t(decision === 'approved' ? 'moderation.alreadyApproved' : 'moderation.alreadyDeclined'),
