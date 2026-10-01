@@ -33,14 +33,14 @@ const NotificationRow = ({
   t,
 }: Props) => {
   // У части видов в comment лежит код статуса заказа («ready_to_deliver»), а
-  // не текст человека. Переводить его напрямую нельзя: у покупателя своя,
-  // укрупнённая шкала статусов — сначала код приводится к ней, и только потом
-  // берётся подпись. Иначе на экран попадал сам ключ («orders.status.approved»).
-  const statusLabelKey = data.comment
-    ? orderStatus.client.getLabelKey(
-        orderStatus.client.map[data.comment as Order.StatusCode],
-      )
-    : "";
+  // не текст человека. Переводить его напрямую нельзя — на экран попал бы сам
+  // ключ. Подпись та же, что в «Моих заказах», но способа получения в
+  // уведомлении нет, поэтому последние шаги нейтральные: «Готов к получению»
+  // вместо «Ждёт в пункте выдачи» / «Передан в доставку».
+  const statusLabelKey =
+    data.comment && data.comment in orderStatus.client.map
+      ? orderStatus.buyer.getLabelKey(data.comment as Order.StatusCode, null)
+      : "";
 
   const detail = data.comment
     ? STATUS_COMMENT_KINDS.has(data.kind)

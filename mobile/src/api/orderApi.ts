@@ -140,6 +140,36 @@ const useGetShopOrders = (
   return query;
 };
 
+const ATTENTION_COUNT_KEY = "shop-orders-attention-count";
+
+/** Как часто сверять счётчик, пока приложение открыто. */
+const ATTENTION_REFETCH_MS = 60_000;
+
+/**
+ * Сколько заказов ждут действий продавца — для значка на вкладке «Заказы».
+ *
+ * Продавец не видел, что от него чего-то ждут: новый заказ лежал в общем
+ * списке среди завершённых, и узнать о нём можно было только открыв вкладку.
+ * Сервер считает части FBS в принятых оператором заказах, которые ещё не
+ * приняты или не собраны (FBO собирает склад Postshop — продавцу не задача).
+ *
+ * Раз в минуту обновляем сами: push-уведомления до приложения доходят не
+ * всегда, а заказ ждёт ответа.
+ */
+const useGetAttentionCount = (shopId: number | undefined | null) =>
+  useQuery<{ count: number }, AxiosError<ApiErrorResponse>>({
+    queryKey: [ATTENTION_COUNT_KEY, shopId],
+    queryFn: async () => {
+      const response = await api.req({
+        method: "GET",
+        url: `/orders/shop/${shopId}/attention-count`,
+      });
+      return response.data;
+    },
+    enabled: !!shopId,
+    refetchInterval: ATTENTION_REFETCH_MS,
+  });
+
 const useUpdateShopStatus = ({
   orderId,
   shopId,
@@ -168,6 +198,11 @@ const useUpdateShopStatus = ({
         queryKey: ["get-order", orderId],
       });
       queryClient.invalidateQueries({ queryKey: ["get-shop-orders", shopId] });
+      // Принятая или собранная часть больше не ждёт продавца — значок на
+      // вкладке «Заказы» должен уменьшиться сразу, а не через минуту.
+      queryClient.invalidateQueries({
+        queryKey: [ATTENTION_COUNT_KEY, shopId],
+      });
     },
   });
   return mutation;
@@ -205,4 +240,5 @@ export const orderApi = {
   useGetShopOrders,
   useUpdateShopStatus,
   useUpdateStatus,
+  useGetAttentionCount,
 };

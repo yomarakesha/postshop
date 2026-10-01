@@ -90,7 +90,12 @@ declare namespace Product {
       brand_id: number;
       measure_unit_id: number;
       currency_id?: number;
-      images: RNFile[];
+      /**
+       * Не передан — фото остаются прежними. Передавать только при смене
+       * фото: любые присланные фото сервер считает правкой содержимого и
+       * отправляет товар на модерацию.
+       */
+      images?: RNFile[];
       price: number;
       discount_type?: DiscountType | null;
       remove_discount: boolean;

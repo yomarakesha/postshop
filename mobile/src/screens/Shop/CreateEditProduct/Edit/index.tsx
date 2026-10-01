@@ -95,6 +95,11 @@ const EditProductScreen = () => {
   };
 
   const [images, setImages] = useState<ExpoImagePicker.ImagePickerAsset[]>([]);
+  // Менял ли продавец фото. Фото товара скачиваются в форму и раньше
+  // уходили обратно при каждом сохранении — сервер считал это сменой фото и
+  // отправлял товар на модерацию даже после правки одной цены. Теперь
+  // images шлём, только если продавец добавил или убрал снимок.
+  const [imagesChanged, setImagesChanged] = useState(false);
   const [hasDiscount, setHasDiscount] = useState(data?.discount ? true : false);
   const [discountType, setDiscountType] = useState<Product.DiscountType>(
     data?.discount_type ?? "percentage",
@@ -198,6 +203,7 @@ const EditProductScreen = () => {
         result.assets,
         PRODUCT_IMAGE_MAX_SIDE,
       );
+      setImagesChanged(true);
       setImages((prev) => {
         const remaining = 5 - prev.length;
 
@@ -207,6 +213,7 @@ const EditProductScreen = () => {
   };
 
   const handleRemove = useCallback((index: number) => {
+    setImagesChanged(true);
     setImages((prev) => prev.filter((_, i) => i !== index));
   }, []);
 
@@ -278,7 +285,7 @@ const EditProductScreen = () => {
     ];
 
     try {
-      await updateMutation.mutateAsync({
+      const updated = await updateMutation.mutateAsync({
         shop_base_id: shopBaseId!,
         translations: JSON.stringify(translations),
         price: data.price,
@@ -289,11 +296,17 @@ const EditProductScreen = () => {
         hashtag: hasHashtag ? hashtag : null,
         measure_unit_id: selectedMeasureUnit?.id,
         remove_discount: !hasDiscount,
-        images: images.map((img) => ({
-          uri: Platform.OS === "ios" ? img.uri.replace("file://", "") : img.uri,
-          name: img.fileName ?? img.uri.split("/").pop() ?? "image.jpg",
-          type: img.mimeType ?? "image/jpeg",
-        })),
+        // undefined — поле не уходит вовсе, и сервер оставляет прежние фото.
+        images: imagesChanged
+          ? images.map((img) => ({
+              uri:
+                Platform.OS === "ios"
+                  ? img.uri.replace("file://", "")
+                  : img.uri,
+              name: img.fileName ?? img.uri.split("/").pop() ?? "image.jpg",
+              type: img.mimeType ?? "image/jpeg",
+            }))
+          : undefined,
         currency_id: selectedCurrency?.id ? selectedCurrency.id : undefined,
         // Пустое поле формы сервер считает непереданным, поэтому стёртый
         // штрихкод снимается отдельным флагом.
@@ -308,6 +321,18 @@ const EditProductScreen = () => {
           if (f.exists) f.delete();
         } catch {}
       }
+
+      // На модерацию товар уходит, только если менялось содержимое
+      // (название, описание, фото, категория…). Цена и скидка — нет, и
+      // обещать проверку там, где её не будет, нельзя: смотрим на ответ.
+      Toast.show({
+        type: "success",
+        text1: t(
+          updated?.status === "pending"
+            ? "store.addEditProduct.result.moderation"
+            : "store.addEditProduct.result.saved",
+        ),
+      });
 
       router.back();
     } catch (e: any) {

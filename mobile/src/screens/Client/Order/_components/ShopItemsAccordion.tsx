@@ -27,12 +27,30 @@ type Props = {
   shopName?: string;
   data: Order.OrderShop;
   t: TFunction;
+  /**
+   * Возвраты — только у завершённого заказа (раньше товар не получен, и
+   * сервер заявку не примет). Без этого поля строки товаров без кнопки.
+   */
+  returns?: {
+    /** Последняя заявка по строке заказа, если была. */
+    byItemId: Map<number, ReturnRequest.Item>;
+    onReturn: (item: Order.ItemProduct) => void;
+  };
 };
+
+/** Пока заявка в этих состояниях, вторую по той же покупке сервер не примет. */
+const ACTIVE_RETURN_STATUSES: ReturnRequest.Status[] = ["pending", "approved"];
 
 const getProductName = (product: Product.Item) =>
   product.translations[0]?.name ?? "";
 
-const ShopItemsAccordion = ({ data, shopLogoPath, shopName, t }: Props) => {
+const ShopItemsAccordion = ({
+  data,
+  shopLogoPath,
+  shopName,
+  t,
+  returns,
+}: Props) => {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(true);
   const [contentHeight, setContentHeight] = useState(0);
@@ -141,57 +159,112 @@ const ShopItemsAccordion = ({ data, shopLogoPath, shopName, t }: Props) => {
             const listed = toMoneyNumber(item.product.price);
             const hadDiscount = listed > paid;
 
+            // Отклонённую магазином часть покупатель не получал — возвращать
+            // нечего.
+            const canRequestReturn = !!returns && !isRejected;
+            const lastReturn = returns?.byItemId.get(item.id);
+            const hasActiveReturn =
+              !!lastReturn &&
+              ACTIVE_RETURN_STATUSES.includes(lastReturn.status);
+
             return (
-              // Нажатие открывает товар: раньше строка была неинтерактивной,
-              // и вернуться к купленному товару из заказа было нельзя.
-              <Pressable
+              <View
                 key={item.id}
-                style={[styles.row, index === 0 && styles.firstRow]}
-                onPress={() =>
-                  router.push({
-                    pathname: "/products/[id]",
-                    params: { id: String(item.product_id) },
-                  })
-                }
+                style={[styles.itemBlock, index === 0 && styles.firstRow]}
               >
-                <Image
-                  source={{ uri: getImageUrl(item.product.images[0]) }}
-                  style={styles.productImage}
-                  contentFit="cover"
-                />
-                <View style={styles.info}>
-                  <Typography variant="p2" weight="medium" numberOfLines={3}>
-                    {getProductName(item.product)}
-                  </Typography>
-                  <View style={styles.priceRow}>
-                    <Typography
-                      variant="p3"
-                      weight="medium"
-                      color={hadDiscount ? "error" : "secondary"}
-                    >
-                      {formatMoney(item.price_at_order, item.product.currency)}
+                {/* Нажатие открывает товар: раньше строка была неинтерактивной,
+                  и вернуться к купленному товару из заказа было нельзя. */}
+                <Pressable
+                  style={styles.row}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/products/[id]",
+                      params: { id: String(item.product_id) },
+                    })
+                  }
+                >
+                  <Image
+                    source={{ uri: getImageUrl(item.product.images[0]) }}
+                    style={styles.productImage}
+                    contentFit="cover"
+                  />
+                  <View style={styles.info}>
+                    <Typography variant="p2" weight="medium" numberOfLines={3}>
+                      {getProductName(item.product)}
                     </Typography>
-                    {hadDiscount ? (
+                    <View style={styles.priceRow}>
+                      <Typography
+                        variant="p3"
+                        weight="medium"
+                        color={hadDiscount ? "error" : "secondary"}
+                      >
+                        {formatMoney(
+                          item.price_at_order,
+                          item.product.currency,
+                        )}
+                      </Typography>
+                      {hadDiscount ? (
+                        <Typography
+                          variant="t2"
+                          weight="medium"
+                          color="secondary"
+                          isLineThrough
+                        >
+                          {formatMoney(
+                            item.product.price,
+                            item.product.currency,
+                          )}
+                        </Typography>
+                      ) : null}
+                      <Typography
+                        variant="p3"
+                        weight="medium"
+                        color="secondary"
+                      >
+                        {" • "}
+                        {item.quantity} {t("common.pieces")}
+                      </Typography>
+                    </View>
+                  </View>
+                </Pressable>
+                {/* «Вернуть» — сосед строки, а не её содержимое: вложенное
+                  нажатие внутри нажатия достаётся то одному, то другому. */}
+                {canRequestReturn ? (
+                  <View style={styles.returnRow}>
+                    {lastReturn ? (
                       <Typography
                         variant="t2"
                         weight="medium"
-                        color="secondary"
-                        isLineThrough
+                        color={
+                          lastReturn.status === "rejected"
+                            ? "error"
+                            : lastReturn.status === "approved"
+                              ? "success"
+                              : "secondary"
+                        }
+                        style={styles.returnStatus}
                       >
-                        {formatMoney(item.product.price, item.product.currency)}
+                        {t(`client.order.returns.status.${lastReturn.status}`)}
                       </Typography>
+                    ) : (
+                      <View style={styles.returnStatus} />
+                    )}
+                    {/* После отказа можно попросить снова — например, с
+                      другой причиной; сервер это допускает. */}
+                    {!hasActiveReturn ? (
+                      <Pressable
+                        onPress={() => returns?.onReturn(item)}
+                        hitSlop={10}
+                        accessibilityRole="button"
+                      >
+                        <Typography variant="t1" weight="semiBold" color="main">
+                          {t("client.order.returns.action")}
+                        </Typography>
+                      </Pressable>
                     ) : null}
-                    <Typography
-                      variant="p3"
-                      weight="medium"
-                      color="secondary"
-                    >
-                      {" • "}
-                      {item.quantity} {t("common.pieces")}
-                    </Typography>
                   </View>
-                </View>
-              </Pressable>
+                ) : null}
+              </View>
             );
           })}
         </View>
@@ -275,13 +348,27 @@ const styles = StyleSheet.create((theme) => ({
     right: 0,
     top: 0,
   },
+  // Рамка между товарами — у блока целиком, чтобы строка возврата
+  // оставалась под своим товаром, а не отделялась от него чертой.
+  itemBlock: {
+    paddingVertical: theme.spacing(4),
+    gap: theme.spacing(2),
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.stroke,
+  },
   row: {
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing(3),
-    paddingVertical: theme.spacing(4),
-    borderTopWidth: 1,
-    borderTopColor: theme.colors.stroke,
+  },
+  returnRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: theme.spacing(3),
+  },
+  returnStatus: {
+    flex: 1,
   },
   firstRow: {
     borderTopWidth: 0,

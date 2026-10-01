@@ -15,6 +15,14 @@ export type ShopAdditionalEditLinkType =
 const EditShopScreen = () => {
   const { t } = useTranslation();
   const warehouseType = useShopStore((s) => s.shop?.warehouse_type);
+  // Шаги — массив в переводах; без проверки на массив отсутствующий ключ
+  // вернул бы строку-ключ, и map упал бы.
+  const rawSteps = warehouseType
+    ? t(`store.editShopAdditional.warehouse.howto.${warehouseType}.steps`, {
+        returnObjects: true,
+      })
+    : [];
+  const howtoSteps: string[] = Array.isArray(rawSteps) ? rawSteps : [];
 
   const steps: { key: ShopAdditionalEditLinkType; title: string }[] = [
     { key: "name", title: t("store.editShopAdditional.baseInfo") },
@@ -53,6 +61,26 @@ const EditShopScreen = () => {
             <Typography weight="medium">
               {t(`store.editShopAdditional.warehouse.${warehouseType}`)}
             </Typography>
+            {/* Одно слово «FBS»/«FBO» ничего не объясняло: тестировщик
+                спрашивал, что от него требуется при каждом типе. Коротко —
+                где товар и какой раздел за что отвечает. */}
+            <View style={styles.howto}>
+              <Typography variant="t1" weight="medium">
+                {t(
+                  `store.editShopAdditional.warehouse.howto.${warehouseType}.title`,
+                )}
+              </Typography>
+              {howtoSteps.map((step) => (
+                <View key={step} style={styles.howtoStep}>
+                  <Typography variant="t1" color="secondary">
+                    •
+                  </Typography>
+                  <Typography variant="t1" style={styles.shrink}>
+                    {step}
+                  </Typography>
+                </View>
+              ))}
+            </View>
             <Typography variant="t1" color="secondary">
               {t("store.editShopAdditional.warehouse.hint")}
             </Typography>
@@ -105,6 +133,15 @@ const styles = StyleSheet.create((theme) => ({
   },
   shrink: {
     flexShrink: 1,
+  },
+  howto: {
+    alignSelf: "stretch",
+    gap: theme.spacing(1),
+    marginTop: theme.spacing(1),
+  },
+  howtoStep: {
+    flexDirection: "row",
+    gap: theme.spacing(2),
   },
   chevron: {
     color: theme.colors.passive2,

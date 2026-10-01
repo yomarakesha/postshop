@@ -4,8 +4,9 @@ import useAppStore from "@/store/useAppStore";
 import useShopStore from "@/store/useShopStore";
 import TabBarIcon from "@/utils/TabBarIcon";
 import { Redirect, Tabs } from "expo-router";
+import { orderApi } from "@/api/orderApi";
 import React, { useEffect } from "react";
-import { StyleSheet, View } from "react-native";
+import { AppState, StyleSheet, View } from "react-native";
 import { useUnistyles } from "react-native-unistyles";
 
 // images & icons
@@ -29,6 +30,12 @@ const ShopTabs = () => {
   const user = useUserStore((s) => s.user);
   const { t } = useTranslation();
   const currentLanguage = useAppStore((s) => s.lang);
+  // Значок «ждут ваших действий» на вкладке «Заказы». Продавец не видел, что
+  // заказ ждёт его, пока сам не откроет список; запрос сам обновляется раз в
+  // минуту (см. useGetAttentionCount).
+  const attentionQuery = orderApi.useGetAttentionCount(activeShopBaseId);
+  const attentionCount = attentionQuery.data?.count ?? 0;
+  const refetchAttention = attentionQuery.refetch;
 
   const TAB_SCREENS = [
     { name: "(home)", title: t("nav.home"), icon: HomeIcon },
@@ -42,6 +49,16 @@ const ShopTabs = () => {
       useAppStore.setState({ mode: "client" });
     }
   }, [activeShopBaseId, user, currentLanguage]);
+
+  // Вернулся в приложение — сверяем сразу. TanStack Query в React Native сам
+  // о возвращении из фона не знает (focusManager слушает окно браузера), а
+  // за время в фоне мог прийти новый заказ.
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") refetchAttention();
+    });
+    return () => subscription.remove();
+  }, [refetchAttention]);
 
   useEffect(() => {
     if (shopAdditionalQuery.data) {
@@ -94,13 +111,28 @@ const ShopTabs = () => {
           },
         }}
       >
-        {TAB_SCREENS.map(({ name, title, icon }) => (
-          <Tabs.Screen
-            key={name}
-            name={name}
-            options={{ title, tabBarIcon: TabBarIcon(icon) }}
-          />
-        ))}
+        {TAB_SCREENS.map(({ name, title, icon }) => {
+          const isOrders = name === "(orders)";
+          return (
+            <Tabs.Screen
+              key={name}
+              name={name}
+              options={{
+                title,
+                tabBarIcon: TabBarIcon(icon),
+                tabBarBadge:
+                  isOrders && attentionCount > 0 ? attentionCount : undefined,
+                // Цвет текста не задаём: theme.colors.white — это фон, в
+                // тёмной теме он тёмный; у значка по умолчанию текст белый.
+                tabBarBadgeStyle: { backgroundColor: theme.colors.failure },
+              }}
+              // Открыл вкладку — значок должен совпадать со списком.
+              listeners={
+                isOrders ? { focus: () => void refetchAttention() } : undefined
+              }
+            />
+          );
+        })}
       </Tabs>
       {isOffline && (
         <View style={StyleSheet.absoluteFill}>{offlineScreen}</View>

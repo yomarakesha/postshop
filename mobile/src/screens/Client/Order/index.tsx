@@ -6,7 +6,7 @@ import Typography from "@/ui/Typography";
 import { orderStatus } from "@/utils/orderStatus";
 import OctagonXIcon from "@assets/icons/octagon-x.svg";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useMemo } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet, useUnistyles } from "react-native-unistyles";
@@ -14,6 +14,9 @@ import ShopItemsAccordion from "./_components/ShopItemsAccordion";
 import PriceSummary from "@/ui/PriceSummary";
 import ErrorAlert from "@/utils/errorAlert";
 import { roundMoney } from "@/utils/formatMoney";
+import { returnApi } from "@/api/returnApi";
+import { TrueSheet } from "@lodev09/react-native-true-sheet";
+import ReturnSheet, { ReturnTarget } from "./_components/ReturnSheet";
 
 const OrderScreen = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -24,14 +27,45 @@ const OrderScreen = () => {
   const { theme } = useUnistyles();
   const updateOrderStatusMutation = orderApi.useUpdateStatus(Number(id));
 
+  // Возврат возможен только по завершённому заказу — до этого товар не
+  // получен. Свои заявки нужны, чтобы у товара с заявкой показать её статус
+  // вместо кнопки «Вернуть».
+  const isCompleted = data?.order_status.code === "completed";
+  const myReturnsQuery = returnApi.useMyReturns(isCompleted);
+  const returnSheetRef = useRef<TrueSheet>(null);
+  const [returnTarget, setReturnTarget] = useState<ReturnTarget | null>(null);
+
+  // Сервер отдаёт заявки от новых к старым — первая найденная по строке
+  // заказа и есть последняя.
+  const returnsByItemId = useMemo(() => {
+    const map = new Map<number, ReturnRequest.Item>();
+    for (const request of myReturnsQuery.data ?? []) {
+      if (!map.has(request.order_item_id)) {
+        map.set(request.order_item_id, request);
+      }
+    }
+    return map;
+  }, [myReturnsQuery.data]);
+
+  const handleReturn = (item: Order.ItemProduct) => {
+    setReturnTarget({
+      orderItemId: item.id,
+      name: item.product.translations[0]?.name ?? "",
+      purchased: Number(item.quantity),
+    });
+    returnSheetRef.current?.present();
+  };
+
   const handleReject = () => {
     useConfirmationModal.setState({
       isOpen: true,
       onConfirm: async () => {
         try {
-          await updateOrderStatusMutation.mutateAsync()
-          router.back()
-        } catch (e) { ErrorAlert(t, e as any) }
+          await updateOrderStatusMutation.mutateAsync();
+          router.back();
+        } catch (e) {
+          ErrorAlert(t, e as any);
+        }
       },
       Icon: OctagonXIcon,
       title: t("confirmCancelOrder.title"),
@@ -83,7 +117,18 @@ const OrderScreen = () => {
   const uiStatus = data.all_shops_rejected
     ? "cancelled"
     : orderStatus.client.map[data.order_status.code];
-  const isPartiallyRejected = data.has_rejected_shops && !data.all_shops_rejected;
+  // Подпись — по способу получения: на последних шагах «Ждёт в пункте
+  // выдачи» и «Передан в доставку» значат для покупателя разное.
+  const statusLabelKey = orderStatus.buyer.getLabelKey(
+    data.all_shops_rejected ? "rejected" : data.order_status.code,
+    data.delivery_method,
+  );
+  // Подсказка нужна, только если вернуть есть что: хотя бы одна часть
+  // заказа не отклонена магазином.
+  const showReturnHint =
+    isCompleted && data.order_shops.some((part) => part.status !== "rejected");
+  const isPartiallyRejected =
+    data.has_rejected_shops && !data.all_shops_rejected;
 
   const Icon = orderStatus.client.getIcon(uiStatus);
 
@@ -129,7 +174,7 @@ const OrderScreen = () => {
               isCentered
               style={styles.statusLabel}
             >
-              {t(orderStatus.client.getLabelKey(uiStatus))}
+              {t(statusLabelKey)}
             </Typography>
             <View style={[styles.statusSide, styles.statusSideRight]}>
               {actions}
@@ -140,6 +185,16 @@ const OrderScreen = () => {
             <Typography variant="t1" weight="medium" color="error" isCentered>
               {t("client.orders.partiallyRejected")}
             </Typography>
+          ) : null}
+
+          {/* Тестировщик не нашёл, как вернуть товар: кнопка у товара
+              незаметна, пока не знаешь, что её искать. */}
+          {showReturnHint ? (
+            <View style={styles.returnHint}>
+              <Typography variant="t1" weight="medium">
+                {t("client.order.returns.hint")}
+              </Typography>
+            </View>
           ) : null}
 
           <View style={styles.separator}>
@@ -156,6 +211,11 @@ const OrderScreen = () => {
                     ?.additional?.name
                 }
                 t={t}
+                returns={
+                  isCompleted
+                    ? { byItemId: returnsByItemId, onReturn: handleReturn }
+                    : undefined
+                }
               />
             ))}
           </View>
@@ -175,6 +235,7 @@ const OrderScreen = () => {
           />
         </View>
       </ScrollView>
+      <ReturnSheet ref={returnSheetRef} target={returnTarget} t={t} />
     </>
   );
 };
@@ -220,6 +281,11 @@ const styles = StyleSheet.create((theme) => ({
   },
   separator: {
     gap: theme.spacing(4),
+  },
+  returnHint: {
+    padding: theme.spacing(3),
+    borderRadius: theme.spacing(3),
+    backgroundColor: theme.colors.blue1,
   },
   divider: {
     height: 1,

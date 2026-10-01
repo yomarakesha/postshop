@@ -7,6 +7,12 @@ import RefreshControl from "@/ui/RefreshControl";
 import Typography from "@/ui/Typography";
 import useAppStore from "@/store/useAppStore";
 import { formatApiDate } from "@/utils/formatDate";
+import Button from "@/ui/Button";
+import { useConfirmationModal } from "@/store/useConfirmationModal";
+import PackageCheckIcon from "@assets/icons/package-check.svg";
+import OctagonXIcon from "@assets/icons/octagon-x.svg";
+import Toast from "react-native-toast-message";
+import ErrorAlert from "@/utils/errorAlert";
 import React, { useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { FlatList, ListRenderItem, View } from "react-native";
@@ -16,9 +22,10 @@ import { StyleSheet } from "react-native-unistyles";
  * Возвраты по товарам магазина — как на витрине (`pages/my-store-returns`).
  *
  * Об оформленном возврате продавцу приходит уведомление, а посмотреть, по
- * какому товару и почему, в приложении было негде. Экран только для чтения:
- * решение по заявке принимает платформа, и кнопок, которые продавцу ничего не
- * дадут, здесь нет.
+ * какому товару и почему, в приложении было негде. Решение по заявке
+ * принимает платформа. Одобрение остаток не меняет — товар ещё в пути;
+ * продавец FBS сам отмечает, что товар вернулся, и решает: снова в продажу
+ * или брак. Возврат FBO получает склад Postshop — у продавца только пояснение.
  */
 const ShopReturnsScreen = () => {
   const { t } = useTranslation();
@@ -26,6 +33,101 @@ const ShopReturnsScreen = () => {
   const lang = useAppStore((s) => s.lang);
   const { data, isLoading, isRefetching, refetch } = returnApi.useShopReturns(
     shopBaseId!,
+  );
+  const { mutateAsync: receive, isPending: isReceiving } = returnApi.useReceive(
+    shopBaseId!,
+  );
+
+  // Подтверждение обязательно: отметку о получении не отменить, а «в
+  // продажу» сразу увеличивает остаток — товар начнут покупать.
+  const confirmReceive = useCallback(
+    (item: ReturnRequest.Item, restock: boolean) => {
+      useConfirmationModal.setState({
+        isOpen: true,
+        type: restock ? "success" : "danger",
+        Icon: restock ? PackageCheckIcon : OctagonXIcon,
+        title: t(
+          restock
+            ? "store.returns.receive.confirmRestockTitle"
+            : "store.returns.receive.confirmDefectiveTitle",
+        ),
+        description: restock
+          ? t("store.returns.receive.confirmRestockDescription", {
+              count: Number(item.quantity),
+            })
+          : t("store.returns.receive.confirmDefectiveDescription"),
+        confirmTitle: t("store.returns.receive.confirm"),
+        cancelTitle: t("common.no"),
+        onConfirm: async () => {
+          try {
+            await receive({ id: item.id, restock });
+            Toast.show({
+              type: "success",
+              text1: t("store.returns.receive.saved"),
+            });
+          } catch (e) {
+            ErrorAlert(t, e as any);
+          }
+        },
+      });
+    },
+    [receive, t],
+  );
+
+  // Что после одобрения: получен ли товар назад и кто его получает.
+  const renderReceive = useCallback(
+    (item: ReturnRequest.Item) => {
+      if (item.received_at) {
+        const date = formatApiDate(item.received_at, lang, {
+          dateStyle: "medium",
+        });
+        return (
+          <View style={styles.receiveBox}>
+            <Typography
+              variant="t1"
+              weight="medium"
+              color={item.restocked ? "success" : "error"}
+            >
+              {t(
+                item.restocked
+                  ? "store.returns.receive.restocked"
+                  : "store.returns.receive.defectiveDone",
+                { date },
+              )}
+            </Typography>
+          </View>
+        );
+      }
+      if (item.warehouse_type === "fbo") {
+        return (
+          <View style={styles.receiveBox}>
+            <Typography variant="t1" color="secondary">
+              {t("store.returns.receive.fbo")}
+            </Typography>
+          </View>
+        );
+      }
+      return (
+        <View style={styles.receiveBox}>
+          <Typography variant="t1" color="secondary">
+            {t("store.returns.receive.awaiting")}
+          </Typography>
+          <Button
+            variant="primary"
+            title={t("store.returns.receive.restock")}
+            disabled={isReceiving}
+            onPress={() => confirmReceive(item, true)}
+          />
+          <Button
+            variant="secondary"
+            title={t("store.returns.receive.defective")}
+            disabled={isReceiving}
+            onPress={() => confirmReceive(item, false)}
+          />
+        </View>
+      );
+    },
+    [t, lang, isReceiving, confirmReceive],
   );
 
   const renderItem: ListRenderItem<ReturnRequest.Item> = useCallback(
@@ -86,10 +188,11 @@ const ShopReturnsScreen = () => {
               {formatApiDate(item.created_at, lang, { dateStyle: "medium" })}
             </Typography>
           )}
+          {item.status === "approved" ? renderReceive(item) : null}
         </View>
       );
     },
-    [t, lang],
+    [t, lang, renderReceive],
   );
 
   return (
@@ -150,6 +253,14 @@ const styles = StyleSheet.create((theme) => ({
   title: {
     flex: 1,
     gap: theme.spacing(0.5),
+  },
+  // Отделяем блок получения от текста заявки: это уже не «что просили»,
+  // а «что сделать сейчас».
+  receiveBox: {
+    gap: theme.spacing(2),
+    paddingTop: theme.spacing(2),
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.stroke,
   },
   status: (status: ReturnRequest.Status) => ({
     paddingVertical: theme.spacing(1),

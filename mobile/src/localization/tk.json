@@ -450,6 +450,23 @@
         "goodsPrice": "Harytlaryň bahasy",
         "discount": "Arzanladyş",
         "grandTotal": "Umumy jemi"
+      },
+      "returns": {
+        "hint": "Haryt gelişmedimi? Onuň ýanyndaky «Gaýtar» düwmesine basyň",
+        "action": "Gaýtar",
+        "sheetTitle": "Harydy gaýtarmak",
+        "quantityLabel": "Näçesini gaýtarmaly (satyn alnan: {{count}})",
+        "reasonLabel": "Sebäbi",
+        "reasonPlaceholder": "Harytda näme nädogry?",
+        "submit": "Arza ugrat",
+        "sent": "Gaýtarmak arzasy ugradyldy",
+        "quantityInvalid": "1-den {{count}}-e çenli mukdar giriziň",
+        "reasonRequired": "Gaýtarmagyň sebäbini ýazyň",
+        "status": {
+          "pending": "Gaýtarmak seredilýär",
+          "approved": "Gaýtarmak tassyklandy",
+          "rejected": "Gaýtarmak kabul edilmedi"
+        }
       }
     },
     "selectLanguage": {
@@ -502,11 +519,12 @@
         "ready_to_take": "Almaga taýýar",
         "ready_to_deliver": "Eltip bermäge taýýar",
         "completed": "Tamamlandy"
-      }
+      },
+      "needsAction": "Siziň hereketiňize garaşýar"
     },
     "order": {
       "noApproved": "Operator sargydy kabul edenden soň, sargyt bilen baglanyşykly hereketler elýeterli bolar.",
-      "readyToPickup": "Almaga taýýar",
+      "readyToPickup": "Ýygnaldy",
       "fboNote": "Sargydy Postshop ammary ýygnaýar — sizden hiç zat talap edilmeýär"
     },
     "add": "Haryt goş",
@@ -555,7 +573,25 @@
       "warehouse": {
         "fbs": "FBS — harydy özüm saklaýaryn",
         "fbo": "FBO — haryt Postshop ammarynda",
-        "hint": "Ammaryň görnüşini Postshop işgärleri üýtgedýär. Üýtgetmek üçin goldaw gullugyna ýüz tutuň."
+        "hint": "Ammaryň görnüşini Postshop işgärleri üýtgedýär. Üýtgetmek üçin goldaw gullugyna ýüz tutuň.",
+        "howto": {
+          "fbs": {
+            "title": "Haryt sizde saklanýar",
+            "steps": [
+              "Haryt geldi — «Haryt kabul etmek»",
+              "Sanadyňyz — «Galyndylar»",
+              "Täze sargyt — kabul ediň we «Ýygnaldy» diýip belläň",
+              "Gaýtarma — «Yzyna gaýtarmalar» bölüminde alnandygyny belläň"
+            ]
+          },
+          "fbo": {
+            "title": "Haryt Postshop ammarynda saklanýar",
+            "steps": [
+              "Harydy ugratmak — «Ammar»",
+              "Sargytlary we gaýtarmalary Postshop ammary işleýär"
+            ]
+          }
+        }
       }
     },
     "myProducts": {
@@ -596,6 +632,10 @@
         "vendorHint": "Hökmany däl. 8, 12, 13 ýa-da 14 san — gaplamadaky ýaly",
         "invalid": "Ştrihkod 8, 12, 13 ýa-da 14 sandan ybarat bolmaly",
         "duplicate": "Şeýle ştrihkodly haryt dükanyňyzda eýýäm bar"
+      },
+      "result": {
+        "moderation": "Üýtgeşmeler moderasiýa ugradyldy",
+        "saved": "Üýtgeşmeler ýatda saklandy"
       }
     },
     "stock": {
@@ -649,6 +689,20 @@
         "pending": "Gaýtarmak seredilýär",
         "approved": "Gaýtarmak tassyklandy",
         "rejected": "Gaýtarmak kabul edilmedi"
+      },
+      "receive": {
+        "fbo": "Gaýtarmany Postshop ammary kabul eder",
+        "awaiting": "Haryt size gaýdyp gelýär — alanyňyzda belläň",
+        "restock": "Alyndy — satuwa gaýtar",
+        "defective": "Alyndy — kemçilikli",
+        "confirmRestockTitle": "Haryt satuwa gaýtarylsynmy?",
+        "confirmRestockDescription": "Haryt bitin: galyndy {{count}} artar we ony ýene satyn alyp bolar.",
+        "confirmDefectiveTitle": "Haryt kemçilikli diýip bellensinmi?",
+        "confirmDefectiveDescription": "Haryt alyndy, ýöne satuwa gaýtarylmaz — galyndy üýtgemez.",
+        "confirm": "Tassykla",
+        "restocked": "{{date}} alyndy — satuwa gaýtaryldy",
+        "defectiveDone": "{{date}} alyndy — kemçilikli",
+        "saved": "Alnandygy bellendi"
       }
     },
     "intake": {
@@ -717,7 +771,7 @@
     "loadMore": "Ýene görkez",
     "kind": {
       "order_cancelled": "Alyjy sargydy ýatyrdy",
-      "order_created": "Dükanyňyzda täze sargyt",
+      "order_created": "Dükanyňyzda täze sargyt — satyjy tertibinde «Sargytlar» bölüminde kabul ediň",
       "order_shop_rejected": "Dükan sargydyň bir böleginden ýüz öwürdi",
       "order_status": "Sargydyň ýagdaýy üýtgedi",
       "product_approved": "Haryt barlagdan geçdi",
@@ -725,7 +779,7 @@
       "product_out_of_stock": "Haryt gutardy — galyndyny dolduryň ýa-da satuwdan aýryň",
       "receipt_confirmed": "Kabul ediliş tassyklandy, haryt galyndyda",
       "return_approved": "Yzyna gaýtarmak tassyklandy",
-      "return_received": "Harydyňyz boýunça gaýtarma tassyklandy",
+      "return_received": "Gaýtarma tassyklandy — haryt size gaýdyp geler; «Yzyna gaýtarmalar» bölüminde alnandygyny belläň",
       "return_rejected": "Yzyna gaýtarmak kabul edilmedi",
       "review_approved": "Synyňyz ýerleşdirildi",
       "review_received": "Harydyňyz barada täze syn",
@@ -733,6 +787,26 @@
       "shop_approved": "Dükan arzasy tassyklandy",
       "shop_blocked": "Dükan platforma tarapyndan ýapyldy",
       "shop_rejected": "Dükan arzasy kabul edilmedi"
+    }
+  },
+  "orderStatus": {
+    "buyer": {
+      "pending": "Tassyklanmagyna garaşýar",
+      "approved": "Kabul edildi",
+      "ready_to_take": "Ýygnaldy",
+      "ready_to_deliver": "Almaga taýýar",
+      "ready_to_deliver_pickup": "Bermek nokadynda garaşýar",
+      "ready_to_deliver_delivery": "Eltip bermäge berildi",
+      "completed": "Tamamlandy",
+      "completed_pickup": "Alyndy",
+      "completed_delivery": "Eltip berildi",
+      "rejected": "Ret edildi"
+    },
+    "seller": {
+      "pending": "Täze — sargydy kabul ediň",
+      "approved": "Kabul edildi — ýygnaň",
+      "ready_to_take": "Ýygnaldy — operatora tabşyryň",
+      "rejected": "Siz ret etdiňiz"
     }
   }
 }

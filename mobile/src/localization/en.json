@@ -450,6 +450,23 @@
         "goodsPrice": "Goods price",
         "discount": "Discount",
         "grandTotal": "Grand total"
+      },
+      "returns": {
+        "hint": "Item didn't suit you? Tap “Return” next to it",
+        "action": "Return",
+        "sheetTitle": "Return an item",
+        "quantityLabel": "How many to return (bought: {{count}})",
+        "reasonLabel": "Reason",
+        "reasonPlaceholder": "What is wrong with the item?",
+        "submit": "Send request",
+        "sent": "Return request sent",
+        "quantityInvalid": "Enter a quantity from 1 to {{count}}",
+        "reasonRequired": "Describe the reason for the return",
+        "status": {
+          "pending": "Return under review",
+          "approved": "Return approved",
+          "rejected": "Return declined"
+        }
       }
     },
     "selectLanguage": {
@@ -503,11 +520,12 @@
         "ready_to_take": "Ready to take",
         "ready_to_deliver": "Ready to deliver",
         "completed": "Completed"
-      }
+      },
+      "needsAction": "Waiting for you"
     },
     "order": {
       "noApproved": "Order actions will be available once an operator accepts the order.",
-      "readyToPickup": "Ready to pickup",
+      "readyToPickup": "Packed",
       "fboNote": "The order is fulfilled by the Postshop warehouse — nothing is required from you"
     },
     "shopAdditional": {
@@ -555,7 +573,25 @@
       "warehouse": {
         "fbs": "FBS — I store the goods myself",
         "fbo": "FBO — goods are at the Postshop warehouse",
-        "hint": "The warehouse type is changed by Postshop staff. Contact support to change it."
+        "hint": "The warehouse type is changed by Postshop staff. Contact support to change it.",
+        "howto": {
+          "fbs": {
+            "title": "The goods are stored by you",
+            "steps": [
+              "Goods arrived — “Goods intake”",
+              "Counted the shelf — “Stock”",
+              "New order — accept it and mark it “Packed”",
+              "Return — mark it received in “Returns”"
+            ]
+          },
+          "fbo": {
+            "title": "The goods are stored at the Postshop warehouse",
+            "steps": [
+              "Sending goods — “Warehouse”",
+              "Orders and returns are handled by the Postshop warehouse"
+            ]
+          }
+        }
       }
     },
     "myProducts": {
@@ -596,6 +632,10 @@
         "vendorHint": "Optional. 8, 12, 13 or 14 digits, as on the package",
         "invalid": "The barcode must be 8, 12, 13 or 14 digits",
         "duplicate": "A product with this barcode already exists in your store"
+      },
+      "result": {
+        "moderation": "Changes sent for moderation",
+        "saved": "Changes saved"
       }
     },
     "stock": {
@@ -649,6 +689,20 @@
         "pending": "Return under review",
         "approved": "Return approved",
         "rejected": "Return declined"
+      },
+      "receive": {
+        "fbo": "The Postshop warehouse will receive this return",
+        "awaiting": "The item is coming back to you — mark it when it arrives",
+        "restock": "Received — back on sale",
+        "defective": "Received — defective",
+        "confirmRestockTitle": "Put the item back on sale?",
+        "confirmRestockDescription": "The item is intact: stock grows by {{count}} and it can be bought again.",
+        "confirmDefectiveTitle": "Mark the item as defective?",
+        "confirmDefectiveDescription": "The item is received but will not go back on sale — stock stays the same.",
+        "confirm": "Confirm",
+        "restocked": "Received {{date}} — back on sale",
+        "defectiveDone": "Received {{date}} — defective",
+        "saved": "Receipt recorded"
       }
     },
     "intake": {
@@ -717,7 +771,7 @@
     "loadMore": "Show more",
     "kind": {
       "order_cancelled": "The customer cancelled an order",
-      "order_created": "New order in your shop",
+      "order_created": "New order in your shop — accept it in seller mode, «Orders»",
       "order_shop_rejected": "A store rejected part of your order",
       "order_status": "Order status changed",
       "product_approved": "Product passed the review",
@@ -725,7 +779,7 @@
       "product_out_of_stock": "The product is out of stock — top it up or take it off sale",
       "receipt_confirmed": "Receipt confirmed, stock updated",
       "return_approved": "Return approved",
-      "return_received": "A return of your product was approved",
+      "return_received": "Return approved — the item is coming back to you; mark it received in “Returns”",
       "return_rejected": "Return declined",
       "review_approved": "Your review is published",
       "review_received": "New review of your product",
@@ -733,6 +787,26 @@
       "shop_approved": "Shop application approved",
       "shop_blocked": "The shop was closed by the platform",
       "shop_rejected": "Shop application rejected"
+    }
+  },
+  "orderStatus": {
+    "buyer": {
+      "pending": "Awaiting confirmation",
+      "approved": "Accepted",
+      "ready_to_take": "Packed",
+      "ready_to_deliver": "Ready for pickup or delivery",
+      "ready_to_deliver_pickup": "Waiting at the pickup point",
+      "ready_to_deliver_delivery": "Out for delivery",
+      "completed": "Completed",
+      "completed_pickup": "Picked up",
+      "completed_delivery": "Delivered",
+      "rejected": "Rejected"
+    },
+    "seller": {
+      "pending": "New — accept the order",
+      "approved": "Accepted — pack it",
+      "ready_to_take": "Packed — hand over to the operator",
+      "rejected": "You rejected it"
     }
   }
 }

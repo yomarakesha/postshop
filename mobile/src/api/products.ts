@@ -116,7 +116,13 @@ const useCreate = () => {
 
 const useUpdate = (productId: number) => {
   const queryClient = useQueryClient();
-  const mutation = useMutation<undefined, AxiosError, Product.API.UpdateBody>({
+  // Ответ — товар после правки: по его status экран понимает, ушёл ли товар
+  // на модерацию.
+  const mutation = useMutation<
+    Product.Item | undefined,
+    AxiosError,
+    Product.API.UpdateBody
+  >({
     mutationKey: ["update-product", productId],
     mutationFn: async (data) => {
       const { body, contentType } = await buildMultipartFromBody(data);

@@ -83,9 +83,15 @@ const OrderScreen = () => {
     (el) => el.shop_base_id === shop?.shop_base_id,
   );
 
-  const Icon = isGlobalRejected
-    ? orderStatus.shop.getIcon("rejected")
-    : orderStatus.shop.getIcon(orderShop?.status);
+  // Крупный статус — см. orderStatus.seller.getView: пока заказ у оператора
+  // и после сборки — общий статус заказа, пока от продавца ждут действий —
+  // статус его части с подсказкой. Раньше здесь всегда была часть, и
+  // завершённый заказ продавец видел как «Готов к выдаче».
+  const statusView = data
+    ? orderStatus.seller.getView(data, orderShop)
+    : undefined;
+  const StatusIcon = statusView?.Icon;
+  const globalCode = data?.order_status.code;
 
   const handleCancel = () => {
     useConfirmationModal.setState({
@@ -110,12 +116,21 @@ const OrderScreen = () => {
   };
 
   const actions = useMemo(() => {
-    if (isGlobalRejected) return null;
+    if (!globalCode || isGlobalRejected) return null;
+    // Пока оператор заказ не принял — продавцу ещё нечего делать. Подсказка
+    // «действия станут доступны…» только на этом шаге: раньше она оставалась
+    // и после того, как оператор завершил заказ.
+    const isWaitingOperator = globalCode === "pending";
+    // Отвечать продавцу можно только пока заказ принят оператором; дальше
+    // его ведёт оператор, и кнопки сервер всё равно не примет.
+    const isSellerStep = globalCode === "approved";
+
     // FBO: товар на складе Postshop, часть собирают сотрудники платформы.
     // Раньше продавец видел «Принять/Отклонить/Готов к выдаче», а сервер
     // отвечал на них 403 — кнопки прячем и объясняем, почему их нет.
     if (orderShop?.warehouse_type === "fbo") {
-      // После выдачи/отказа подсказка уже не нужна — как и кнопки у FBS.
+      // После сборки подсказка уже не нужна — как и кнопки у FBS.
+      if (!isWaitingOperator && !isSellerStep) return null;
       if (orderShop.status !== "pending" && orderShop.status !== "approved") {
         return null;
       }
@@ -125,31 +140,31 @@ const OrderScreen = () => {
         </Typography>
       );
     }
+    if (isWaitingOperator) {
+      return (
+        <Typography color="secondary" isCentered>
+          {t("store.order.noApproved")}
+        </Typography>
+      );
+    }
+    if (!isSellerStep) return null;
     if (orderShop?.status === "pending") {
-      if (data?.order_status.code === "pending") {
-        return (
-          <Typography color="secondary" isCentered>
-            {t("store.order.noApproved")}
-          </Typography>
-        );
-      } else {
-        return (
-          <View style={styles.actionsWrapper}>
-            <Button
-              variant="primary"
-              onPress={handleApprove}
-              title={t("common.approve")}
-              style={styles.actionButton}
-            />
-            <Button
-              variant="error"
-              onPress={handleCancel}
-              title={t("common.reject")}
-              style={styles.actionButton}
-            />
-          </View>
-        );
-      }
+      return (
+        <View style={styles.actionsWrapper}>
+          <Button
+            variant="primary"
+            onPress={handleApprove}
+            title={t("common.approve")}
+            style={styles.actionButton}
+          />
+          <Button
+            variant="error"
+            onPress={handleCancel}
+            title={t("common.reject")}
+            style={styles.actionButton}
+          />
+        </View>
+      );
     }
     if (orderShop?.status === "approved") {
       return (
@@ -160,7 +175,11 @@ const OrderScreen = () => {
         />
       );
     }
-  }, [orderShop]);
+    return null;
+    // Обработчики пересоздаются каждый рендер, но зависят только от
+    // orderShop и мутации — перечисленного достаточно.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderShop, globalCode, isGlobalRejected, t]);
 
   if (isMissing) return null;
   if (isLoading || !data) return <ActivityIndicator isFullScreen />;
@@ -173,24 +192,17 @@ const OrderScreen = () => {
       />
       <ScrollView style={styles.flex1} contentContainerStyle={styles.wrapper}>
         <View style={styles.contentContainer}>
-          {Icon && (
-            <Icon
+          {statusView && StatusIcon && (
+            <StatusIcon
               width={48}
               height={48}
               style={styles.statusIcon(
-                orderStatus.shop.getColor(
-                  isGlobalRejected ? "rejected" : orderShop?.status,
-                  theme,
-                ),
+                orderStatus.seller.getToneColor(statusView.tone, theme),
               )}
             />
           )}
           <Typography variant="p2" weight="semiBold" isCentered>
-            {t(
-              orderStatus.shop.getLabelKey(
-                isGlobalRejected ? "rejected" : orderShop?.status,
-              ),
-            )}
+            {statusView ? t(statusView.labelKey) : ""}
           </Typography>
           {actions}
           <View style={styles.divider} />

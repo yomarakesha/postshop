@@ -1,14 +1,20 @@
-import React, { useMemo } from "react";
+import React from "react";
 import { Pressable, View } from "react-native";
 import { StyleSheet, UnistylesRuntime } from "react-native-unistyles";
 import Typography from "@/ui/Typography";
 import { TFunction } from "i18next";
-import { orderStatus } from "@/utils/orderStatus";
+import { orderStatus, SellerStatusView } from "@/utils/orderStatus";
 import { formatMoney } from "@/utils/formatMoney";
 import type { MoneyValue } from "@/utils/formatMoney";
 
 type Props = {
-  status: Order.ShopOrderStatus;
+  /** Что показать — см. orderStatus.seller.getView. */
+  view: SellerStatusView;
+  /**
+   * Заказ ждёт действий продавца. Помечаем отдельной строкой: среди десятков
+   * завершённых новый заказ терялся, хотя его нужно принять.
+   */
+  needsAction?: boolean;
   id: number;
   date: string;
   price: MoneyValue;
@@ -16,27 +22,13 @@ type Props = {
   t: TFunction;
 };
 
-const Card = ({ status, onPress, id, price, date, t }: Props) => {
+const Card = ({ view, needsAction, onPress, id, price, date, t }: Props) => {
   const theme = UnistylesRuntime.getTheme();
-
-  const textColorMap = useMemo<Record<Order.ShopOrderStatus, string>>(
-    () => ({
-      pending: "warning",
-      ready_to_take: "success",
-      approved: "main",
-      rejected: "error",
-    }),
-    [],
-  );
-
-  const StatusIcon = orderStatus.shop.getIcon(status);
-  const label = orderStatus.shop.getLabelKey(status);
+  const color = orderStatus.seller.getToneColor(view.tone, theme);
+  const StatusIcon = view.Icon;
 
   return (
-    <Pressable
-      style={styles.container(orderStatus.shop.getColor(status, theme))}
-      onPress={() => onPress(id)}
-    >
+    <Pressable style={styles.container(color)} onPress={() => onPress(id)}>
       <View style={styles.row}>
         <Typography weight="medium" numberOfLines={1} style={styles.shrink}>
           {t("order")} #{id}
@@ -51,26 +43,33 @@ const Card = ({ status, onPress, id, price, date, t }: Props) => {
           color="secondary"
           weight="medium"
           numberOfLines={1}
-          style={styles.shrink}
+          style={styles.fixed}
         >
           {date}
         </Typography>
         <View style={styles.statusRow}>
-          <StatusIcon
-            width={20}
-            height={20}
-            style={styles.statusIcon(orderStatus.shop.getColor(status, theme))}
-          />
+          <StatusIcon width={20} height={20} style={styles.statusIcon(color)} />
+          {/* Подписи вида «Собран — передайте оператору» длиннее прежних:
+              сжимается текст, а не дата слева. */}
           <Typography
             variant="t1"
-            color={textColorMap[status] as any}
+            color={view.tone}
             weight="semiBold"
             numberOfLines={1}
+            style={styles.shrink}
           >
-            {t(label)}
+            {t(view.labelKey)}
           </Typography>
         </View>
       </View>
+      {needsAction ? (
+        <View style={styles.noticeRow}>
+          <View style={styles.noticeMarker} />
+          <Typography variant="t1" color="warning" weight="medium">
+            {t("store.orders.needsAction")}
+          </Typography>
+        </View>
+      ) : null}
     </Pressable>
   );
 };
@@ -96,11 +95,26 @@ const styles = StyleSheet.create((theme) => ({
     flexDirection: "row",
     alignItems: "center",
     gap: theme.spacing(1),
+    flexShrink: 1,
   },
   shrink: {
     flexShrink: 1,
   },
+  fixed: {
+    flexShrink: 0,
+  },
   statusIcon: (color: string) => ({
     color,
   }),
+  noticeRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: theme.spacing(2),
+  },
+  noticeMarker: {
+    width: theme.spacing(1),
+    alignSelf: "stretch",
+    borderRadius: theme.spacing(1),
+    backgroundColor: theme.colors.warning,
+  },
 }));

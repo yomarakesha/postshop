@@ -116,6 +116,12 @@ const OrdersScreen = () => {
                       ? "cancelled"
                       : orderStatus.client.map[el.order_status.code]
                   }
+                  // Все магазины отказались — для покупателя заказ отклонён,
+                  // даже если общий статус ещё не сменился.
+                  labelKey={orderStatus.buyer.getLabelKey(
+                    el.all_shops_rejected ? "rejected" : el.order_status.code,
+                    el.delivery_method,
+                  )}
                   partiallyRejected={
                     el.has_rejected_shops && !el.all_shops_rejected
                   }

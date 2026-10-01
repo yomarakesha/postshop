@@ -450,6 +450,23 @@
         "goodsPrice": "Ürün fiyatı",
         "discount": "İndirim",
         "grandTotal": "Genel toplam"
+      },
+      "returns": {
+        "hint": "Ürün uymadı mı? Yanındaki «İade et» düğmesine dokunun",
+        "action": "İade et",
+        "sheetTitle": "Ürün iadesi",
+        "quantityLabel": "Kaç adet iade edilecek (alınan: {{count}})",
+        "reasonLabel": "Neden",
+        "reasonPlaceholder": "Üründe sorun ne?",
+        "submit": "Talep gönder",
+        "sent": "İade talebi gönderildi",
+        "quantityInvalid": "1 ile {{count}} arasında bir miktar girin",
+        "reasonRequired": "İade nedenini açıklayın",
+        "status": {
+          "pending": "İade inceleniyor",
+          "approved": "İade onaylandı",
+          "rejected": "İade reddedildi"
+        }
       }
     },
     "selectLanguage": {
@@ -503,11 +520,12 @@
         "ready_to_take": "Teslim almaya hazır",
         "ready_to_deliver": "Teslimata hazır",
         "completed": "Tamamlandı"
-      }
+      },
+      "needsAction": "İşleminizi bekliyor"
     },
     "order": {
       "noApproved": "Sipariş işlemleri, bir operatör siparişi kabul ettikten sonra kullanılabilir olacaktır.",
-      "readyToPickup": "Teslim almaya hazır",
+      "readyToPickup": "Hazırlandı",
       "fboNote": "Sipariş Postshop deposu tarafından hazırlanıyor — sizden bir şey yapmanız gerekmiyor"
     },
     "shopAdditional": {
@@ -555,7 +573,25 @@
       "warehouse": {
         "fbs": "FBS — ürünleri kendim saklıyorum",
         "fbo": "FBO — ürünler Postshop deposunda",
-        "hint": "Depo türünü Postshop çalışanları değiştirir. Değiştirmek için destek ekibine başvurun."
+        "hint": "Depo türünü Postshop çalışanları değiştirir. Değiştirmek için destek ekibine başvurun.",
+        "howto": {
+          "fbs": {
+            "title": "Ürünler sizde saklanır",
+            "steps": [
+              "Ürün geldi — «Ürün kabulü»",
+              "Sayım yaptınız — «Stok»",
+              "Yeni sipariş — kabul edin ve «Hazırlandı» olarak işaretleyin",
+              "İade — teslim almayı «İadeler»de işaretleyin"
+            ]
+          },
+          "fbo": {
+            "title": "Ürünler Postshop deposunda saklanır",
+            "steps": [
+              "Ürün gönderimi — «Depo»",
+              "Siparişleri ve iadeleri Postshop deposu yürütür"
+            ]
+          }
+        }
       }
     },
     "myProducts": {
@@ -596,6 +632,10 @@
         "vendorHint": "İsteğe bağlı. Ambalajdaki gibi 8, 12, 13 veya 14 hane",
         "invalid": "Barkod 8, 12, 13 veya 14 haneden oluşmalıdır",
         "duplicate": "Mağazanızda bu barkoda sahip bir ürün zaten var"
+      },
+      "result": {
+        "moderation": "Değişiklikler moderasyona gönderildi",
+        "saved": "Değişiklikler kaydedildi"
       }
     },
     "stock": {
@@ -649,6 +689,20 @@
         "pending": "İade inceleniyor",
         "approved": "İade onaylandı",
         "rejected": "İade reddedildi"
+      },
+      "receive": {
+        "fbo": "Bu iadeyi Postshop deposu teslim alacak",
+        "awaiting": "Ürün size geri dönüyor — ulaştığında işaretleyin",
+        "restock": "Alındı — satışa geri koy",
+        "defective": "Alındı — kusurlu",
+        "confirmRestockTitle": "Ürün satışa geri konsun mu?",
+        "confirmRestockDescription": "Ürün sağlam: stok {{count}} artar ve yeniden satın alınabilir.",
+        "confirmDefectiveTitle": "Ürün kusurlu olarak işaretlensin mi?",
+        "confirmDefectiveDescription": "Ürün alındı ancak satışa dönmeyecek — stok değişmez.",
+        "confirm": "Onayla",
+        "restocked": "{{date}} alındı — satışa geri kondu",
+        "defectiveDone": "{{date}} alındı — kusurlu",
+        "saved": "Teslim alma kaydedildi"
       }
     },
     "intake": {
@@ -717,7 +771,7 @@
     "loadMore": "Daha fazla göster",
     "kind": {
       "order_cancelled": "Müşteri siparişi iptal etti",
-      "order_created": "Mağazanızda yeni sipariş",
+      "order_created": "Mağazanızda yeni sipariş — satıcı modunda «Siparişler»den kabul edin",
       "order_shop_rejected": "Bir mağaza siparişinizin bir kısmını reddetti",
       "order_status": "Sipariş durumu değişti",
       "product_approved": "Ürün kontrolü geçti",
@@ -725,7 +779,7 @@
       "product_out_of_stock": "Ürün tükendi — stoğu doldurun ya da satıştan kaldırın",
       "receipt_confirmed": "Kabul onaylandı, stok güncellendi",
       "return_approved": "İade onaylandı",
-      "return_received": "Ürününüz için iade onaylandı",
+      "return_received": "İade onaylandı — ürün size geri dönecek; teslim almayı «İadeler»de işaretleyin",
       "return_rejected": "İade reddedildi",
       "review_approved": "Yorumunuz yayınlandı",
       "review_received": "Ürününüze yeni yorum",
@@ -733,6 +787,26 @@
       "shop_approved": "Mağaza başvurusu onaylandı",
       "shop_blocked": "Mağaza platform tarafından kapatıldı",
       "shop_rejected": "Mağaza başvurusu reddedildi"
+    }
+  },
+  "orderStatus": {
+    "buyer": {
+      "pending": "Onay bekliyor",
+      "approved": "Kabul edildi",
+      "ready_to_take": "Hazırlandı",
+      "ready_to_deliver": "Teslim almaya hazır",
+      "ready_to_deliver_pickup": "Teslim noktasında bekliyor",
+      "ready_to_deliver_delivery": "Kargoya verildi",
+      "completed": "Tamamlandı",
+      "completed_pickup": "Teslim alındı",
+      "completed_delivery": "Teslim edildi",
+      "rejected": "Reddedildi"
+    },
+    "seller": {
+      "pending": "Yeni — siparişi kabul edin",
+      "approved": "Kabul edildi — hazırlayın",
+      "ready_to_take": "Hazırlandı — operatöre teslim edin",
+      "rejected": "Reddettiniz"
     }
   }
 }

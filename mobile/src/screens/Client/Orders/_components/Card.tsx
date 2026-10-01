@@ -9,7 +9,13 @@ import { CurrencySource, formatMoney } from "@/utils/formatMoney";
 type TypographyColor = React.ComponentProps<typeof Typography>["color"];
 
 type Props = {
+  /** Укрупнённый статус — от него только цвет рамки и иконка. */
   status: Order.UIStatus;
+  /**
+   * Ключ подписи статуса. Подпись точнее цвета: «Ждёт в пункте выдачи» и
+   * «Передан в доставку» — оба «в работе», но покупателю нужно разное.
+   */
+  labelKey: string;
   id: number;
   date: string;
   price: number;
@@ -33,6 +39,7 @@ const statusTextColor: Record<Order.UIStatus, TypographyColor> = {
 
 const Card = ({
   status,
+  labelKey,
   onPress,
   id,
   price,
@@ -42,7 +49,6 @@ const Card = ({
   currency,
 }: Props) => {
   const StatusIcon = orderStatus.client.getIcon(status);
-  const label = orderStatus.client.getLabelKey(status);
 
   return (
     <Pressable
@@ -80,7 +86,7 @@ const Card = ({
             numberOfLines={1}
             style={styles.flexible}
           >
-            {t(label)}
+            {t(labelKey)}
           </Typography>
         </View>
       </View>

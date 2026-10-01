@@ -15,6 +15,7 @@ import { Image } from "expo-image";
 import useShopStore from "@/store/useShopStore";
 import Card from "./_components/Card";
 import ActivityIndicator from "@/ui/ActivityIndicator";
+import { orderStatus } from "@/utils/orderStatus";
 
 type OrderMonthGroup = {
   key: string;
@@ -60,8 +61,13 @@ const OrdersScreen = () => {
 
   const groupedByMonth = groupByMonth(orders);
 
+  // Вместе со списком — и значок на вкладке: потянул список вниз, значит
+  // хочешь видеть актуальное везде.
+  const attentionQuery = orderApi.useGetAttentionCount(shop?.shop_base_id);
+
   const onRefresh = () => {
     ordersQuery.refetch();
+    attentionQuery.refetch();
   };
 
   const handleClickOrder = (id: number) => {
@@ -103,11 +109,8 @@ const OrdersScreen = () => {
                     id={el.id}
                     onPress={handleClickOrder}
                     date={formatApiDateTimeNumeric(el.created_at)}
-                    status={
-                      el.order_status.code === "rejected"
-                        ? "rejected"
-                        : (orderShop.status ?? "pending")
-                    }
+                    view={orderStatus.seller.getView(el, orderShop)}
+                    needsAction={orderStatus.seller.needsAction(el, orderShop)}
                     price={orderShop.subtotal}
                     t={t}
                   />

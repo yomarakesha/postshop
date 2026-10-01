@@ -10,6 +10,13 @@ declare namespace Order {
   type ShopOrderStatus = "pending" | "approved" | "rejected" | "ready_to_take";
   type UIStatus = "pending" | "in_progress" | "cancelled" | "done";
 
+  /**
+   * Как заказ попадёт к покупателю. Сервер выводит его сам (есть пункт
+   * выдачи — самовывоз), чтобы подписи «Ждёт в пункте выдачи» / «Передан в
+   * доставку» везде совпадали с витриной.
+   */
+  type DeliveryMethod = "pickup" | "delivery";
+
   type PaymentType = "cash" | "card" | "cash_and_card";
 
   type Translation = {
@@ -65,6 +72,8 @@ declare namespace Order {
      */
     delivery_price: string | null;
     pickup_point: PickupPoint.Item | null;
+    /** Может не прийти от старого сервера — тогда подписи нейтральные. */
+    delivery_method?: DeliveryMethod;
     comment: string | null;
     items: Order.ItemProduct[];
     shops: (ShopBase.Item & {
