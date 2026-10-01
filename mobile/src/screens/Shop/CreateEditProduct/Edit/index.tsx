@@ -295,9 +295,11 @@ const EditProductScreen = () => {
           type: img.mimeType ?? "image/jpeg",
         })),
         currency_id: selectedCurrency?.id ? selectedCurrency.id : undefined,
-        // Всегда шлём строку: "" стирает штрихкод. null/undefined сериализатор
-        // multipart выбрасывает, и очистить поле было бы нельзя.
-        vendor_barcode: normalizeVendorBarcode(data.vendor_barcode),
+        // Пустое поле формы сервер считает непереданным, поэтому стёртый
+        // штрихкод снимается отдельным флагом.
+        ...(normalizeVendorBarcode(data.vendor_barcode)
+          ? { vendor_barcode: normalizeVendorBarcode(data.vendor_barcode) }
+          : { remove_vendor_barcode: true }),
       });
 
       for (const img of images) {

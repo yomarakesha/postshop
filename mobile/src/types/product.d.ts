@@ -99,9 +99,10 @@ declare namespace Product {
       // преобразования — форма редактирования именно так и делает.
       discount?: number | string | null;
       hashtag?: string | null;
-      // Пустая строка стирает штрихкод на сервере. null/undefined сериализатор
-      // multipart выбрасывает, и поле тогда просто не меняется.
+      // Не передан — штрихкод не меняется; стереть его — remove_vendor_barcode:
+      // пустое поле формы сервер считает непереданным.
       vendor_barcode?: string | null;
+      remove_vendor_barcode?: boolean;
     };
 
     type GetMyVars = Product.Filters & {

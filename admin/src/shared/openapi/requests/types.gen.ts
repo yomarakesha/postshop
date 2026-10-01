@@ -280,9 +280,15 @@ export type BodyUpdateProductProductsProductIdPut = {
     /**
      * Vendor Barcode
      *
-     * Заводской штрихкод; пустая строка — убрать
+     * Заводской штрихкод (8, 12, 13 или 14 цифр)
      */
     vendor_barcode?: string | null;
+    /**
+     * Remove Vendor Barcode
+     *
+     * Убрать заводской штрихкод
+     */
+    remove_vendor_barcode?: boolean;
     /**
      * Price
      */

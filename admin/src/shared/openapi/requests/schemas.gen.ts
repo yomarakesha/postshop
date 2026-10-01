@@ -536,7 +536,13 @@ export const Body_update_product_products__product_id__putSchema = {
                 }
             ],
             title: 'Vendor Barcode',
-            description: 'Заводской штрихкод; пустая строка — убрать'
+            description: 'Заводской штрихкод (8, 12, 13 или 14 цифр)'
+        },
+        remove_vendor_barcode: {
+            type: 'boolean',
+            title: 'Remove Vendor Barcode',
+            description: 'Убрать заводской штрихкод',
+            default: false
         },
         price: {
             anyOf: [
