@@ -25,8 +25,8 @@ export function ProductModerationDetailPage() {
   const navigate = useNavigate()
 
   const { data, isLoading } = useProductQuery(productId)
-  const approve = useApproveMutation(productId)
-  const decline = useDeclineMutation(productId)
+  const approve = useApproveMutation()
+  const decline = useDeclineMutation()
 
   if (isLoading) {
     return (
@@ -62,7 +62,7 @@ export function ProductModerationDetailPage() {
             <Button
               type="button"
               variant="destructive"
-              onClick={() => decline.mutate()}
+              onClick={() => decline.mutate(productId)}
               isLoading={decline.isPending}
               disabled={isBusy}
             >
@@ -71,7 +71,7 @@ export function ProductModerationDetailPage() {
             </Button>
             <Button
               type="button"
-              onClick={() => approve.mutate()}
+              onClick={() => approve.mutate(productId)}
               isLoading={approve.isPending}
               disabled={isBusy}
             >
@@ -111,7 +111,7 @@ export function ProductModerationDetailPage() {
 
         <div className="space-y-1.5">
           <Label>{t('moderation.shopId')}</Label>
-          <p className="text-sm tabular-nums">{product.shop_base_id}</p>
+          <p className="text-sm">{product.shop_name ?? `#${product.shop_base_id}`}</p>
         </div>
 
         <div className="space-y-1.5">
@@ -142,6 +142,23 @@ export function ProductModerationDetailPage() {
           <div className="space-y-1.5">
             <Label>{t('moderation.hashtag')}</Label>
             <p className="text-sm">{product.hashtag}</p>
+          </div>
+        )}
+
+        {/* Штрихкодов на карточке не было, и сверить заводской код продавца
+          с упаковкой на фото модератор не мог. Штрихкод Postshop выдаётся
+          платформой всегда, заводской — только если продавец его указал. */}
+        {product.barcode && (
+          <div className="space-y-1.5">
+            <Label>{t('moderation.barcode')}</Label>
+            <p className="font-mono text-sm tabular-nums">{product.barcode}</p>
+          </div>
+        )}
+
+        {product.vendor_barcode && (
+          <div className="space-y-1.5">
+            <Label>{t('moderation.vendorBarcode')}</Label>
+            <p className="font-mono text-sm tabular-nums">{product.vendor_barcode}</p>
           </div>
         )}
 

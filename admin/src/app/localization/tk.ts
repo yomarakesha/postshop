@@ -315,7 +315,14 @@ export const tk = {
     longitude: 'Uzynlyk',
     longitudePlaceholder: 'Uzynlygy giriziň',
     location: 'Kartada ýerleşişi',
-    locationRequired: 'Kartada ýerleşişi belläň',
+    latitudeRequired: 'Giňişligi görkeziň — san bilen ýa-da kartada basyp',
+    longitudeRequired: 'Uzynlygy görkeziň — san bilen ýa-da kartada basyp',
+    latitudeInvalid: 'Giňişlik −90-dan 90-a çenli san bolmaly',
+    longitudeInvalid: 'Uzynlyk −180-den 180-e çenli san bolmaly',
+    latitudeHint: '−90-dan 90-a çenli, meselem 37.960100',
+    longitudeHint: '−180-den 180-e çenli, meselem 58.326100',
+    mapUnavailable:
+      'Karta elýeterli däl: karta serweri sazlanmadyk (VITE_MAP_TILES_URL). Giňişligi we uzynlygy ýokardaky meýdanlara giriziň.',
   },
   stores: {
     searchPlaceholder: 'Dükanlary gözlemek...',
@@ -330,15 +337,28 @@ export const tk = {
     changeWarehouseType: 'Üýtgetmek',
     changeWarehouseTypeTitle: 'Dükany {{type}}-e geçirmelimi?',
     toFbsText:
-      'Dükan harytlaryny özi saklar we galyndylary özi alyp barar. Platformanyň ammaryndaky galyndy sargytlarda hasaba alynmaz — harydy ammardan alyň. Eýýäm resmileşdirilen sargytlar öňki görnüşde tamamlanar.',
+      'Dükan harytlaryny özi saklar we galyndylary özi alyp barar. Görnüşi diňe dükanda galyndy (öz ýa-da platformanyň ammarynda), açyk sargyt we kabul edişiň garalamasy ýok wagtynda üýtgedip bolýar: ilki harydy ammardan alyň we sargytlaryň tamamlanmagyna garaşyň.',
     toFboText:
-      'Dükanyň harytlary platformanyň ammarlarynda saklanar. Dükanyň özi alyp baran galyndylary hasaba alynmaz: kabul ediş tassyklanýança harytlaryny satyn alyp bolmaz. Eýýäm resmileşdirilen sargytlar öňki görnüşde tamamlanar.',
+      'Dükanyň harytlary platformanyň ammarlarynda saklanar we olary diňe kabul ediş tassyklanandan soň satyn alyp bolar. Görnüşi diňe dükanda galyndy, açyk sargyt we kabul edişiň garalamasy ýok wagtynda üýtgedip bolýar: ilki dükanyň özi alyp baran galyndylaryny nollaň we sargytlaryň tamamlanmagyna garaşyň.',
     fboDisabledHint: 'Platformanyň ammary öçürildi — FBO-e geçirip bolmaýar',
     warehouseTypeChanged: 'Ammar görnüşi üýtgedildi',
+    warehouseTypeBlocked:
+      'Ammar görnüşini häzir üýtgedip bolmaýar: dükanda galyndy, açyk sargyt we kabul edişiň garalamasy bolmaly däl',
+    warehouseTypeBlockers: {
+      openOrders: 'açyk sargytlar: {{count}}',
+      draftReceipts: 'kabul edişiň garalamalary: {{count}}',
+      fbsStock: 'dükanda galyndysy bar harytlar (FBS): {{count}}',
+      fboStock: 'platformanyň ammaryndaky harytlar (FBO): {{count}}',
+    },
   },
   warehouseType: {
     fbs: 'FBS',
     fbo: 'FBO',
+    none: 'Saýlanmadyk',
+    fulfilment: {
+      fbs: 'FBS — satyjy ýygnaýar',
+      fbo: 'FBO — Postshop ammary ýygnaýar',
+    },
   },
   documentKind: {
     individual_registration: 'Şahsy telekeçini hasaba alyş şahadatnamasy',
@@ -406,6 +426,12 @@ export const tk = {
     grandTotal: 'Tölemeli',
     shopsTitle: 'Dükanlar',
     notAllShopsReady: 'Ähli dükanlar almaga taýyn däl',
+    fboPartWaitsApproval:
+      'Bu bölegiň ýagdaýyny Postshop ammary alyp barýar — sargyt kabul edilenden soň',
+    rejectPartTitle: '«{{shop}}» dükanynyň sargyt bölegini ret etmelimi?',
+    rejectPartText:
+      'Bu dükanyň harytlary berilmez, alyja ret edilendigi barada habar gider. Beýleki dükanlar öz böleklerini ýygnamagy dowam eder.',
+    rejectPartCommentPlaceholder: 'Ret etmegiň sebäbi (hökman däl)',
     paymentType: 'Töleg görnüşi',
     pickupPoint: 'Eltip berme nokady',
     deliveryAddress: 'Eltip beriş salgysy',
@@ -446,6 +472,10 @@ export const tk = {
     measureUnit: 'Ölçeg birligi',
     brand: 'Brend',
     hashtag: 'Heşteg',
+    barcode: 'Postshop ştrihkody',
+    vendorBarcode: 'Öndürijiniň ştrihkody',
+    alreadyApproved: 'Haryt eýýäm tassyklanan — belki, başga moderator tarapyndan',
+    alreadyDeclined: 'Haryt eýýäm ret edilen — belki, başga moderator tarapyndan',
     moderationComment: 'Moderatoryň teswiri',
     updatedAt: 'Täzelenen senesi',
     images: 'Suratlar',

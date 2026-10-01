@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { useShopAdditionalQuery } from '../model/useShopAdditionalQuery'
 import { useShopBaseQuery } from '../model/useShopBaseQuery'
 import { useUpdateRegistrationStatusMutation } from '../model/useUpdateRegistrationStatusMutation'
 import { formatDate } from '@/shared/lib/formatDate'
@@ -14,6 +15,7 @@ import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
 import { Label } from '@/shared/ui/label'
 import { Textarea } from '@/shared/ui/textarea'
 import { ShopDocuments } from '@/widgets/ShopDocuments'
+import { WarehouseTypeBadge } from '@/widgets/WarehouseTypeBadge'
 
 const statusVariant = {
   [RegistrationStatus.PENDING]: 'warning',
@@ -29,6 +31,7 @@ export function BecomeStoreRequestDetailPage() {
   const navigate = useNavigate()
 
   const { data, isLoading } = useShopBaseQuery(shopId)
+  const { data: additional } = useShopAdditionalQuery(shopId)
   const updateStatus = useUpdateRegistrationStatusMutation(shopId)
   // Хук объявлен здесь, а не ниже: после условных возвратов порядок хуков
   // менялся бы между отрисовками.
@@ -118,6 +121,13 @@ export function BecomeStoreRequestDetailPage() {
             <Badge variant={statusVariant[shop.registration_status]}>
               {t(`registrationStatus.${shop.registration_status}`)}
             </Badge>
+          </div>
+        </div>
+
+        <div className="space-y-1.5">
+          <Label>{t('stores.warehouseType')}</Label>
+          <div>
+            <WarehouseTypeBadge type={additional?.warehouse_type} />
           </div>
         </div>
 

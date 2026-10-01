@@ -1,3 +1,4 @@
+import { useMutationState } from '@tanstack/react-query'
 import { Check, Loader2, X } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -7,6 +8,8 @@ import { useApproveMutation } from '../model/useApproveMutation'
 import { useDeclineMutation } from '../model/useDeclineMutation'
 import { useModerationQueueQuery } from '../model/useModerationQueueQuery'
 import { formatDate } from '@/shared/lib/formatDate'
+import { productModerationKeys } from '@/shared/lib/productModeration'
+import type { ModerationDecision } from '@/shared/lib/productModeration'
 import { ProductStatus } from '@/shared/openapi/requests'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
@@ -26,6 +29,21 @@ export function ProductModerationPage() {
   const approve = useApproveMutation()
   const decline = useDeclineMutation()
   const [declineId, setDeclineId] = useState<number | null>(null)
+
+  // Занятость строки считалась по approve.variables — это только последний
+  // вызов: одобрив товар А и сразу товар Б, модератор снова получал активные
+  // кнопки у А, пока тот ещё не записан. Здесь — все идущие решения разом.
+  // Мутация остаётся pending и на время перезапроса очереди (onSettled
+  // возвращает промис), так что кнопки не оживают раньше нового статуса.
+  const busy = useMutationState({
+    filters: { mutationKey: productModerationKeys.decideAll, status: 'pending' },
+    select: (mutation) => ({
+      productId: mutation.state.variables as number,
+      decision: mutation.options.mutationKey?.[2] as ModerationDecision,
+    }),
+  })
+  const busyWith = (productId: number, decision: ModerationDecision) =>
+    busy.some((entry) => entry.productId === productId && entry.decision === decision)
 
   const products = data?.data ?? []
 
@@ -58,9 +76,9 @@ export function ProductModerationPage() {
                   product.translations[0]?.name ??
                   '—'
                 const isPending = product.status === ProductStatus.PENDING
-                const isBusy =
-                  (approve.isPending && approve.variables === product.id) ||
-                  (decline.isPending && decline.variables === product.id)
+                const isApproving = busyWith(product.id, 'approved')
+                const isDeclining = busyWith(product.id, 'declined')
+                const isBusy = isApproving || isDeclining
 
                 return (
                   <TableRow
@@ -70,8 +88,10 @@ export function ProductModerationPage() {
                   >
                     <TableCell className="tabular-nums">{product.id}</TableCell>
                     <TableCell className="font-medium">{name}</TableCell>
-                    <TableCell className="text-muted-foreground tabular-nums">
-                      {product.shop_base_id}
+                    {/* Показывался голый shop_base_id: модератор видел «12» и
+                      не понимал, чей это товар. */}
+                    <TableCell className="text-muted-foreground">
+                      {product.shop_name ?? `#${product.shop_base_id}`}
                     </TableCell>
                     <TableCell className="tabular-nums">{product.price}</TableCell>
                     <TableCell>
@@ -94,7 +114,7 @@ export function ProductModerationPage() {
                             size="sm"
                             variant="destructive"
                             onClick={() => setDeclineId(product.id)}
-                            isLoading={isBusy && decline.isPending}
+                            isLoading={isDeclining}
                             disabled={isBusy}
                           >
                             <X className="size-3.5" />
@@ -103,7 +123,7 @@ export function ProductModerationPage() {
                           <Button
                             size="sm"
                             onClick={() => approve.mutate(product.id)}
-                            isLoading={isBusy && approve.isPending}
+                            isLoading={isApproving}
                             disabled={isBusy}
                           >
                             <Check className="size-3.5" />

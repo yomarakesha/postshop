@@ -7,15 +7,27 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import { useOrderQuery } from '../model/useOrderQuery'
 import { useUpdateOrderStatusMutation } from '../model/useUpdateOrderStatusMutation'
+import { useUpdateShopPartStatusMutation } from '../model/useUpdateShopPartStatusMutation'
+import { PERMISSION_KEYS } from '@/shared/constants/PermissionKeys'
+import { useHasPermission } from '@/shared/hooks/useHasPermission'
 import { buildFileUrl } from '@/shared/lib/buildFileUrl'
 import { formatDate } from '@/shared/lib/formatDate'
 import { getTranslationName } from '@/shared/lib/getTranslationName'
-import { OrderStatusCode, PaymentType, getUserUsersUserIdGet } from '@/shared/openapi/requests'
+import {
+  LocalOrderStatusCode,
+  OrderStatusCode,
+  PaymentType,
+  WarehouseType,
+  getUserUsersUserIdGet,
+} from '@/shared/openapi/requests'
+import type { OrderShopResponse } from '@/shared/openapi/requests'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
+import { Textarea } from '@/shared/ui/textarea'
+import { WarehouseTypeBadge } from '@/widgets/WarehouseTypeBadge'
 
 const statusBadgeVariant: Record<
   OrderStatusCode,
@@ -27,6 +39,19 @@ const statusBadgeVariant: Record<
   [OrderStatusCode.READY_TO_TAKE]: 'info',
   [OrderStatusCode.READY_TO_DELIVER]: 'info',
   [OrderStatusCode.COMPLETED]: 'success',
+}
+
+/**
+ * Куда можно перевести часть заказа из её текущего статуса — те же правила,
+ * что на сервере: pending → approved/rejected, approved → ready_to_take/rejected.
+ * Кнопки недопустимых переходов не показываются, а не отвечают 400.
+ */
+const PART_TRANSITIONS: Partial<Record<LocalOrderStatusCode, LocalOrderStatusCode[]>> = {
+  [LocalOrderStatusCode.PENDING]: [LocalOrderStatusCode.APPROVED, LocalOrderStatusCode.REJECTED],
+  [LocalOrderStatusCode.APPROVED]: [
+    LocalOrderStatusCode.READY_TO_TAKE,
+    LocalOrderStatusCode.REJECTED,
+  ],
 }
 
 const paymentTypeKey: Record<string, string> = {
@@ -43,7 +68,11 @@ export function OrderDetailPage() {
 
   const { data: orderData, isLoading } = useOrderQuery(orderId)
   const updateStatus = useUpdateOrderStatusMutation(orderId)
+  const updatePartStatus = useUpdateShopPartStatusMutation(orderId)
+  const { hasPermission } = useHasPermission()
   const [askReject, setAskReject] = useState(false)
+  const [rejectPart, setRejectPart] = useState<OrderShopResponse | null>(null)
+  const [rejectPartComment, setRejectPartComment] = useState('')
 
   const order = orderData?.data
   const userId = order?.user_id
@@ -75,6 +104,19 @@ export function OrderDetailPage() {
   const handleStatusUpdate = (status: OrderStatusCode, deliveryPrice?: string | null) => {
     updateStatus.mutate({ statusCode: status, deliveryPrice })
   }
+
+  // Часть FBO собирает склад Postshop, и её статус ведёт сотрудник; часть FBS
+  // — продавец, здесь она только для просмотра. Сервер принимает смену
+  // статуса части лишь пока весь заказ «Одобрен».
+  const canFulfilParts =
+    statusCode === OrderStatusCode.APPROVED &&
+    hasPermission(PERMISSION_KEYS.ORDERS.updateShopStatus)
+  const partActions = (orderShop: OrderShopResponse) =>
+    orderShop.warehouse_type === WarehouseType.FBO && canFulfilParts
+      ? (PART_TRANSITIONS[orderShop.status] ?? [])
+      : []
+  const isPartBusy = (orderShop: OrderShopResponse) =>
+    updatePartStatus.isPending && updatePartStatus.variables?.shopId === orderShop.shop_base_id
 
   return (
     <>
@@ -285,26 +327,98 @@ export function OrderDetailPage() {
               <p className="text-sm font-semibold">{t('orders.shopsTitle')}</p>
             </div>
             <div className="divide-y">
-              {order.order_shops.map((orderShop) => (
-                <div key={orderShop.id} className="flex items-center justify-between gap-3 py-3">
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium truncate">
-                      {orderShop.shop.additional?.name ?? `#${orderShop.shop_base_id}`}
-                    </p>
-                    <p className="text-xs text-muted-foreground tabular-nums mt-0.5">
-                      {orderShop.items.length} {t('orders.items')}
-                    </p>
+              {order.order_shops.map((orderShop) => {
+                const actions = partActions(orderShop)
+                const busy = isPartBusy(orderShop)
+                return (
+                  <div key={orderShop.id} className="space-y-2 py-3">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="min-w-0 space-y-1">
+                        <p className="text-sm font-medium truncate">
+                          {orderShop.shop.additional?.name ?? `#${orderShop.shop_base_id}`}
+                        </p>
+                        <div className="flex flex-wrap items-center gap-2">
+                          {/* Кто собирает часть, видно не было: сотрудник не
+                            знал, ждать продавца или собирать самому. */}
+                          <WarehouseTypeBadge type={orderShop.warehouse_type} fulfilment />
+                          <span className="text-xs text-muted-foreground tabular-nums">
+                            {orderShop.items.length} {t('orders.items')}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <Badge variant={statusBadgeVariant[orderShop.status]}>
+                          {t(`orders.statusLabel.${orderShop.status}`)}
+                        </Badge>
+                        <p className="text-sm font-semibold tabular-nums w-20 text-right">
+                          {parseFloat(orderShop.subtotal).toFixed(2)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {orderShop.comment && (
+                      <p className="text-xs text-muted-foreground whitespace-pre-line">
+                        {t('orders.comment')}: {orderShop.comment}
+                      </p>
+                    )}
+
+                    {actions.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {actions.includes(LocalOrderStatusCode.APPROVED) && (
+                          <Button
+                            size="sm"
+                            onClick={() =>
+                              updatePartStatus.mutate({
+                                shopId: orderShop.shop_base_id,
+                                statusCode: LocalOrderStatusCode.APPROVED,
+                              })
+                            }
+                            isLoading={busy}
+                            disabled={updatePartStatus.isPending}
+                          >
+                            {t('orders.approve')}
+                          </Button>
+                        )}
+                        {actions.includes(LocalOrderStatusCode.READY_TO_TAKE) && (
+                          <Button
+                            size="sm"
+                            onClick={() =>
+                              updatePartStatus.mutate({
+                                shopId: orderShop.shop_base_id,
+                                statusCode: LocalOrderStatusCode.READY_TO_TAKE,
+                              })
+                            }
+                            isLoading={busy}
+                            disabled={updatePartStatus.isPending}
+                          >
+                            {t('orders.readyToPickup')}
+                          </Button>
+                        )}
+                        {actions.includes(LocalOrderStatusCode.REJECTED) && (
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => {
+                              setRejectPartComment('')
+                              setRejectPart(orderShop)
+                            }}
+                            disabled={updatePartStatus.isPending}
+                          >
+                            {t('orders.reject')}
+                          </Button>
+                        )}
+                      </div>
+                    )}
+
+                    {orderShop.warehouse_type === WarehouseType.FBO &&
+                      statusCode === OrderStatusCode.PENDING && (
+                        <p className="text-xs text-muted-foreground">
+                          {t('orders.fboPartWaitsApproval')}
+                        </p>
+                      )}
                   </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <Badge variant={statusBadgeVariant[orderShop.status]}>
-                      {t(`orders.statusLabel.${orderShop.status}`)}
-                    </Badge>
-                    <p className="text-sm font-semibold tabular-nums w-20 text-right">
-                      {parseFloat(orderShop.subtotal).toFixed(2)}
-                    </p>
-                  </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           </div>
         )}
@@ -373,6 +487,35 @@ export function OrderDetailPage() {
         destructive
         busy={updateStatus.isPending}
         onConfirm={() => handleStatusUpdate(OrderStatusCode.REJECTED)}
+      />
+      <ConfirmDialog
+        open={rejectPart !== null}
+        onOpenChange={(open) => !open && setRejectPart(null)}
+        title={t('orders.rejectPartTitle', {
+          shop: rejectPart?.shop.additional?.name ?? `#${rejectPart?.shop_base_id ?? ''}`,
+        })}
+        description={
+          <div className="space-y-2">
+            <p>{t('orders.rejectPartText')}</p>
+            <Textarea
+              value={rejectPartComment}
+              onChange={(e) => setRejectPartComment(e.target.value)}
+              placeholder={t('orders.rejectPartCommentPlaceholder')}
+              rows={3}
+            />
+          </div>
+        }
+        confirmLabel={t('orders.reject')}
+        destructive
+        busy={updatePartStatus.isPending}
+        onConfirm={() => {
+          if (!rejectPart) return
+          updatePartStatus.mutate({
+            shopId: rejectPart.shop_base_id,
+            statusCode: LocalOrderStatusCode.REJECTED,
+            comment: rejectPartComment.trim() || null,
+          })
+        }}
       />
     </>
   )

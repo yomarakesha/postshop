@@ -7,6 +7,7 @@ import { getTranslationName } from '@/shared/lib/getTranslationName'
 import { Input } from '@/shared/ui/input'
 import { Label } from '@/shared/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
+import { CoordinateFields, validateCoordinate } from '@/widgets/CoordinateFields'
 import { Form } from '@/widgets/Form'
 import { LocationMap } from '@/widgets/LocationMap'
 
@@ -28,8 +29,8 @@ export function CreatePickupPointPage() {
         name: value.name,
         address: value.address,
         city_id: Number(value.city_id),
-        latitude: value.latitude,
-        longitude: value.longitude,
+        latitude: value.latitude.trim(),
+        longitude: value.longitude.trim(),
       })
     },
   })
@@ -97,28 +98,51 @@ export function CreatePickupPointPage() {
 
         <div />
 
+        {/* Координаты задавались только щелчком по карте. Без
+          VITE_MAP_TILES_URL карта не рисуется, а полей для ручного ввода не
+          было — ни одного пункта выдачи создать было нельзя. Поля видны
+          всегда; карта, если она есть, заполняет их же. */}
         <form.Field
           name="latitude"
           validators={{
-            onSubmit: ({ value }) => (!value ? t('pickupPoints.locationRequired') : undefined),
+            onSubmit: ({ value }) => validateCoordinate(value, 'latitude', t),
           }}
         >
           {(latField) => (
-            <form.Field name="longitude">
+            <form.Field
+              name="longitude"
+              validators={{
+                onSubmit: ({ value }) => validateCoordinate(value, 'longitude', t),
+              }}
+            >
               {(lngField) => (
-                <div className="col-span-2 space-y-1.5">
-                  <Label>{t('pickupPoints.location')}</Label>
-                  <LocationMap
-                    latitude={latField.state.value}
-                    longitude={lngField.state.value}
-                    onChange={(lat, lng) => {
-                      latField.handleChange(lat)
-                      lngField.handleChange(lng)
+                <div className="col-span-2 space-y-4">
+                  <CoordinateFields
+                    t={t}
+                    latitude={{
+                      value: latField.state.value,
+                      errors: latField.state.meta.errors,
+                      onChange: latField.handleChange,
+                      onBlur: latField.handleBlur,
+                    }}
+                    longitude={{
+                      value: lngField.state.value,
+                      errors: lngField.state.meta.errors,
+                      onChange: lngField.handleChange,
+                      onBlur: lngField.handleBlur,
                     }}
                   />
-                  {latField.state.meta.errors.length > 0 && (
-                    <p className="text-destructive text-sm">{latField.state.meta.errors[0]}</p>
-                  )}
+                  <div className="space-y-1.5">
+                    <Label>{t('pickupPoints.location')}</Label>
+                    <LocationMap
+                      latitude={latField.state.value}
+                      longitude={lngField.state.value}
+                      onChange={(lat, lng) => {
+                        latField.handleChange(lat)
+                        lngField.handleChange(lng)
+                      }}
+                    />
+                  </div>
                 </div>
               )}
             </form.Field>

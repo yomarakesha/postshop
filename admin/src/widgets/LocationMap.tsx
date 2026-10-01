@@ -1,5 +1,6 @@
 import maplibregl from 'maplibre-gl'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 import { LocalStorage } from '@/shared/lib/LocalStorage'
 import { loadMapStyle } from '@/shared/lib/mapStyle'
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function LocationMap({ latitude, longitude, onChange }: Props) {
+  const { t } = useTranslation()
   const [hasMapServer, setHasMapServer] = useState(true)
   const containerRef = useRef<HTMLDivElement>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
@@ -108,13 +110,15 @@ export function LocationMap({ latitude, longitude, onChange }: Props) {
   }, [latitude, longitude])
 
   // Пока картографический сервер не задан, вместо пустого поля — объяснение.
-  // Координаты в этом случае вводятся полями выше, карта их не заменяет.
+  // Текст обещал ручной ввод координат, а полей для него на форме не было;
+  // теперь они есть (CoordinateFields) и стоят над картой, текст ведёт к ним.
+  // Высота меньше, чем у карты: пустая серая плашка на полэкрана только
+  // отодвигала кнопку «Сохранить».
   if (!hasMapServer) {
     return (
-      <div className="h-120 w-full rounded-lg bg-gray-100 flex items-center justify-center p-4">
-        <p className="text-sm text-gray-500 text-center">
-          Карта недоступна: картографический сервер не настроен (VITE_MAP_TILES_URL). Координаты
-          можно ввести вручную.
+      <div className="w-full rounded-lg bg-muted flex items-center justify-center p-4">
+        <p className="text-sm text-muted-foreground text-center">
+          {t('pickupPoints.mapUnavailable')}
         </p>
       </div>
     )

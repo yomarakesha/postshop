@@ -9,7 +9,7 @@ import { useStoresQuery } from '../model/useStoresQuery'
 import { useWarehousesQuery } from '@/pages/warehouses/model/useWarehousesQuery'
 import { buildFileUrl } from '@/shared/lib/buildFileUrl'
 import { getTranslationName } from '@/shared/lib/getTranslationName'
-import { WarehouseType } from '@/shared/openapi/requests'
+import { RegistrationStatus, WarehouseType } from '@/shared/openapi/requests'
 import { Button } from '@/shared/ui/button'
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
 import {
@@ -50,12 +50,16 @@ export function CreateGoodsReceivingPage() {
   )
 
   const { data: storesData } = useStoresQuery()
-  // Приёмка на склад платформы — только для магазинов FBO. Магазин FBS хранит
-  // товар у себя, и сервер такой документ отклонит.
+  // Приёмка на склад платформы — только для одобренных магазинов FBO. Магазин
+  // FBS хранит товар у себя, и сервер такой документ отклонит. Статус отбирает
+  // и сервер, но проверка здесь остаётся: без неё форма зависела бы от того,
+  // что вернул запрос, а не от правила.
   const stores = useMemo(
     () =>
       (storesData?.data ?? []).filter(
-        (store) => store.additional?.warehouse_type === WarehouseType.FBO,
+        (store) =>
+          store.registration_status === RegistrationStatus.APPROVED &&
+          store.additional?.warehouse_type === WarehouseType.FBO,
       ),
     [storesData],
   )

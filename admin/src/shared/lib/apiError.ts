@@ -46,7 +46,7 @@ export const toApiError = (body: unknown, status: number): ApiError => ({
   detail: extractDetail(body),
 })
 
-const isApiError = (error: unknown): error is ApiError =>
+export const isApiError = (error: unknown): error is ApiError =>
   isRecord(error) && typeof error.status === 'number'
 
 /** Текст для показа: объяснение по коду ответа плюс сообщение сервера. */

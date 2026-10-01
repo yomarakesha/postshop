@@ -9,7 +9,7 @@ import { PERMISSION_KEYS } from '@/shared/constants/PermissionKeys'
 import { useHasPermission } from '@/shared/hooks/useHasPermission'
 import { readTotalCount, useListControls } from '@/shared/hooks/useListControls'
 import { useRowNavigation } from '@/shared/hooks/useRowNavigation'
-import { formatDate } from '@/shared/lib/formatDate'
+import { formatDate, formatDateOnly } from '@/shared/lib/formatDate'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
@@ -92,10 +92,10 @@ export function BannersPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-muted-foreground tabular-nums">
-                    {banner.start_date ? formatDate(banner.start_date) : '—'}
+                    {banner.start_date ? formatDateOnly(banner.start_date) : '—'}
                   </TableCell>
                   <TableCell className="text-muted-foreground tabular-nums">
-                    {banner.end_date ? formatDate(banner.end_date) : '—'}
+                    {banner.end_date ? formatDateOnly(banner.end_date) : '—'}
                   </TableCell>
                   <TableCell className="text-muted-foreground tabular-nums">
                     {formatDate(banner.created_at)}

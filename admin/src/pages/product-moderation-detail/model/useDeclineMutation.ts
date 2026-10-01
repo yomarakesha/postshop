@@ -1,23 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 
-import { declineProductProductsProductIdDeclinePatch } from '@/shared/openapi/requests'
+import { useModerateProductMutation } from '@/shared/hooks/useModerateProductMutation'
 
-export function useDeclineMutation(productId: number) {
-  const queryClient = useQueryClient()
+export function useDeclineMutation() {
   const navigate = useNavigate()
-
-  return useMutation({
-    mutationFn: () =>
-      declineProductProductsProductIdDeclinePatch({
-        path: { product_id: productId },
-        throwOnError: true,
-      }),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['products', 'moderation'] })
-      queryClient.invalidateQueries({ queryKey: ['products', 'moderation-count'] })
-      queryClient.invalidateQueries({ queryKey: ['products', productId] })
-      navigate('/product-moderation')
-    },
-  })
+  return useModerateProductMutation('declined', { onDone: () => navigate('/product-moderation') })
 }

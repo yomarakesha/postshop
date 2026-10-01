@@ -1,5 +1,5 @@
 import { Loader2, Search, Store } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useStoresQuery } from '../model/useStoresQuery'
@@ -15,6 +15,7 @@ import {
   InputGroupText,
 } from '@/shared/ui/input-group'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table'
+import { WarehouseTypeBadge } from '@/widgets/WarehouseTypeBadge'
 
 const statusBadgeVariant = {
   [RegistrationStatus.PENDING]: 'warning',
@@ -36,11 +37,7 @@ export function StoresPage() {
 
   const { data, isLoading } = useStoresQuery(debouncedSearch)
 
-  const stores = useMemo(
-    () =>
-      (data?.data ?? []).filter((shop) => shop.registration_status === RegistrationStatus.APPROVED),
-    [data],
-  )
+  const stores = data?.data ?? []
 
   return (
     <div className="space-y-6">
@@ -67,6 +64,7 @@ export function StoresPage() {
               <TableHead>{t('stores.logo')}</TableHead>
               <TableHead>{t('fields.name')}</TableHead>
               <TableHead>{t('becomeStoreRequests.legalEntityType')}</TableHead>
+              <TableHead>{t('stores.warehouseType')}</TableHead>
               <TableHead>{t('becomeStoreRequests.registrationStatus')}</TableHead>
               <TableHead>{t('fields.status')}</TableHead>
               <TableHead>{t('fields.createdAt')}</TableHead>
@@ -75,7 +73,7 @@ export function StoresPage() {
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={7} className="h-32 text-center">
+                <TableCell colSpan={8} className="h-32 text-center">
                   <Loader2 className="mx-auto size-5 animate-spin text-muted-foreground" />
                 </TableCell>
               </TableRow>
@@ -108,6 +106,9 @@ export function StoresPage() {
                     {t(shop.legal_entity_type)}
                   </TableCell>
                   <TableCell>
+                    <WarehouseTypeBadge type={shop.additional?.warehouse_type} />
+                  </TableCell>
+                  <TableCell>
                     <Badge variant={statusBadgeVariant[shop.registration_status]}>
                       {t(`registrationStatus.${shop.registration_status}`)}
                     </Badge>
@@ -124,7 +125,7 @@ export function StoresPage() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={7} className="h-32 text-center text-muted-foreground">
+                <TableCell colSpan={8} className="h-32 text-center text-muted-foreground">
                   {t('noResults')}
                 </TableCell>
               </TableRow>

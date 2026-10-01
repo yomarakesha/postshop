@@ -11,14 +11,12 @@ import {
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
-import { toast } from 'sonner'
 
 import { useChangeWarehouseTypeMutation } from '../model/useChangeWarehouseTypeMutation'
 import { useStoreDetailQuery } from '../model/useStoreDetailQuery'
 import { useStoreProductsQuery, STORE_PRODUCTS_PAGE_SIZE } from '../model/useStoreProductsQuery'
 import { useToggleShopBlockMutation } from '../model/useToggleShopBlockMutation'
 import { useFeatures } from '@/shared/hooks/useFeatures'
-import { getErrorMessage } from '@/shared/lib/apiError'
 import { buildFileUrl } from '@/shared/lib/buildFileUrl'
 import { formatDate } from '@/shared/lib/formatDate'
 import {
@@ -33,6 +31,7 @@ import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
 import { Label } from '@/shared/ui/label'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table'
 import { ShopDocuments } from '@/widgets/ShopDocuments'
+import { WarehouseTypeBadge } from '@/widgets/WarehouseTypeBadge'
 
 const registrationStatusVariant = {
   [RegistrationStatus.PENDING]: 'warning',
@@ -169,7 +168,7 @@ export function StoreDetailPage() {
         <div className="space-y-1.5">
           <Label>{t('stores.warehouseType')}</Label>
           <div className="flex items-center gap-3">
-            <p className="text-sm">{currentType ? t(`warehouseType.${currentType}`) : '—'}</p>
+            <WarehouseTypeBadge type={currentType} />
             {currentType && (
               <Button
                 type="button"
@@ -352,16 +351,9 @@ export function StoreDetailPage() {
         busy={changeWarehouseType.isPending}
         onConfirm={() => {
           if (!additional) return
-          changeWarehouseType.mutate(
-            { shopAdditionalId: additional.id, warehouseType: nextType },
-            {
-              onSuccess: () => {
-                toast.success(t('stores.warehouseTypeChanged'))
-                setAskWarehouseType(false)
-              },
-              onError: (error) => toast.error(getErrorMessage(error)),
-            },
-          )
+          // Тосты успеха и отказа — в самом хуке: onError, переданный сюда,
+          // не глушил глобальный, и отказ показывался двумя тостами.
+          changeWarehouseType.mutate({ shopAdditionalId: additional.id, warehouseType: nextType })
         }}
       />
 
