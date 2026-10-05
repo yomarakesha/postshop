@@ -365,10 +365,12 @@ async def block_shop_base(
     платформой — решение, а не уход продавца, и заказы разбирает она же.
     """
     shop_base = await ensure_can_manage_shop(shop_id, current_user, db)
-    if not shop_base.is_active:
-        raise HTTPException(status_code=400, detail="Shop base is already blocked")
-
     by_staff = is_staff(current_user, *STAFF_SHOPS) and current_user.id != shop_base.owner_id
+    # Магазин, который владелец закрыл сам, сотрудник всё равно блокирует:
+    # иначе блок отвечал «уже закрыт», флаг не ставился, и владелец открывал
+    # магазин обратно.
+    if not shop_base.is_active and (not by_staff or shop_base.blocked_by_staff):
+        raise HTTPException(status_code=400, detail="Shop base is already blocked")
     if not by_staff:
         blockers = await shop_close_blockers(db, shop_id)
         if blockers:

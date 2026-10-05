@@ -692,9 +692,11 @@ async def block_product(
     """
     product = await get_product_or_404(product_id, db)
     shop = await _ensure_can_manage_shop(product.shop_base_id, current_user, db)
-    if not product.is_active:
-        raise HTTPException(status_code=400, detail="Product is already blocked")
     by_staff = is_staff(current_user, *STAFF_SHOPS) and current_user.id != shop.owner_id
+    # Товар, который владелец снял сам, сотрудник всё равно блокирует: иначе
+    # блок отвечал «уже снят», флаг не ставился, и владелец возвращал товар.
+    if not product.is_active and (not by_staff or product.blocked_by_staff):
+        raise HTTPException(status_code=400, detail="Product is already blocked")
     product.is_active = False
     product.blocked_by_staff = by_staff
     if by_staff:
