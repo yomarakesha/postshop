@@ -27,7 +27,7 @@ from app.schemas.brand import BrandResponse
 from app.core.dependencies import require_permissions
 from app.core.permissions import Perm
 from app.models.notification import NotificationKind
-from app.services.notifications import notify
+from app.services.notifications import notify, notify_shop_owner
 from app.core.ownership import STAFF_SHOPS, is_staff
 from app.services.stock import product_has_stock_history
 from app.core.visibility import visible_to_customer, shop_public_conditions
@@ -700,9 +700,9 @@ async def block_product(
     product.is_active = False
     product.blocked_by_staff = by_staff
     if by_staff:
-        await notify(
+        await notify_shop_owner(
             db,
-            user_id=shop.owner_id,
+            shop_base_id=shop.id,
             kind=NotificationKind.product_blocked,
             entity_id=product.id,
         )
