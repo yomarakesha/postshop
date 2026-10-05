@@ -21,9 +21,13 @@ from app.schemas.warehouse_operation import (
     WarehouseOperationResponse,
     WarehouseProductBalance,
     WarehouseStockResponse,
+    ShopProductWarehouseHistory,
 )
 from app.core.dependencies import require_permissions
 from app.core.permissions import Perm
+from app.core.dependencies import get_current_user
+from app.core.ownership import STAFF_STOCK, ensure_can_manage_shop
+from app.models.user import User
 from app.services.stock import ensure_product_unit, fbo_available
 
 router = APIRouter()
@@ -296,3 +300,42 @@ async def get_warehouse_product_balance(
     balance = _compute_balance(operations)
 
     return {"warehouse_id": warehouse_id, "product_id": product_id, "balance": balance}
+
+
+@router.get("/shop/{shop_id}/product/{product_id}", response_model=ShopProductWarehouseHistory)
+async def get_shop_product_history(
+    shop_id: int,
+    product_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    """
+    Движения товара магазина FBO по складам Postshop — приход, продажи,
+    возвраты, списания.
+
+    Продавец FBO видел только итоговое число: откуда оно взялось и что
+    платформа списала как брак или вернула ему, узнать было негде. Права на
+    журнал склада у продавца нет, поэтому отдельный метод — только по своему
+    магазину.
+    """
+    await ensure_can_manage_shop(shop_id, current_user, db, staff_codes=STAFF_STOCK,
+                                 detail="You can only read stock of your own shops")
+    product = await _get_product_or_404(product_id, db)
+    if product.shop_base_id != shop_id:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    operations = (await db.execute(
+        select(WarehouseOperation)
+        .options(selectinload(WarehouseOperation.measure_unit))
+        .where(
+            WarehouseOperation.shop_id == shop_id,
+            WarehouseOperation.product_id == product_id,
+        )
+        .order_by(WarehouseOperation.created_at.desc(), WarehouseOperation.id.desc())
+    )).scalars().all()
+
+    return ShopProductWarehouseHistory(
+        product_id=product_id,
+        balance=_compute_balance(list(operations)),
+        operations=list(operations),
+    )

@@ -1,9 +1,10 @@
 import enum
 from app.models.shop_additional import WarehouseType
 from pydantic import BaseModel, Field, computed_field, model_validator
-from datetime import date as date_type, datetime
+from datetime import date as date_type, datetime, timedelta
 from decimal import Decimal
 from typing import List, Literal, Optional
+from app.config import settings
 from app.models.order import PaymentType
 from app.models.order_status import OrderStatusCode
 from app.models.order_shop import LocalOrderStatusCode
@@ -40,6 +41,11 @@ class ShopOrderStatusUpdate(BaseModel):
     """Смена локального статуса части заказа магазином."""
     status_code: LocalOrderStatusCode
     comment:     Optional[Comment1000] = None
+
+
+class OrderPaymentUpdate(BaseModel):
+    """Отметка оператора: деньги за заказ получены (или отметка снята)."""
+    paid: bool
 
 
 class OrderCancelRequest(BaseModel):
@@ -218,6 +224,8 @@ class OrderResponse(BaseModel):
     pickup_point:     Optional[PickupPointResponse] = None
     comment:          Optional[str]              = None
     status_comment:   Optional[str]              = None
+    paid_at:          Optional[datetime]         = None
+    completed_at:     Optional[datetime]         = None
     items:            list[OrderItemResponse]
     shops:            list[ShopFullResponse]     = []
     order_shops:      list[OrderShopResponse]    = []
@@ -251,6 +259,14 @@ class OrderResponse(BaseModel):
             (s.subtotal for s in self.order_shops if s.status != LocalOrderStatusCode.rejected),
             Decimal("0"),
         ) + (self.delivery_price or Decimal("0"))
+
+    @computed_field
+    @property
+    def return_until(self) -> Optional[datetime]:
+        """До какого момента можно подать заявку на возврат; None — заказ не завершён."""
+        if self.completed_at is None:
+            return None
+        return self.completed_at + timedelta(days=settings.RETURN_WINDOW_DAYS)
 
     @computed_field
     @property

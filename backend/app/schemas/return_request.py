@@ -44,6 +44,8 @@ class ReturnResponse(BaseModel):
     product_id: Optional[int] = None
     product_name: Optional[str] = None
     quantity: Decimal
+    # Сумма к возврату: цена на момент заказа × количество.
+    amount: Optional[Decimal] = None
     reason: str
     status: ReturnStatus
     resolution_comment: Optional[str] = None

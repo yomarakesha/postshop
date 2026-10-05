@@ -15,6 +15,7 @@ from app.schemas.stock_operation import (
     StockOperationResponse,
     ProductAvailability,
     ProductStockResponse,
+    FbsStockSummary,
 )
 from app.core.dependencies import require_permissions
 from app.core.ownership import STAFF_STOCK, ensure_can_manage_shop
@@ -24,6 +25,7 @@ from app.services.stock import (
     ensure_product_unit,
     available as stock_available,
     fbs_available,
+    fbs_stock,
     is_tracked,
     note_if_out_of_stock,
     send_out_of_stock_sms,
@@ -257,6 +259,32 @@ async def get_product_stock(
     )
 
 
+@router.get("/{product_id}/summary", response_model=FbsStockSummary)
+async def get_product_stock_summary(
+    product_id: int,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_permissions(Perm.STOCK_OPERATIONS_READ)),
+):
+    """Остаток FBS в разрезе — для пересчёта полки.
+
+    on_shelf — что должно лежать на полке (журнал минус собранное, но ещё не
+    проданное), reserved — что держат открытые заказы, available — что можно
+    продать.
+    """
+    product = await _get_product_or_404(product_id, db)
+    await ensure_can_manage_shop(product.shop_base_id, current_user, db,
+                                 staff_codes=STAFF_STOCK,
+                                 detail="You can only read stock of your own shops")
+    stock = await fbs_stock(db, product.shop_base_id, product_id)
+    return FbsStockSummary(
+        product_id=product_id,
+        balance=stock.balance,
+        on_shelf=stock.on_shelf,
+        reserved=stock.reserved,
+        available=max(stock.available, Decimal("0")),
+    )
+
+
 @router.get("/{product_id}/balance", response_model=dict)
 async def get_product_balance(
     product_id: int,
@@ -318,8 +346,12 @@ async def set_stock(
     await db.execute(
         select(Product.id).where(Product.id == payload.product_id).with_for_update()
     )
-    available = await fbs_available(db, payload.shop_id, payload.product_id, for_update=True)
-    delta = payload.quantity - available
+    # Продавец считает то, что лежит на полке. Сравнивать с «доступно» нельзя:
+    # оно за вычетом резерва, а несобранный заказ ещё на полке — пересчёт
+    # прибавлял его второй раз. Собранный же заказ с полки уже ушёл, хотя
+    # продажа ещё не записана, — его вычитаем из журнала.
+    stock = await fbs_stock(db, payload.shop_id, payload.product_id, for_update=True)
+    delta = payload.quantity - stock.on_shelf
     if delta == 0:
         raise HTTPException(status_code=409, detail="Stock already equals the requested amount")
 

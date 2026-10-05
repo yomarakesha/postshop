@@ -88,3 +88,12 @@ class ProductAvailability(BaseModel):
     product_id: int
     tracked:    bool
     available:  Decimal
+
+
+class FbsStockSummary(BaseModel):
+    """Остаток FBS в разрезе: журнал, полка, резерв, доступно."""
+    product_id: int
+    balance: Decimal
+    on_shelf: Decimal
+    reserved: Decimal
+    available: Decimal

@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
@@ -6,6 +6,7 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
+from app.config import settings
 from app.core.dependencies import get_current_user, require_permissions
 from app.core.ownership import STAFF_ORDERS, ensure_can_manage_shop, has_permission
 from app.core.pagination import limit_param, set_pagination_headers, skip_param
@@ -65,6 +66,7 @@ def _to_response(request: ReturnRequest) -> ReturnResponse:
         product_id=order_item.product_id if order_item else None,
         product_name=name,
         quantity=request.quantity,
+        amount=request.amount,
         reason=request.reason,
         status=request.status,
         resolution_comment=request.resolution_comment,
@@ -131,7 +133,7 @@ async def create_return(
     """
     result = await db.execute(
         select(OrderItem)
-        .options(selectinload(OrderItem.product))
+        .options(selectinload(OrderItem.product), selectinload(OrderItem.order))
         .join(Order, Order.id == OrderItem.order_id)
         .join(OrderStatus, OrderStatus.id == Order.order_status_id)
         .join(OrderShop, OrderShop.id == OrderItem.order_shop_id)
@@ -152,6 +154,18 @@ async def create_return(
         raise HTTPException(
             status_code=404,
             detail="Purchase not found among your completed orders",
+        )
+
+    # Срок возврата — от завершения заказа. У заказов, завершённых до появления
+    # даты завершения, её проставила миграция.
+    order = order_item.order
+    completed_at = order.completed_at or order.updated_at or order.created_at
+    deadline = completed_at + timedelta(days=settings.RETURN_WINDOW_DAYS)
+    if datetime.now(timezone.utc) > deadline:
+        raise HTTPException(
+            status_code=400,
+            detail=f"The return period ({settings.RETURN_WINDOW_DAYS} days after the order "
+                   f"was completed) is over",
         )
 
     if payload.quantity > Decimal(order_item.quantity):
@@ -175,6 +189,8 @@ async def create_return(
         user_id=current_user.id,
         order_item_id=payload.order_item_id,
         quantity=payload.quantity,
+        # Сумма к возврату фиксируется при подаче: цена на момент заказа.
+        amount=(Decimal(order_item.price_at_order) * Decimal(payload.quantity)).quantize(Decimal("0.01")),
         reason=payload.reason,
         status=ReturnStatus.pending,
     )

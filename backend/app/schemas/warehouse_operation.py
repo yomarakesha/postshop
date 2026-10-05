@@ -51,6 +51,13 @@ class WarehouseStockResponse(BaseModel):
     operations:   list[WarehouseOperationResponse]
 
 
+class ShopProductWarehouseHistory(BaseModel):
+    """Движения товара магазина по всем складам платформы — для продавца FBO."""
+    product_id:   int
+    balance:      Decimal
+    operations:   list[WarehouseOperationResponse]
+
+
 class WarehouseProductBalance(BaseModel):
     """Остаток одного товара на складе — строка сводки по складу."""
     product_id:    int

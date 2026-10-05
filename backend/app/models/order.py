@@ -29,6 +29,11 @@ class Order(Base):
     # пожелание, и продавец терял «позвоните перед доставкой».
     comment          = Column(Text, nullable=True)
     status_comment   = Column(Text, nullable=True)
+    # Деньги получены — отметку ставит оператор. Без неё заказ не завершить:
+    # раньше завершённый заказ считался проданным, получены деньги или нет.
+    paid_at          = Column(UTCDateTime(), nullable=True)
+    # Когда заказ завершён: от этого считается срок возврата.
+    completed_at     = Column(UTCDateTime(), nullable=True)
     created_at       = Column(UTCDateTime(), server_default=func.now())
     updated_at       = Column(UTCDateTime(), onupdate=func.now())
 

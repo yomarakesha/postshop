@@ -127,6 +127,57 @@ async def fbs_available(
     return balance - reserved
 
 
+async def fbs_packed(
+    db: AsyncSession, shop_id: int, product_id: int, *, for_update: bool = False
+) -> Decimal:
+    """Сколько товара уже собрано в открытые заказы, но ещё не продано.
+
+    Продажа пишется в журнал при завершении заказа, а с полки товар уходит
+    раньше — когда продавец отмечает часть «Собран». Между этими моментами
+    товар есть в журнале, но не на полке.
+    """
+    query = (
+        select(func.coalesce(func.sum(OrderItem.quantity), 0))
+        .select_from(OrderItem)
+        .join(OrderShop, OrderItem.order_shop_id == OrderShop.id)
+        .join(Order, OrderItem.order_id == Order.id)
+        .join(OrderStatus, Order.order_status_id == OrderStatus.id)
+        .where(
+            OrderShop.shop_base_id == shop_id,
+            OrderItem.product_id == product_id,
+            OrderShop.status == LocalOrderStatusCode.ready_to_take,
+            OrderStatus.code.notin_(_CLOSED_ORDER_STATUSES),
+        )
+    )
+    if for_update:
+        query = query.with_for_update()
+    return Decimal((await db.execute(query)).scalar_one())
+
+
+@dataclass(frozen=True)
+class FbsStock:
+    """Остаток FBS в разрезе: что в журнале, что на полке, что занято, что свободно."""
+
+    balance: Decimal
+    on_shelf: Decimal
+    reserved: Decimal
+    available: Decimal
+
+
+async def fbs_stock(
+    db: AsyncSession, shop_id: int, product_id: int, *, for_update: bool = False
+) -> FbsStock:
+    balance = await _fbs_ledger_balance(db, shop_id, product_id, for_update=for_update)
+    reserved = await _reserved(db, shop_id, product_id, for_update=for_update)
+    packed = await fbs_packed(db, shop_id, product_id, for_update=for_update)
+    return FbsStock(
+        balance=balance,
+        on_shelf=balance - packed,
+        reserved=reserved,
+        available=balance - reserved,
+    )
+
+
 async def _fbs_record_sold(db: AsyncSession, order_shop: OrderShop) -> None:
     """Списывает sold по позициям части заказа. Идемпотентно (не списывает дважды)."""
     existing = await db.execute(

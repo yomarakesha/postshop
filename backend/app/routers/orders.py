@@ -1,6 +1,6 @@
 from decimal import Decimal
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status, Response
 from sqlalchemy import delete as sql_delete, select, asc, desc, func
@@ -37,7 +37,7 @@ from app.schemas.order import (
     SummaryPoint,
     SummaryTotals,
     OrderCreate, OrderResponse, OrderStatusUpdate, ShopOrderStatusUpdate,
-    OrderCancelRequest, TopProductResponse, DailyRevenue,
+    OrderCancelRequest, OrderPaymentUpdate, TopProductResponse, DailyRevenue,
     ShopWeeklyRevenueResponse,
 )
 from app.core.dependencies import require_permissions
@@ -164,6 +164,26 @@ def _completed_shop_sales(shop_id: int, *columns):
             Product.shop_base_id == shop_id,
             OrderStatus.code == OrderStatusCode.completed,
             OrderShop.status != LocalOrderStatusCode.rejected,
+        )
+    )
+
+
+def _approved_shop_returns(shop_id: int, *columns):
+    """Select по подтверждённым возвратам товаров магазина.
+
+    Возврат уменьшает продажу: раньше возвращённый товар оставался в выручке и
+    в топе, будто его купили. Период считается так же, как у продаж, — по дате
+    оформления заказа, иначе возврат попадал бы в другую неделю, чем продажа.
+    """
+    return (
+        select(*columns)
+        .select_from(ReturnRequest)
+        .join(OrderItem, OrderItem.id == ReturnRequest.order_item_id)
+        .join(Product, OrderItem.product_id == Product.id)
+        .join(Order, OrderItem.order_id == Order.id)
+        .where(
+            Product.shop_base_id == shop_id,
+            ReturnRequest.status == ReturnStatus.approved,
         )
     )
 
@@ -367,6 +387,8 @@ async def get_orders(
                                      description="Номер заказа или часть телефона покупателя"),
     fbo_attention: bool      = Query(default=False,
                                      description="Только заказы с частью FBO, ждущей склада Postshop"),
+    paid:      Optional[bool] = Query(default=None,
+                                      description="true — оплаченные, false — без отметки об оплате"),
     sort:      SortOption    = Query(default="newest"),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permissions(Perm.ORDERS_READ)),
@@ -401,6 +423,8 @@ async def get_orders(
 
     if fbo_attention:
         query = query.where(Order.id.in_(_fbo_attention_order_ids()))
+    if paid is not None:
+        query = query.where(Order.paid_at.is_not(None) if paid else Order.paid_at.is_(None))
 
     if sort == "status_asc":
         query = query.order_by(asc(Order.order_status_id))
@@ -524,6 +548,20 @@ async def get_shop_top_products(
     if not rows:
         return []
 
+    returned = {
+        r.product_id: r
+        for r in (await db.execute(
+            _approved_shop_returns(
+                shop_id,
+                OrderItem.product_id,
+                func.coalesce(func.sum(ReturnRequest.quantity), 0).label("quantity"),
+                func.coalesce(func.sum(ReturnRequest.amount), 0).label("amount"),
+            )
+            .where(OrderItem.product_id.in_([r.product_id for r in rows]))
+            .group_by(OrderItem.product_id)
+        )).all()
+    }
+
     # Догружаем сами товары для ответа, сохраняя порядок топа.
     product_ids = [r.product_id for r in rows]
     products_res = await db.execute(
@@ -536,15 +574,24 @@ async def get_shop_top_products(
     )
     products = {p.id: p for p in products_res.scalars().all()}
 
-    return [
-        TopProductResponse(
+    # Возвращённое — не продано: вычитаем и количество, и деньги, и заново
+    # сортируем — после возвратов порядок топа мог измениться.
+    top = []
+    for r in rows:
+        if r.product_id not in products:
+            continue
+        ret = returned.get(r.product_id)
+        quantity = int(r.total_quantity) - (int(ret.quantity) if ret else 0)
+        revenue = Decimal(r.total_revenue) - (Decimal(ret.amount) if ret else Decimal("0"))
+        if quantity <= 0:
+            continue
+        top.append(TopProductResponse(
             product=products[r.product_id],
-            total_quantity=int(r.total_quantity),
-            total_revenue=r.total_revenue,
-        )
-        for r in rows
-        if r.product_id in products
-    ]
+            total_quantity=quantity,
+            total_revenue=revenue,
+        ))
+    top.sort(key=lambda item: item.total_quantity, reverse=True)
+    return top
 
 
 def _summary_bounds(period: SummaryPeriod) -> tuple[datetime, datetime, timedelta, int]:
@@ -585,7 +632,11 @@ async def _summary_totals(db: AsyncSession, shop_id: int, start: datetime, end: 
     )).one()
 
     orders = int(row.orders or 0)
-    revenue = Decimal(row.revenue or 0)
+    returned = (await db.execute(
+        _approved_shop_returns(shop_id, func.coalesce(func.sum(ReturnRequest.amount), 0))
+        .where(Order.created_at >= start, Order.created_at < end)
+    )).scalar() or 0
+    revenue = Decimal(row.revenue or 0) - Decimal(returned)
 
     # Отказы считаем отдельно: _completed_shop_sales их отбрасывает намеренно —
     # отклонённая часть не продажа. Но продавцу важно видеть, сколько он
@@ -652,6 +703,18 @@ async def get_shop_summary(
         .group_by(day_expr)
     )).all()
     by_day = {r.day: r for r in rows}
+    returned_by_day = {
+        r.day: Decimal(r.amount)
+        for r in (await db.execute(
+            _approved_shop_returns(
+                shop_id,
+                day_expr.label("day"),
+                func.coalesce(func.sum(ReturnRequest.amount), 0).label("amount"),
+            )
+            .where(Order.created_at >= start, Order.created_at < end)
+            .group_by(day_expr)
+        )).all()
+    }
 
     # Пустые отрезки отдаём нулями: без них график «сжимается» и дни без продаж
     # просто исчезают с оси, создавая впечатление ровных продаж.
@@ -662,10 +725,12 @@ async def get_shop_summary(
         orders = revenue = 0
         day = cursor
         while day < bucket_end:
-            found = by_day.get(day.astimezone(BUSINESS_TZ).date())
+            local_day = day.astimezone(BUSINESS_TZ).date()
+            found = by_day.get(local_day)
             if found:
                 orders += int(found.orders)
                 revenue += Decimal(found.revenue)
+            revenue -= returned_by_day.get(local_day, Decimal("0"))
             day += timedelta(days=1)
         points.append(SummaryPoint(
             date=cursor.astimezone(BUSINESS_TZ).date(),
@@ -833,6 +898,18 @@ async def get_shop_weekly_revenue(
         .group_by(day_expr)
     )).all()
     by_day_map = {r.day: r for r in day_rows}
+    returned_by_day = {
+        r.day: Decimal(r.amount)
+        for r in (await db.execute(
+            _approved_shop_returns(
+                shop_id,
+                day_expr.label("day"),
+                func.coalesce(func.sum(ReturnRequest.amount), 0).label("amount"),
+            )
+            .where(Order.created_at >= week_start, Order.created_at < week_end)
+            .group_by(day_expr)
+        )).all()
+    }
 
     # Отдаём все семь дней, включая нулевые: иначе график «сжимался» и дни без
     # продаж просто исчезали с оси.
@@ -843,7 +920,10 @@ async def get_shop_weekly_revenue(
         by_day.append(DailyRevenue(
             date=day,
             orders_count=int(found.orders_count) if found else 0,
-            total_revenue=found.total_revenue if found else Decimal("0"),
+            total_revenue=(
+                (Decimal(found.total_revenue) if found else Decimal("0"))
+                - returned_by_day.get(day, Decimal("0"))
+            ),
         ))
 
     return ShopWeeklyRevenueResponse(
@@ -851,7 +931,7 @@ async def get_shop_weekly_revenue(
         period_start=week_start,
         period_end=week_end,
         orders_count=int(row.orders_count),
-        total_revenue=row.total_revenue,
+        total_revenue=Decimal(row.total_revenue) - sum(returned_by_day.values(), Decimal("0")),
         by_day=by_day,
     )
 
@@ -921,6 +1001,14 @@ async def update_order_status(
                 detail="Order uses a pickup point, delivery_price is not applicable",
             )
 
+    # Завершить можно только оплаченный заказ: раньше завершённый заказ
+    # считался проданным, получены деньги или нет.
+    if payload.status_code == OrderStatusCode.completed and order.paid_at is None:
+        raise HTTPException(
+            status_code=400,
+            detail="Order is not paid: mark the payment before completing the order",
+        )
+
     # Мягкий гард на ready_to_take: заказ нельзя собирать к доставке, пока не все
     # неотклонённые магазины готовы; если отказали все — заказу место в rejected.
     if payload.status_code == OrderStatusCode.ready_to_take:
@@ -971,18 +1059,39 @@ async def update_order_status(
     # повторно сюда не попасть. FBO/без типа сервис пропускает.
     out_of_stock: list = []
     if payload.status_code == OrderStatusCode.completed:
+        # От этой даты считается срок возврата.
+        order.completed_at = datetime.now(timezone.utc)
         out_of_stock = await record_sold_for_order(db, order)
 
     # Покупатель узнавал о смене статуса, только зайдя и проверив: ни письма, ни
     # SMS, ни отметки в интерфейсе не было. Новый код статуса кладём в comment
     # уведомления — переводить его должен клиент, у витрины четыре языка.
-    await notify(
-        db,
-        user_id=order.user_id,
-        kind=NotificationKind.order_status,
-        entity_id=order.id,
-        comment=payload.status_code.value,
-    )
+    # Заказ с доставкой при подтверждении получает цену доставки, и сумма
+    # вырастает. Покупатель узнаёт цену и итог сразу — и может отменить заказ,
+    # если не согласен (отмена разрешена до сборки).
+    if payload.status_code == OrderStatusCode.approved and order.delivery_price is not None:
+        goods = sum(
+            (item.price_at_order * item.quantity
+             for order_shop in order.order_shops
+             if order_shop.status != LocalOrderStatusCode.rejected
+             for item in order_shop.items),
+            Decimal("0"),
+        )
+        await notify(
+            db,
+            user_id=order.user_id,
+            kind=NotificationKind.order_approved_delivery,
+            entity_id=order.id,
+            comment=f"{order.delivery_price:.2f}|{goods + order.delivery_price:.2f}",
+        )
+    else:
+        await notify(
+            db,
+            user_id=order.user_id,
+            kind=NotificationKind.order_status,
+            entity_id=order.id,
+            comment=payload.status_code.value,
+        )
 
     # Одобрение — момент, когда продавцу пора собирать заказ. Раньше ему
     # сообщали при оформлении, когда действовать было ещё нельзя, а при
@@ -1018,6 +1127,35 @@ async def update_order_status(
     await send_out_of_stock_sms(out_of_stock)
     for phone, text in shop_sms:
         await send_sms(phone, text)
+    return await get_order_or_404(order_id, db)
+
+
+@router.patch("/{order_id}/payment", response_model=OrderResponse)
+async def update_order_payment(
+    order_id: int,
+    payload: OrderPaymentUpdate,
+    db: AsyncSession = Depends(get_db),
+    _=Depends(require_permissions(Perm.ORDERS_UPDATE_STATUS)),
+):
+    """Отметить, что деньги за заказ получены, или снять ошибочную отметку.
+
+    Ставит оператор: при наличных — когда курьер или пункт выдачи сдал
+    деньги, при карте — когда оплата прошла. Без отметки заказ не завершить.
+    У завершённого заказа отметку не снять — продажа уже записана.
+    """
+    order = await get_order_or_404(order_id, db)
+    code = OrderStatusCode(order.order_status.code)
+    if code == OrderStatusCode.rejected:
+        raise HTTPException(status_code=400, detail="Order is rejected")
+    if not payload.paid and code == OrderStatusCode.completed:
+        raise HTTPException(
+            status_code=400, detail="Payment of a completed order cannot be unmarked",
+        )
+    if payload.paid and order.paid_at is None:
+        order.paid_at = datetime.now(timezone.utc)
+    elif not payload.paid:
+        order.paid_at = None
+    await db.commit()
     return await get_order_or_404(order_id, db)
 
 

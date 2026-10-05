@@ -47,6 +47,9 @@ class ReturnRequest(Base):
     user_id       = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     order_item_id = Column(Integer, ForeignKey("order_items.id", ondelete="CASCADE"), nullable=False, index=True)
     quantity      = Column(Numeric(12, 3), nullable=False)
+    # Сумма к возврату: цена на момент заказа × количество. На неё
+    # уменьшается выручка магазина в статистике.
+    amount        = Column(Numeric(12, 2), nullable=True)
     # Причина обязательна: без неё решение принимать не по чему.
     reason        = Column(Text, nullable=False)
     status        = Column(Enum(ReturnStatus), nullable=False, default=ReturnStatus.pending, index=True)

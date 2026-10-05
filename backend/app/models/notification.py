@@ -54,6 +54,11 @@ class NotificationKind(str, enum.Enum):
     # ничего не узнавал: дошёл ли товар и закрыт ли возврат.
     return_completed = "return_completed"
 
+    # Заказ с доставкой подтверждён: в comment — «цена_доставки|итог».
+    # Цену доставки назначает оператор, и раньше сумма просто вырастала без
+    # объяснения; теперь покупатель видит её и может отменить заказ.
+    order_approved_delivery = "order_approved_delivery"
+
 
 class Notification(Base):
     """
