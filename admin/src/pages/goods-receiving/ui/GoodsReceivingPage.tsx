@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom'
 
 import { useStockReceiptsQuery } from '../model/useStockReceiptsQuery'
 import { formatDate } from '@/shared/lib/formatDate'
-import { ReceiptStatus } from '@/shared/openapi/requests'
+import { receiptStatusVariant } from '@/shared/lib/receiptStatus'
 import { Badge } from '@/shared/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table'
 import { CreateButton } from '@/widgets/CreateButton'
@@ -70,9 +70,7 @@ export function GoodsReceivingPage() {
                       {totalQuantity}
                     </TableCell>
                     <TableCell>
-                      <Badge
-                        variant={receipt.status === ReceiptStatus.CONFIRMED ? 'success' : 'default'}
-                      >
+                      <Badge variant={receiptStatusVariant[receipt.status]}>
                         {t(`goodsReceiving.status.${receipt.status}`)}
                       </Badge>
                     </TableCell>

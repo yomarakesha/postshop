@@ -251,6 +251,15 @@ export const ru = {
     selectedCount: 'Выбрано: {{count}}',
   },
   warehouses: {
+    writeOff: 'Списать',
+    returnToShop: 'Вернуть магазину',
+    writeOffTitle: 'Списать «{{product}}»?',
+    returnToShopTitle: 'Вернуть «{{product}}» магазину?',
+    writeOffText:
+      'Брак, порча или утеря: товар уйдёт из остатка без продажи. На складе: {{count}}. Товар, который держат открытые заказы, списать нельзя.',
+    returnToShopText:
+      'Товар уходит со склада Postshop обратно продавцу. На складе: {{count}}. Товар, который держат открытые заказы, вернуть нельзя.',
+    outgoQuantity: 'Количество',
     searchPlaceholder: 'Поиск складов...',
     name: 'Название склада',
     namePlaceholder: 'Введите название склада',
@@ -270,6 +279,11 @@ export const ru = {
     noProducts: 'На складе нет товаров',
   },
   goodsReceiving: {
+    cancel: 'Отменить приёмку',
+    cancelTitle: 'Отменить приёмку?',
+    cancelText:
+      'Документ закроется без прихода на склад. Подтвердить его после отмены будет нельзя.',
+    editQuantity: 'Изменить',
     confirm: 'Подтвердить приём',
     confirmTitle: 'Подтвердить приём товара?',
     confirmText:
@@ -278,6 +292,7 @@ export const ru = {
     productsCount: 'Кол-во товаров',
     totalQuantity: 'Общее количество',
     status: {
+      cancelled: 'Отменено',
       draft: 'Черновик',
       confirmed: 'Подтверждено',
     },
@@ -406,7 +421,14 @@ export const ru = {
   },
 
   orders: {
-    searchPlaceholder: 'Поиск по ID заказа или ID пользователя...',
+    searchPlaceholder: 'Поиск по номеру заказа или телефону покупателя...',
+    filter: {
+      all: 'Все',
+      fbo: 'Ждут склада Postshop',
+    },
+    rejectCommentPlaceholder: 'Причина отказа — её увидят покупатель и магазины',
+    customerComment: 'Комментарий покупателя',
+    statusComment: 'Решение платформы',
     userId: 'Пользователь',
     userIdLabel: 'ID {{id}}',
     status: 'Статус',

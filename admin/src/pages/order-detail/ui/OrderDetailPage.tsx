@@ -18,6 +18,7 @@ import {
   orderStatusBadgeVariant as statusBadgeVariant,
   orderStatusLabel,
 } from '@/shared/lib/orderStatus'
+import { cn } from '@/shared/lib/utils'
 import {
   LocalOrderStatusCode,
   OrderStatusCode,
@@ -64,6 +65,7 @@ export function OrderDetailPage() {
   const updatePartStatus = useUpdateShopPartStatusMutation(orderId)
   const { hasPermission } = useHasPermission()
   const [askReject, setAskReject] = useState(false)
+  const [rejectComment, setRejectComment] = useState('')
   const [rejectPart, setRejectPart] = useState<OrderShopResponse | null>(null)
   const [rejectPartComment, setRejectPartComment] = useState('')
 
@@ -87,6 +89,11 @@ export function OrderDetailPage() {
   if (!order) return null
 
   const user = userData?.data
+  const rejectedShopIds = new Set(
+    (order.order_shops ?? [])
+      .filter((orderShop) => orderShop.status === LocalOrderStatusCode.REJECTED)
+      .map((orderShop) => orderShop.shop_base_id),
+  )
   const statusCode = order.order_status.code
 
   // Способ получения считает сервер (delivery_method): по нему же выбираются
@@ -208,26 +215,47 @@ export function OrderDetailPage() {
               </div>
             )}
 
+            {/* Отклонить можно и собранный, и переданный в доставку заказ:
+                покупатель не пришёл, не дозвонились. Раньше кнопки здесь не
+                было, хотя сервер такой переход принимает. */}
             {statusCode === OrderStatusCode.READY_TO_TAKE && (
-              <Button
-                variant="default"
-                onClick={() => handleStatusUpdate(OrderStatusCode.READY_TO_DELIVER)}
-                isLoading={updateStatus.isPending}
-                disabled={updateStatus.isPending}
-              >
-                {orderActionLabel(t, OrderStatusCode.READY_TO_DELIVER, deliveryMethod)}
-              </Button>
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  variant="default"
+                  onClick={() => handleStatusUpdate(OrderStatusCode.READY_TO_DELIVER)}
+                  isLoading={updateStatus.isPending}
+                  disabled={updateStatus.isPending}
+                >
+                  {orderActionLabel(t, OrderStatusCode.READY_TO_DELIVER, deliveryMethod)}
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => setAskReject(true)}
+                  disabled={updateStatus.isPending}
+                >
+                  {t('orders.reject')}
+                </Button>
+              </div>
             )}
 
             {statusCode === OrderStatusCode.READY_TO_DELIVER && (
-              <Button
-                variant="default"
-                onClick={() => handleStatusUpdate(OrderStatusCode.COMPLETED)}
-                isLoading={updateStatus.isPending}
-                disabled={updateStatus.isPending}
-              >
-                {orderActionLabel(t, OrderStatusCode.COMPLETED, deliveryMethod)}
-              </Button>
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  variant="default"
+                  onClick={() => handleStatusUpdate(OrderStatusCode.COMPLETED)}
+                  isLoading={updateStatus.isPending}
+                  disabled={updateStatus.isPending}
+                >
+                  {orderActionLabel(t, OrderStatusCode.COMPLETED, deliveryMethod)}
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => setAskReject(true)}
+                  disabled={updateStatus.isPending}
+                >
+                  {t('orders.reject')}
+                </Button>
+              </div>
             )}
           </div>
         )}
@@ -262,8 +290,14 @@ export function OrderDetailPage() {
             {order.items.map((item) => {
               const name = getTranslationName(item.product.translations, i18n.language) ?? '—'
               const image = item.product.images?.[0]
+              // Товары отказавшегося магазина в сумму к оплате не входят — а
+              // в списке выглядели так же, как остальные.
+              const isRejectedPart = rejectedShopIds.has(item.product.shop_base_id)
               return (
-                <div key={item.id} className="flex items-center gap-3 py-3">
+                <div
+                  key={item.id}
+                  className={cn('flex items-center gap-3 py-3', isRejectedPart && 'opacity-50')}
+                >
                   <div className="size-14 shrink-0 overflow-hidden rounded-lg border bg-muted flex items-center justify-center">
                     {image ? (
                       <img
@@ -281,7 +315,12 @@ export function OrderDetailPage() {
                       {parseFloat(item.price_at_order).toFixed(2)} × {item.quantity}
                     </p>
                   </div>
-                  <p className="text-sm font-semibold tabular-nums shrink-0">
+                  <p
+                    className={cn(
+                      'text-sm font-semibold tabular-nums shrink-0',
+                      isRejectedPart && 'line-through',
+                    )}
+                  >
                     {(parseFloat(item.price_at_order) * item.quantity).toFixed(2)}
                   </p>
                 </div>
@@ -456,8 +495,17 @@ export function OrderDetailPage() {
 
           {order.comment && (
             <div className="space-y-1 col-span-2">
-              <Label>{t('orders.comment')}</Label>
+              <Label>{t('orders.customerComment')}</Label>
               <p className="text-sm font-medium">{order.comment}</p>
+            </div>
+          )}
+
+          {/* Решение платформы и отметка отмены покупателем — отдельно от
+              пожелания покупателя: раньше они его затирали. */}
+          {order.status_comment && (
+            <div className="space-y-1 col-span-2">
+              <Label>{t('orders.statusComment')}</Label>
+              <p className="text-sm font-medium">{order.status_comment}</p>
             </div>
           )}
 
@@ -478,11 +526,28 @@ export function OrderDetailPage() {
         open={askReject}
         onOpenChange={setAskReject}
         title={t('confirm.rejectOrderTitle')}
-        description={t('confirm.rejectOrderText')}
+        description={
+          <div className="space-y-2">
+            <p>{t('confirm.rejectOrderText')}</p>
+            {/* Причина уходит покупателю и магазинам: без неё отказ выглядел
+                случайным. */}
+            <Textarea
+              value={rejectComment}
+              onChange={(e) => setRejectComment(e.target.value)}
+              placeholder={t('orders.rejectCommentPlaceholder')}
+              rows={3}
+            />
+          </div>
+        }
         confirmLabel={t('orders.reject')}
         destructive
         busy={updateStatus.isPending}
-        onConfirm={() => handleStatusUpdate(OrderStatusCode.REJECTED)}
+        onConfirm={() =>
+          updateStatus.mutate(
+            { statusCode: OrderStatusCode.REJECTED, comment: rejectComment.trim() || null },
+            { onSuccess: () => setRejectComment('') },
+          )
+        }
       />
       <ConfirmDialog
         open={rejectPart !== null}

@@ -251,6 +251,15 @@ export const tk = {
     selectedCount: 'Saýlanan: {{count}}',
   },
   warehouses: {
+    writeOff: 'Hasapdan aýyr',
+    returnToShop: 'Dükana gaýtar',
+    writeOffTitle: '«{{product}}» hasapdan aýyrmalymy?',
+    returnToShopTitle: '«{{product}}» dükana gaýtarmalymy?',
+    writeOffText:
+      'Kemçilik, zaýalanma ýa-da ýitgi: haryt satylman galyndydan aýrylar. Ammarda: {{count}}. Açyk sargytlaryň saklaýan harydyny aýryp bolmaýar.',
+    returnToShopText:
+      'Haryt Postshop ammaryndan satyja gaýtarylýar. Ammarda: {{count}}. Açyk sargytlaryň saklaýan harydyny gaýtaryp bolmaýar.',
+    outgoQuantity: 'Mukdar',
     searchPlaceholder: 'Ammarlary gözlemek...',
     name: 'Ammaryň ady',
     namePlaceholder: 'Ammaryň adyny giriziň',
@@ -270,6 +279,10 @@ export const tk = {
     noProducts: 'Ammarda haryt ýok',
   },
   goodsReceiving: {
+    cancel: 'Kabul etmegi ýatyr',
+    cancelTitle: 'Kabul etmegi ýatyrmalymy?',
+    cancelText: 'Resminama ammara girizilmezden ýapylar. Ýatyrylandan soň ony tassyklap bolmaz.',
+    editQuantity: 'Üýtget',
     confirm: 'Kabul edildi diý',
     confirmTitle: 'Harydyň kabul edilenini tassyklamalymy?',
     confirmText:
@@ -278,6 +291,7 @@ export const tk = {
     productsCount: 'Haryt sany',
     totalQuantity: 'Umumy mukdary',
     status: {
+      cancelled: 'Ýatyryldy',
       draft: 'Garalama',
       confirmed: 'Tassyklandy',
     },
@@ -407,7 +421,14 @@ export const tk = {
   },
 
   orders: {
-    searchPlaceholder: 'Sargyt ID ýa-da ulanyjy ID boýunça gözlemek...',
+    searchPlaceholder: 'Sargyt belgisi ýa-da alyjynyň telefony boýunça gözlemek...',
+    filter: {
+      all: 'Hemmesi',
+      fbo: 'Postshop ammaryna garaşýar',
+    },
+    rejectCommentPlaceholder: 'Ret etmegiň sebäbi — ony alyjy we dükanlar görer',
+    customerComment: 'Alyjynyň teswiri',
+    statusComment: 'Platformanyň karary',
     userId: 'Ulanyjy',
     userIdLabel: 'ID {{id}}',
     status: 'Ýagdaýy',

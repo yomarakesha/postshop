@@ -1,15 +1,18 @@
-import { ArrowLeft, Check, Loader2 } from 'lucide-react'
+import { ArrowLeft, Check, Loader2, X } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { useConfirmReceiptMutation } from '../model/useConfirmReceiptMutation'
+import { useCancelReceiptMutation, useUpdateReceiptItemMutation } from '../model/useReceiptActions'
 import { useStockReceiptQuery } from '../model/useStockReceiptQuery'
 import { formatDate } from '@/shared/lib/formatDate'
+import { receiptStatusVariant } from '@/shared/lib/receiptStatus'
 import { ReceiptStatus } from '@/shared/openapi/requests'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
+import { Input } from '@/shared/ui/input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table'
 
 export function GoodsReceivingDetailPage() {
@@ -23,6 +26,11 @@ export function GoodsReceivingDetailPage() {
 
   const confirmReceipt = useConfirmReceiptMutation()
   const [askConfirm, setAskConfirm] = useState(false)
+  const cancelReceipt = useCancelReceiptMutation()
+  const [askCancel, setAskCancel] = useState(false)
+  const updateItem = useUpdateReceiptItemMutation(receiptId)
+  // Правка количества: какая позиция редактируется и введённое значение.
+  const [editing, setEditing] = useState<{ itemId: number; value: string } | null>(null)
 
   if (isLoading) {
     return (
@@ -43,7 +51,7 @@ export function GoodsReceivingDetailPage() {
           <ArrowLeft className="size-4" />
         </Button>
         <h2 className="text-lg font-semibold">{t('goodsReceiving.detailTitle', { id })}</h2>
-        <Badge variant={receipt.status === ReceiptStatus.CONFIRMED ? 'success' : 'default'}>
+        <Badge variant={receiptStatusVariant[receipt.status]}>
           {t(`goodsReceiving.status.${receipt.status}`)}
         </Badge>
 
@@ -51,15 +59,25 @@ export function GoodsReceivingDetailPage() {
             остаток, отменённый закрыт продавцом. Раньше кнопки не было вовсе,
             и документ продавца висел черновиком навсегда. */}
         {receipt.status === ReceiptStatus.DRAFT && (
-          <Button
-            className="ml-auto"
-            disabled={receipt.items.length === 0 || confirmReceipt.isPending}
-            isLoading={confirmReceipt.isPending}
-            onClick={() => setAskConfirm(true)}
-          >
-            <Check className="size-4" />
-            {t('goodsReceiving.confirm')}
-          </Button>
+          <div className="ml-auto flex gap-2">
+            {/* Магазин не привёз товар — черновик раньше было некуда деть. */}
+            <Button
+              variant="outline"
+              disabled={cancelReceipt.isPending || confirmReceipt.isPending}
+              onClick={() => setAskCancel(true)}
+            >
+              <X className="size-4" />
+              {t('goodsReceiving.cancel')}
+            </Button>
+            <Button
+              disabled={receipt.items.length === 0 || confirmReceipt.isPending}
+              isLoading={confirmReceipt.isPending}
+              onClick={() => setAskConfirm(true)}
+            >
+              <Check className="size-4" />
+              {t('goodsReceiving.confirm')}
+            </Button>
+          </div>
         )}
       </div>
 
@@ -116,7 +134,58 @@ export function GoodsReceivingDetailPage() {
                       {item.measure_unit.code}
                     </TableCell>
                     <TableCell className="text-muted-foreground tabular-nums">
-                      {item.quantity}
+                      {editing?.itemId === item.id ? (
+                        <form
+                          className="flex items-center gap-2"
+                          onSubmit={(e) => {
+                            e.preventDefault()
+                            const amount = Number(editing.value)
+                            if (!Number.isFinite(amount) || amount <= 0) return
+                            updateItem.mutate(
+                              { itemId: item.id, quantity: editing.value },
+                              { onSuccess: () => setEditing(null) },
+                            )
+                          }}
+                        >
+                          <Input
+                            type="number"
+                            min="0"
+                            step="0.001"
+                            className="h-8 w-28"
+                            autoFocus
+                            value={editing.value}
+                            onChange={(e) => setEditing({ itemId: item.id, value: e.target.value })}
+                          />
+                          <Button type="submit" size="sm" isLoading={updateItem.isPending}>
+                            {t('save')}
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setEditing(null)}
+                          >
+                            {t('cancel')}
+                          </Button>
+                        </form>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          {item.quantity}
+                          {/* Привезли не столько, сколько заявили: подтверждается
+                              то, что фактически принято. */}
+                          {receipt.status === ReceiptStatus.DRAFT && (
+                            <Button
+                              size="sm"
+                              variant="ghost"
+                              onClick={() =>
+                                setEditing({ itemId: item.id, value: String(item.quantity) })
+                              }
+                            >
+                              {t('goodsReceiving.editQuantity')}
+                            </Button>
+                          )}
+                        </div>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))
@@ -132,6 +201,18 @@ export function GoodsReceivingDetailPage() {
         </div>
       </div>
 
+      <ConfirmDialog
+        open={askCancel}
+        onOpenChange={setAskCancel}
+        title={t('goodsReceiving.cancelTitle')}
+        description={t('goodsReceiving.cancelText')}
+        confirmLabel={t('goodsReceiving.cancel')}
+        destructive
+        busy={cancelReceipt.isPending}
+        onConfirm={() => {
+          cancelReceipt.mutate(receiptId, { onSuccess: () => setAskCancel(false) })
+        }}
+      />
       <ConfirmDialog
         open={askConfirm}
         onOpenChange={setAskConfirm}

@@ -4,10 +4,17 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 
 import { useWarehouseBalancesQuery } from '../model/useWarehouseBalancesQuery'
+import { useWarehouseOutgoMutation } from '../model/useWarehouseOutgoMutation'
+import type { OutgoKind } from '../model/useWarehouseOutgoMutation'
 import { useWarehouseQuery } from '@/pages/warehouse-edit/model/useWarehouseQuery'
+import { PERMISSION_KEYS } from '@/shared/constants/PermissionKeys'
+import { useHasPermission } from '@/shared/hooks/useHasPermission'
 import { getTranslationName } from '@/shared/lib/getTranslationName'
+import type { WarehouseProductBalance } from '@/shared/openapi/requests'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
+import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
+import { Input } from '@/shared/ui/input'
 import {
   InputGroup,
   InputGroupAddon,
@@ -34,6 +41,19 @@ export function WarehouseDetailPage() {
     search,
   )
   const balances = balancesData?.data ?? []
+
+  const { hasPermission } = useHasPermission()
+  const canOutgo = hasPermission(PERMISSION_KEYS.WAREHOUSE_OPERATIONS.create)
+  const outgo = useWarehouseOutgoMutation()
+  const [outgoTarget, setOutgoTarget] = useState<{
+    row: WarehouseProductBalance
+    kind: OutgoKind
+  } | null>(null)
+  const [outgoQuantity, setOutgoQuantity] = useState('')
+  const openOutgo = (row: WarehouseProductBalance, kind: OutgoKind) => {
+    setOutgoQuantity('')
+    setOutgoTarget({ row, kind })
+  }
 
   if (isLoading) {
     return (
@@ -100,12 +120,13 @@ export function WarehouseDetailPage() {
                 <TableHead>{t('warehouses.productName')}</TableHead>
                 <TableHead>{t('warehouses.productPrice')}</TableHead>
                 <TableHead>{t('warehouses.productQuantity')}</TableHead>
+                {canOutgo && <TableHead className="w-0" />}
               </TableRow>
             </TableHeader>
             <TableBody>
               {isBalancesLoading && (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
+                  <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
                     <Loader2 className="mx-auto size-5 animate-spin" />
                   </TableCell>
                 </TableRow>
@@ -131,12 +152,33 @@ export function WarehouseDetailPage() {
                       {row.balance}{' '}
                       {getTranslationName(row.measure_unit?.translations ?? [], i18n.language)}
                     </TableCell>
+                    {canOutgo && (
+                      <TableCell onClick={(e) => e.stopPropagation()}>
+                        <div className="flex justify-end gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openOutgo(row, 'return_to_shop')}
+                          >
+                            {t('warehouses.returnToShop')}
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            className="text-destructive"
+                            onClick={() => openOutgo(row, 'write_off')}
+                          >
+                            {t('warehouses.writeOff')}
+                          </Button>
+                        </div>
+                      </TableCell>
+                    )}
                   </TableRow>
                 ))}
 
               {!isBalancesLoading && balances.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-32 text-center text-muted-foreground">
+                  <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
                     {t('warehouses.noProducts')}
                   </TableCell>
                 </TableRow>
@@ -145,6 +187,64 @@ export function WarehouseDetailPage() {
           </Table>
         </div>
       </div>
+
+      <ConfirmDialog
+        open={outgoTarget !== null}
+        onOpenChange={(open) => !open && setOutgoTarget(null)}
+        title={
+          outgoTarget
+            ? t(
+                outgoTarget.kind === 'write_off'
+                  ? 'warehouses.writeOffTitle'
+                  : 'warehouses.returnToShopTitle',
+                {
+                  product: getTranslationName(outgoTarget.row.product.translations, i18n.language),
+                },
+              )
+            : ''
+        }
+        description={
+          <div className="space-y-2">
+            <p>
+              {t(
+                outgoTarget?.kind === 'write_off'
+                  ? 'warehouses.writeOffText'
+                  : 'warehouses.returnToShopText',
+                { count: Number(outgoTarget?.row.balance ?? 0) },
+              )}
+            </p>
+            <Input
+              type="number"
+              min="0"
+              step="0.001"
+              autoFocus
+              value={outgoQuantity}
+              onChange={(e) => setOutgoQuantity(e.target.value)}
+              placeholder={t('warehouses.outgoQuantity')}
+            />
+          </div>
+        }
+        confirmLabel={t(
+          outgoTarget?.kind === 'write_off' ? 'warehouses.writeOff' : 'warehouses.returnToShop',
+        )}
+        destructive={outgoTarget?.kind === 'write_off'}
+        busy={outgo.isPending}
+        onConfirm={() => {
+          const amount = Number(outgoQuantity)
+          if (!outgoTarget || !Number.isFinite(amount) || amount <= 0) return
+          outgo.mutate(
+            {
+              warehouseId,
+              shopId: outgoTarget.row.product.shop_base_id,
+              productId: outgoTarget.row.product_id,
+              measureUnitId: outgoTarget.row.product.measure_unit_id,
+              kind: outgoTarget.kind,
+              quantity: outgoQuantity,
+            },
+            { onSuccess: () => setOutgoTarget(null) },
+          )
+        }}
+      />
     </div>
   )
 }

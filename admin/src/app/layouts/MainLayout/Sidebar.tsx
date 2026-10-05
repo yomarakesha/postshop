@@ -33,6 +33,7 @@ import { SidebarItem } from './SidebarItem'
 import { SidebarSection } from './SidebarSection'
 import { PERMISSION_KEYS } from '@/shared/constants/PermissionKeys'
 import { useDraftReceiptsCountQuery } from '@/shared/hooks/useDraftReceiptsCountQuery'
+import { useFboAttentionCountQuery } from '@/shared/hooks/useFboAttentionCountQuery'
 import { useFeatures } from '@/shared/hooks/useFeatures'
 import { useHasPermission } from '@/shared/hooks/useHasPermission'
 import { useModerationCountQuery } from '@/shared/hooks/useModerationCountQuery'
@@ -71,7 +72,14 @@ export const Sidebar = ({ headerHeight, open, onClose }: Props) => {
   const { data: ordersCountData } = usePendingOrdersCountQuery(
     hasPermission(PERMISSION_KEYS.ORDERS.updateStatus),
   )
-  const ordersCount = (ordersCountData?.data as { count: number } | undefined)?.count ?? 0
+  // Сборка FBO-частей — тоже работа оператора: без неё в счётчике её не
+  // было видно вовсе.
+  const { data: fboCountData } = useFboAttentionCountQuery(
+    fboEnabled && hasPermission(PERMISSION_KEYS.ORDERS.updateStatus),
+  )
+  const ordersCount =
+    ((ordersCountData?.data as { count: number } | undefined)?.count ?? 0) +
+    ((fboCountData?.data as { count: number } | undefined)?.count ?? 0)
 
   const renderSection = (
     title: string,
