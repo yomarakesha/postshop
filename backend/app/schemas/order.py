@@ -217,6 +217,7 @@ class OrderResponse(BaseModel):
     delivery_price:   Optional[Decimal]          = None
     pickup_point:     Optional[PickupPointResponse] = None
     comment:          Optional[str]              = None
+    status_comment:   Optional[str]              = None
     items:            list[OrderItemResponse]
     shops:            list[ShopFullResponse]     = []
     order_shops:      list[OrderShopResponse]    = []

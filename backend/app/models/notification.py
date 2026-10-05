@@ -46,6 +46,14 @@ class NotificationKind(str, enum.Enum):
     # своё), и сообщение «статус заказа изменился» было бы неправдой.
     order_shop_rejected = "order_shop_rejected"
 
+    # Сотрудник снял товар с продажи. О закрытии магазина владелец узнавал, о
+    # снятии товара — нет: товар просто пропадал из каталога.
+    product_blocked = "product_blocked"
+
+    # Возврат получен назад (покупателю). После одобрения покупатель больше
+    # ничего не узнавал: дошёл ли товар и закрыт ли возврат.
+    return_completed = "return_completed"
+
 
 class Notification(Base):
     """

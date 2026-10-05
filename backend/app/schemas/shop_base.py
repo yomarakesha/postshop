@@ -45,6 +45,8 @@ class ShopBaseResponse(BaseModel):
     legal_entity_type: LegalEntityType
     documents: List[ShopDocument]
     is_active: bool
+    # Закрыт сотрудником: снять такой блок владелец не может.
+    blocked_by_staff: bool = False
     registration_status: RegistrationStatus
     # Причина отказа или замечание модератора: без неё владелец не знает, что
     # исправить, и после подачи заявки наступала тишина.
@@ -65,6 +67,8 @@ class ShopMeResponse(BaseModel):
     registration_status: RegistrationStatus
     registration_comment: Optional[str] = None
     is_active: bool
+    # Закрыт сотрудником: снять такой блок владелец не может.
+    blocked_by_staff: bool = False
     name: Optional[str] = None
     logo_path: Optional[str] = None
 
@@ -78,6 +82,8 @@ class ShopFullResponse(BaseModel):
     legal_entity_type: LegalEntityType
     documents: List[ShopDocument]
     is_active: bool
+    # Закрыт сотрудником: снять такой блок владелец не может.
+    blocked_by_staff: bool = False
     registration_status: RegistrationStatus
     # Рейтинг магазина: те же отзывы о его товарах. Нужен и в карточке магазина,
     # и в списке магазинов, поэтому отдаётся в обеих схемах.

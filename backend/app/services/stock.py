@@ -244,6 +244,38 @@ def _fbo_sold_operation(
     )
 
 
+# ── Единица измерения ────────────────────────────────────────────────────────
+
+def ensure_product_unit(product: Product, measure_unit_id: int) -> None:
+    """Движение по складу — только в единице самого товара.
+
+    Баланс складывает количества как есть: приход «2 коробки» и продажа
+    «5 штук» (продажа всегда пишется в единице товара) давали остаток −3.
+    Пересчёта между единицами нет, поэтому другая единица — ошибка.
+    """
+    if product.measure_unit_id is not None and measure_unit_id != product.measure_unit_id:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Product {product.id} is counted in measure unit "
+                   f"{product.measure_unit_id}, not {measure_unit_id}",
+        )
+
+
+async def product_has_stock_history(db: AsyncSession, product_id: int) -> bool:
+    """Есть ли у товара движения в каком-либо журнале или позиции в заказах.
+
+    После этого единицу товара менять нельзя: старые количества записаны в
+    прежней, и баланс начал бы складывать одно с другим.
+    """
+    for column in (StockOperation.product_id, WarehouseOperation.product_id, OrderItem.product_id):
+        found = (await db.execute(
+            select(column).where(column == product_id).limit(1)
+        )).scalar_one_or_none()
+        if found is not None:
+            return True
+    return False
+
+
 # ── Публичный API (диспатч по warehouse_type) ────────────────────────────────
 
 def is_tracked(warehouse_type: WarehouseType | None) -> bool:
@@ -506,19 +538,15 @@ async def send_out_of_stock_sms(notices: Sequence[OutOfStockNotice]) -> None:
         )
 
 
-# ── Смена типа склада ────────────────────────────────────────────────────────
+# ── Незавершённые дела магазина ──────────────────────────────────────────────
 
-async def warehouse_type_change_blockers(db: AsyncSession, shop_id: int) -> list[str]:
-    """Почему магазину сейчас нельзя сменить FBS ↔ FBO; пусто — можно.
+async def shop_close_blockers(db: AsyncSession, shop_id: int) -> list[str]:
+    """Что у магазина ещё не завершено; пусто — магазин можно закрыть.
 
-    Остаток, резерв и приёмка живут каждый в своём учёте: остаток FBS — в
-    журнале магазина, FBO — на складах платформы. После смены типа старый
-    учёт просто перестаёт читаться — товар «исчезает» с одной стороны и не
-    появляется с другой, открытый заказ списывается не оттуда, а черновик
-    приёмки уже не подтвердить. Поэтому тип меняется только на чистом месте:
-    остатки сведены к нулю, открытых заказов и черновиков приёмки нет.
+    Открытые заказы (живая часть в незакрытом заказе) и возвраты, которые ещё
+    ждут решения или одобрены, но товар не получен назад.
     """
-    from app.models.stock_receipt import ReceiptStatus, StockReceipt
+    from app.models.return_request import ReturnRequest, ReturnStatus
 
     reasons: list[str] = []
 
@@ -535,6 +563,41 @@ async def warehouse_type_change_blockers(db: AsyncSession, shop_id: int) -> list
     )).scalar_one()
     if open_orders:
         reasons.append(f"open orders: {open_orders}")
+
+    open_returns = (await db.execute(
+        select(func.count(ReturnRequest.id))
+        .join(OrderItem, OrderItem.id == ReturnRequest.order_item_id)
+        .join(OrderShop, OrderShop.id == OrderItem.order_shop_id)
+        .where(
+            OrderShop.shop_base_id == shop_id,
+            (ReturnRequest.status == ReturnStatus.pending)
+            | ((ReturnRequest.status == ReturnStatus.approved) & ReturnRequest.received_at.is_(None)),
+        )
+    )).scalar_one()
+    if open_returns:
+        reasons.append(f"unfinished returns: {open_returns}")
+
+    return reasons
+
+
+# ── Смена типа склада ────────────────────────────────────────────────────────
+
+async def warehouse_type_change_blockers(db: AsyncSession, shop_id: int) -> list[str]:
+    """Почему магазину сейчас нельзя сменить FBS ↔ FBO; пусто — можно.
+
+    Остаток, резерв и приёмка живут каждый в своём учёте: остаток FBS — в
+    журнале магазина, FBO — на складах платформы. После смены типа старый
+    учёт просто перестаёт читаться — товар «исчезает» с одной стороны и не
+    появляется с другой, открытый заказ списывается не оттуда, а черновик
+    приёмки уже не подтвердить. Поэтому тип меняется только на чистом месте:
+    остатки сведены к нулю, открытых заказов, незакрытых возвратов и
+    черновиков приёмки нет.
+    """
+    from app.models.stock_receipt import ReceiptStatus, StockReceipt
+
+    # Незакрытый возврат тоже держит старый учёт: он вернётся в журнал по
+    # снимку типа на момент заказа — туда, где после смены его уже не читают.
+    reasons = await shop_close_blockers(db, shop_id)
 
     drafts = (await db.execute(
         select(func.count(StockReceipt.id)).where(

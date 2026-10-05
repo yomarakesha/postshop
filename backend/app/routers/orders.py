@@ -60,7 +60,7 @@ SortOption = Literal["status_asc", "status_desc", "newest", "oldest"]
 VALID_TRANSITIONS: dict[OrderStatusCode, set[OrderStatusCode]] = {
     OrderStatusCode.pending:          {OrderStatusCode.approved, OrderStatusCode.rejected},
     OrderStatusCode.approved:         {OrderStatusCode.ready_to_take, OrderStatusCode.rejected},
-    OrderStatusCode.ready_to_take:    {OrderStatusCode.ready_to_deliver},
+    OrderStatusCode.ready_to_take:    {OrderStatusCode.ready_to_deliver, OrderStatusCode.rejected},
     OrderStatusCode.ready_to_deliver: {OrderStatusCode.completed, OrderStatusCode.rejected},
     OrderStatusCode.rejected:         set(),
     OrderStatusCode.completed:        set(),
@@ -301,6 +301,34 @@ async def get_pending_orders_count(
     return {"count": count}
 
 
+def _fbo_attention_order_ids():
+    """Заказы, в которых часть FBO ждёт склада Postshop: заказ одобрен, а часть
+    ещё не принята или не собрана. Её собирает сотрудник, и найти такую
+    работу он мог, только открывая заказы по одному."""
+    return (
+        select(OrderShop.order_id)
+        .join(Order, OrderShop.order_id == Order.id)
+        .join(OrderStatus, Order.order_status_id == OrderStatus.id)
+        .where(
+            OrderStatus.code == OrderStatusCode.approved,
+            OrderShop.warehouse_type == WarehouseType.fbo,
+            OrderShop.status.in_((LocalOrderStatusCode.pending, LocalOrderStatusCode.approved)),
+        )
+    )
+
+
+@router.get("/fbo/attention-count")
+async def get_fbo_attention_count(
+    db: AsyncSession = Depends(get_db),
+    _=Depends(require_permissions(Perm.ORDERS_UPDATE_STATUS)),
+):
+    """Сколько заказов ждут сборки складом Postshop — для счётчика в админке."""
+    count = (await db.execute(
+        select(func.count(func.distinct(Order.id))).where(Order.id.in_(_fbo_attention_order_ids()))
+    )).scalar_one()
+    return {"count": count}
+
+
 @router.get("/shop/{shop_id}/attention-count")
 async def get_shop_attention_count(
     shop_id: int,
@@ -335,6 +363,10 @@ async def get_orders(
     limit:     int           = limit_param(20),
     status_id: Optional[int] = Query(default=None, description="Фильтр по ID статуса"),
     user_id:   Optional[int] = Query(default=None, description="Фильтр по пользователю"),
+    q:         Optional[str] = Query(default=None, max_length=50,
+                                     description="Номер заказа или часть телефона покупателя"),
+    fbo_attention: bool      = Query(default=False,
+                                     description="Только заказы с частью FBO, ждущей склада Postshop"),
     sort:      SortOption    = Query(default="newest"),
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permissions(Perm.ORDERS_READ)),
@@ -355,6 +387,20 @@ async def get_orders(
         query = query.where(Order.order_status_id == status_id)
     if user_id is not None:
         query = query.where(Order.user_id == user_id)
+
+    # Поиск был только на экране и только среди загруженных 200 заказов:
+    # более старый заказ не находился вовсе.
+    term = (q or "").strip().lstrip("#")
+    if term:
+        phone_match = Order.user_id.in_(
+            select(User.id).where(User.phone.like(f"%{term}%"))
+        )
+        query = query.where(
+            (Order.id == int(term)) | phone_match if term.isdigit() else phone_match
+        )
+
+    if fbo_attention:
+        query = query.where(Order.id.in_(_fbo_attention_order_ids()))
 
     if sort == "status_asc":
         query = query.order_by(asc(Order.order_status_id))
@@ -899,8 +945,26 @@ async def update_order_status(
         raise HTTPException(status_code=404, detail="Target order status not found")
 
     order.order_status_id = target_status.id
+    # Решение платформы — отдельно от пожелания покупателя: раньше оно
+    # затирало comment, и продавец терял слова покупателя.
     if payload.comment is not None:
-        order.comment = payload.comment
+        order.status_comment = payload.comment
+
+    # Об отказе платформы сообщаем магазинам: продавец FBS, уже собравший
+    # заказ, раньше не узнавал, что его отменили. Статусы частей не трогаем —
+    # отказ платформы не отказ магазина, и в его статистику отказов он
+    # попадать не должен; кабинет продавца сам показывает общий «Отклонён».
+    if payload.status_code == OrderStatusCode.rejected:
+        for order_shop in order.order_shops:
+            if order_shop.status == LocalOrderStatusCode.rejected:
+                continue
+            await notify_shop_owner(
+                db,
+                shop_base_id=order_shop.shop_base_id,
+                kind=NotificationKind.order_cancelled,
+                entity_id=order.id,
+                comment=payload.comment,
+            )
 
     # Заказ завершён — списываем проданный товар со склада по не-rejected частям.
     # Идемпотентно и атомарно в этой же транзакции; completed — терминальный статус,
@@ -1107,21 +1171,21 @@ async def cancel_order(
         raise HTTPException(status_code=500, detail="Order status 'rejected' not found. Run migrations.")
 
     order.order_status_id = rejected_status.id
-    order.comment = (
+    order.status_comment = (
         f"{CUSTOMER_CANCEL_MARKER}: {payload.reason}" if payload.reason else CUSTOMER_CANCEL_MARKER
     )
 
-    # Части заказа тоже закрываем: иначе у отменённого заказа остаются «живые»
-    # части, и в кабинете продавца они выглядят ждущими решения. Действия по
-    # ним всё равно запрещены (менять статус части можно только у заказа в
-    # approved), но список показывал бы работу, которой нет.
-    for order_shop in order.order_shops:
-        if order_shop.status != LocalOrderStatusCode.rejected:
-            order_shop.status = LocalOrderStatusCode.rejected
-
+    # Статусы частей не трогаем: отмена покупателем — не отказ магазина, и в
+    # статистику отказов продавца она попадать не должна. Кабинет продавца
+    # по общему rejected сам показывает «Отклонён», а резерв освобождается по
+    # общему статусу.
+    #
     # Магазин мог уже начать собирать заказ. Причину передаём: без неё отмена
-    # выглядит случайной, а по ней видно, что чинить.
+    # выглядит случайной, а по ней видно, что чинить. Магазину, который сам
+    # уже отказался, сообщать нечего.
     for order_shop in order.order_shops:
+        if order_shop.status == LocalOrderStatusCode.rejected:
+            continue
         await notify_shop_owner(
             db,
             shop_base_id=order_shop.shop_base_id,

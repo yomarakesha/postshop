@@ -24,7 +24,11 @@ class Order(Base):
     # NULL — ещё не назначена (pending) или не применима (самовывоз через pickup_point).
     delivery_price   = Column(Numeric(10, 2), nullable=True)
     pickup_point_id  = Column(Integer, ForeignKey("pickup_points.id", ondelete="SET NULL"), nullable=True)
+    # Пожелание покупателя при оформлении. Решение платформы (причина отказа,
+    # отметка отмены покупателем) — в status_comment: раньше оно затирало
+    # пожелание, и продавец терял «позвоните перед доставкой».
     comment          = Column(Text, nullable=True)
+    status_comment   = Column(Text, nullable=True)
     created_at       = Column(UTCDateTime(), server_default=func.now())
     updated_at       = Column(UTCDateTime(), onupdate=func.now())
 

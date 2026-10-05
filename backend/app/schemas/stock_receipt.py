@@ -23,6 +23,18 @@ class StockReceiptItemCreate(BaseModel):
         return v
 
 
+class StockReceiptItemUpdate(BaseModel):
+    """Фактическое количество позиции: привезли не столько, сколько заявили."""
+    quantity: QuantityDec
+
+    @field_validator("quantity")
+    @classmethod
+    def quantity_must_be_positive(cls, v: Decimal) -> Decimal:
+        if v <= 0:
+            raise ValueError("quantity must be greater than 0")
+        return v
+
+
 class MeasureUnitShort(BaseModel):
     id:   int
     code: str

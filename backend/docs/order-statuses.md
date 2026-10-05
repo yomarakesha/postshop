@@ -44,7 +44,7 @@
 ```
 pending          → approved | rejected
 approved         → ready_to_take | rejected
-ready_to_take    → ready_to_deliver
+ready_to_take    → ready_to_deliver | rejected
 ready_to_deliver → completed | rejected
 rejected         → (терминальный)
 completed        → (терминальный)
@@ -70,7 +70,8 @@ rejected      → (терминальный)
 | Метод / путь | Право | Кто | Назначение |
 |--------------|-------|-----|------------|
 | `POST /orders/` | `orders:create` | Покупатель | Создать заказ из своей корзины (тело — см. ниже) |
-| `GET /orders/` | `orders:read` | Админ | Все заказы. Query: `status_id`, `user_id`, `sort`, `skip`, `limit` |
+| `GET /orders/` | `orders:read` | Админ | Все заказы. Query: `status_id`, `user_id`, `q` (номер заказа или часть телефона), `fbo_attention` (часть FBO ждёт склада), `sort`, `skip`, `limit` |
+| `GET /orders/fbo/attention-count` | `orders:update_status` | Админ | Сколько заказов ждут сборки складом Postshop |
 | `GET /orders/my` | `orders:read_own` | Покупатель | Свои заказы. Query: `status_id`, `sort`, `skip`, `limit` |
 | `GET /orders/{order_id}` | `orders:read` | Админ | Один заказ целиком |
 | `GET /orders/shop/{shop_id}` | `orders:read` | Магазин | Кабинет продавца: заказы магазина; `items`/`shops`/`order_shops` в ответе уже обрезаны только до этого магазина |
@@ -122,6 +123,10 @@ rejected      → (терминальный)
 - заказ с `pickup_point` (самовывоз) — не применима, передача вернёт `400`, в заказе остаётся `null`;
 - на любом другом переходе передача `delivery_price` — `400`.
 
+`comment` пишется в `status_comment` заказа (решение платформы), а не в `comment` покупателя.
+При переводе в `rejected` магазинам с живой частью уходит `order_cancelled` с этим комментарием;
+статусы частей не меняются.
+
 Ответы: `200` — обновлённый `OrderResponse`; `400` — недопустимый переход / нарушен гард `ready_to_take` / ошибка `delivery_price`; `404` — заказ или целевой статус не найден.
 
 ## Смена локального статуса — `PATCH /orders/{order_id}/shop/{shop_id}/status`
@@ -138,8 +143,11 @@ rejected      → (терминальный)
 
 - Доступно **только владельцу** заказа (`403` для чужого) и только пока заказ глобально
   в `pending` или `approved` (`400` позже — заказ уже собирается).
-- Переводит заказ в `rejected`; в `comment` пишется `Отменён покупателем` (+ причина,
+- Переводит заказ в `rejected`; в `status_comment` пишется `Отменён покупателем` (+ причина,
   если передана) — по этому префиксу отмена покупателем отличается от отказа админа.
+  `comment` (пожелание покупателя) не трогается.
+- Статусы частей не меняются: отмена покупателем — не отказ магазина. Магазинам с живой
+  частью уходит уведомление `order_cancelled` с причиной.
 - Резерв стока освобождается автоматически, списания не было (оно происходит только на `completed`).
 
 ---
@@ -163,7 +171,8 @@ rejected      → (терминальный)
   "delivery_address": "...",
   "delivery_price": 20.00,                  // null — не назначена (pending) или самовывоз
   "pickup_point": { /* PickupPointResponse | null */ },
-  "comment": "...",
+  "comment": "...",                         // пожелание покупателя при оформлении
+  "status_comment": "...",                  // решение платформы / «Отменён покупателем: …»
 
   "items": [                                // ВСЕ позиции заказа, плоским списком
     { "id": 1, "product_id": 7, "product": { /* ProductResponse */ },

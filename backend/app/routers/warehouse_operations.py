@@ -24,6 +24,7 @@ from app.schemas.warehouse_operation import (
 )
 from app.core.dependencies import require_permissions
 from app.core.permissions import Perm
+from app.services.stock import ensure_product_unit, fbo_available
 
 router = APIRouter()
 
@@ -101,6 +102,7 @@ async def create_warehouse_operation(
             detail=f"Product {product.id} belongs to shop {product.shop_base_id}, "
                    f"not to shop {payload.shop_id}",
         )
+    ensure_product_unit(product, payload.measure_unit_id)
 
     if payload.operation_type in NEGATIVE_TYPES:
         # Без блокировки строки два одновременных списания проходили одну и ту
@@ -123,6 +125,16 @@ async def create_warehouse_operation(
             raise HTTPException(
                 status_code=400,
                 detail=f"Insufficient stock. Available: {balance}, requested: {payload.quantity}",
+            )
+        # Сверх остатка склада — ещё и резерв открытых заказов: товар, который
+        # уже купили, но ещё не выдали, списывать нельзя. Раньше списание его
+        # не видело, и при завершении заказа остаток уходил в минус.
+        free = await fbo_available(db, payload.shop_id, payload.product_id, for_update=True)
+        if free < payload.quantity:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Insufficient stock: part of it is reserved by open orders. "
+                       f"Free: {max(free, Decimal('0'))}, requested: {payload.quantity}",
             )
 
     op = WarehouseOperation(

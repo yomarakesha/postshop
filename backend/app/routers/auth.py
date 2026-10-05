@@ -377,6 +377,7 @@ async def me(current_user: User = Depends(get_current_user), db: AsyncSession = 
             # берут состояние магазина из профиля, а не отдельным запросом.
             registration_comment=sb.registration_comment,
             is_active=sb.is_active,
+            blocked_by_staff=bool(sb.blocked_by_staff),
             name=sa.name if sa else None,
             logo_path=sa.logo_path if sa else None,
         )

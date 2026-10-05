@@ -20,12 +20,14 @@ from app.models.product_translation import ProductTranslation
 from app.schemas.stock_receipt import (
     StockReceiptCreate,
     StockReceiptItemCreate,
+    StockReceiptItemUpdate,
     StockReceiptResponse,
     StockReceiptItemResponse,
 )
 from app.core.dependencies import require_permissions
 from app.core.ownership import STAFF_STOCK, is_staff
 from app.core.permissions import Perm
+from app.services.stock import ensure_product_unit
 
 router = APIRouter()
 
@@ -262,6 +264,7 @@ async def add_item(
             status_code=400,
             detail=f"Product {product.id} does not belong to shop {receipt.shop_id}",
         )
+    ensure_product_unit(product, payload.measure_unit_id)
 
     item = StockReceiptItem(
         receipt_id=receipt_id,
@@ -270,6 +273,48 @@ async def add_item(
         quantity=payload.quantity,
     )
     db.add(item)
+    await db.commit()
+
+    result = await db.execute(
+        select(StockReceiptItem)
+        .options(
+            selectinload(StockReceiptItem.measure_unit),
+            selectinload(StockReceiptItem.product),
+        )
+        .where(StockReceiptItem.id == item.id)
+    )
+    return result.scalar_one()
+
+
+@router.patch("/{receipt_id}/items/{item_id}", response_model=StockReceiptItemResponse)
+async def update_item_quantity(
+    receipt_id: int,
+    item_id: int,
+    payload: StockReceiptItemUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(require_permissions(Perm.STOCK_RECEIPTS_CREATE)),
+):
+    """
+    Исправить количество позиции черновика.
+
+    Складчик при приёмке находил расхождение — привезли меньше заявленного, —
+    и мог только удалить позицию и завести её заново. Подтверждается то, что
+    фактически принято, поэтому количество правится до подтверждения.
+    """
+    receipt = await _get_draft_or_404(receipt_id, db, lock=True)
+    user_shop_ids = await _get_user_shop_ids(current_user, db)
+    await _check_receipt_access(receipt, user_shop_ids, current_user)
+
+    item = (await db.execute(
+        select(StockReceiptItem).where(
+            StockReceiptItem.id == item_id,
+            StockReceiptItem.receipt_id == receipt_id,
+        )
+    )).scalar_one_or_none()
+    if not item:
+        raise HTTPException(status_code=404, detail="Item not found")
+
+    item.quantity = payload.quantity
     await db.commit()
 
     result = await db.execute(

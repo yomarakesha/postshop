@@ -21,6 +21,7 @@ from app.core.ownership import STAFF_STOCK, ensure_can_manage_shop
 from app.models.user import User
 from app.core.permissions import Perm
 from app.services.stock import (
+    ensure_product_unit,
     available as stock_available,
     fbs_available,
     is_tracked,
@@ -176,6 +177,7 @@ async def create_stock_operation(
             detail=f"Product {product.id} belongs to shop {product.shop_base_id}, "
                    f"not to shop {payload.shop_id}",
         )
+    ensure_product_unit(product, payload.measure_unit_id)
 
     if payload.operation_type in NEGATIVE_TYPES:
         # Строка товара блокируется до расчёта: без этого два одновременных
@@ -311,6 +313,7 @@ async def set_stock(
             detail=f"Product {product.id} belongs to shop {product.shop_base_id}, "
                    f"not to shop {payload.shop_id}",
         )
+    ensure_product_unit(product, payload.measure_unit_id)
 
     await db.execute(
         select(Product.id).where(Product.id == payload.product_id).with_for_update()

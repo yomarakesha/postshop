@@ -79,6 +79,8 @@ class Product(Base):
     views_count  = Column(Integer, nullable=False, default=0, server_default="0")
 
     is_active  = Column(Boolean, default=True)
+    # Снят с продажи сотрудником — владелец вернуть его в продажу не может.
+    blocked_by_staff = Column(Boolean, nullable=False, default=False, server_default="0")
     status     = Column(Enum(ProductStatus), default=ProductStatus.pending, nullable=False, index=True)
     moderation_comment = Column(String(500), nullable=True)
     created_at = Column(UTCDateTime(), server_default=func.now())

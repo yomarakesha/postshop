@@ -292,7 +292,7 @@ async def update_shop_additional(
             raise HTTPException(
                 status_code=409,
                 detail="Warehouse type can be changed only when the shop has no stock, "
-                       "open orders or draft receipts. Now: " + "; ".join(blockers),
+                       "open orders, unfinished returns or draft receipts. Now: " + "; ".join(blockers),
             )
         shop_add.warehouse_type = warehouse_type
     if name is not None:

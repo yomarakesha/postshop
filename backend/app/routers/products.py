@@ -28,7 +28,8 @@ from app.core.dependencies import require_permissions
 from app.core.permissions import Perm
 from app.models.notification import NotificationKind
 from app.services.notifications import notify
-from app.core.ownership import is_staff
+from app.core.ownership import STAFF_SHOPS, is_staff
+from app.services.stock import product_has_stock_history
 from app.core.visibility import visible_to_customer, shop_public_conditions
 from app.core.images import remove_files, check_content_type, process_upload
 from app.services.barcode import normalize_vendor_barcode, platform_barcode
@@ -570,6 +571,17 @@ async def update_product(
         mu_res = await db.execute(select(MeasureUnit).where(MeasureUnit.id == measure_unit_id))
         if not mu_res.scalar_one_or_none():
             raise HTTPException(status_code=404, detail="Measure unit not found")
+        # Остаток и заказы записаны в прежней единице: смена смешала бы их в
+        # одном балансе.
+        if (
+            product.measure_unit_id != measure_unit_id
+            and await product_has_stock_history(db, product.id)
+        ):
+            raise HTTPException(
+                status_code=409,
+                detail="Measure unit cannot be changed: the product already has "
+                       "stock movements or orders in the current unit",
+            )
         content_changed |= product.measure_unit_id != measure_unit_id
         product.measure_unit_id = measure_unit_id
 
@@ -673,11 +685,25 @@ async def block_product(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permissions(Perm.PRODUCTS_BLOCK))
 ):
+    """Снять товар с продажи. Владелец снимает свой, сотрудник — любой.
+
+    Снятие сотрудником помечается: вернуть такой товар владелец не может, и
+    ему приходит уведомление — раньше товар просто пропадал из каталога.
+    """
     product = await get_product_or_404(product_id, db)
-    await _ensure_can_manage_shop(product.shop_base_id, current_user, db)
+    shop = await _ensure_can_manage_shop(product.shop_base_id, current_user, db)
     if not product.is_active:
         raise HTTPException(status_code=400, detail="Product is already blocked")
+    by_staff = is_staff(current_user, *STAFF_SHOPS) and current_user.id != shop.owner_id
     product.is_active = False
+    product.blocked_by_staff = by_staff
+    if by_staff:
+        await notify(
+            db,
+            user_id=shop.owner_id,
+            kind=NotificationKind.product_blocked,
+            entity_id=product.id,
+        )
     await db.commit()
     return await get_product_or_404(product_id, db)
 
@@ -692,7 +718,15 @@ async def unblock_product(
     await _ensure_can_manage_shop(product.shop_base_id, current_user, db)
     if product.is_active:
         raise HTTPException(status_code=400, detail="Product is already active")
+    # Снятое платформой владелец не возвращает: иначе блокировка сотрудника
+    # снималась одним запросом.
+    if product.blocked_by_staff and not is_staff(current_user, *STAFF_SHOPS):
+        raise HTTPException(
+            status_code=403,
+            detail="The product was blocked by the platform; only platform staff can unblock it",
+        )
     product.is_active = True
+    product.blocked_by_staff = False
     await db.commit()
     return await get_product_or_404(product_id, db)
 

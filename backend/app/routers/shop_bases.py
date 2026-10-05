@@ -27,6 +27,7 @@ from app.core.ownership import ensure_can_manage_shop, is_staff, STAFF_SHOPS
 from app.core.permissions import Perm
 from app.models.notification import NotificationKind
 from app.services.notifications import notify
+from app.services.stock import shop_close_blockers
 
 
 from app.core.search import normalize_term
@@ -277,6 +278,7 @@ async def get_all_shops_full(
             # сотруднику через GET /shop-bases/{id}.
             documents=[],
             is_active=shop.is_active,
+            blocked_by_staff=bool(shop.blocked_by_staff),
             registration_status=shop.registration_status,
             created_at=shop.created_at,
             updated_at=shop.updated_at,
@@ -354,12 +356,30 @@ async def block_shop_base(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permissions(Perm.SHOP_BASES_BLOCK))
 ):
-    """Закрыть магазин. Владелец закрывает свой, сотрудник — любой."""
+    """Закрыть магазин. Владелец закрывает свой, сотрудник — любой.
+
+    Владелец не может закрыть магазин, пока у него есть незавершённые дела:
+    открытые заказы и одобренные, но не полученные возвраты. Раньше магазин
+    закрывался молча — товары пропадали из каталога, а заказы покупателей
+    оставались висеть без продавца. Сотрудника это не останавливает: закрытие
+    платформой — решение, а не уход продавца, и заказы разбирает она же.
+    """
     shop_base = await ensure_can_manage_shop(shop_id, current_user, db)
     if not shop_base.is_active:
         raise HTTPException(status_code=400, detail="Shop base is already blocked")
 
+    by_staff = is_staff(current_user, *STAFF_SHOPS) and current_user.id != shop_base.owner_id
+    if not by_staff:
+        blockers = await shop_close_blockers(db, shop_id)
+        if blockers:
+            raise HTTPException(
+                status_code=409,
+                detail="Shop cannot be closed while it has unfinished work. Now: "
+                       + "; ".join(blockers),
+            )
+
     shop_base.is_active = False
+    shop_base.blocked_by_staff = by_staff
 
     # Уведомляем, только если закрыл не сам владелец: себе сообщать о своём же
     # действии незачем, а вот закрытие сотрудником владелец иначе обнаружит
@@ -383,12 +403,23 @@ async def unblock_shop_base(
     db: AsyncSession = Depends(get_db),
     current_user: User = Depends(require_permissions(Perm.SHOP_BASES_BLOCK))
 ):
-    """Снова открыть магазин. Владелец может вернуть свой."""
+    """Снова открыть магазин. Владелец может вернуть свой.
+
+    Но не тот, что закрыла платформа: раньше владелец снимал блокировку
+    сотрудника одним запросом — права block/unblock у него есть, а кто
+    поставил блок, не хранилось.
+    """
     shop_base = await ensure_can_manage_shop(shop_id, current_user, db)
     if shop_base.is_active:
         raise HTTPException(status_code=400, detail="Shop base is already active")
+    if shop_base.blocked_by_staff and not is_staff(current_user, *STAFF_SHOPS):
+        raise HTTPException(
+            status_code=403,
+            detail="The shop was closed by the platform; only platform staff can reopen it",
+        )
 
     shop_base.is_active = True
+    shop_base.blocked_by_staff = False
     await db.commit()
     await db.refresh(shop_base)
     return shop_base

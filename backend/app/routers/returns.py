@@ -13,6 +13,7 @@ from app.core.permissions import Perm
 from app.database import get_db
 from app.models.notification import NotificationKind
 from app.models.order import Order, OrderItem
+from app.models.order_shop import LocalOrderStatusCode, OrderShop
 from app.models.order_status import OrderStatus, OrderStatusCode
 from app.models.product import Product
 from app.models.return_request import ReturnRequest, ReturnStatus
@@ -26,7 +27,7 @@ from app.schemas.return_request import (
     ReturnResponse,
 )
 from app.services.notifications import notify, notify_shop_owner
-from app.services.stock import record_return_from_customer
+from app.services.stock import is_tracked, record_return_from_customer
 
 router = APIRouter()
 
@@ -133,10 +134,15 @@ async def create_return(
         .options(selectinload(OrderItem.product))
         .join(Order, Order.id == OrderItem.order_id)
         .join(OrderStatus, OrderStatus.id == Order.order_status_id)
+        .join(OrderShop, OrderShop.id == OrderItem.order_shop_id)
         .where(
             OrderItem.id == payload.order_item_id,
             Order.user_id == current_user.id,
             OrderStatus.code == OrderStatusCode.completed,
+            # Часть, от которой магазин отказался, покупатель не получал и не
+            # оплачивал. Раньше возврат по ней проходил, и при получении у FBS
+            # остаток рос из ничего.
+            OrderShop.status != LocalOrderStatusCode.rejected,
         )
     )
     order_item = result.scalar_one_or_none()
@@ -386,10 +392,23 @@ async def receive_return(
             detail="You can only receive returns of your own shops",
         )
 
-    if payload.restock:
+    # restocked — «вернулся в остаток». Когда остаток по этой части не ведётся
+    # (FBO при выключенном складе платформы, магазин без типа), записывать
+    # некуда, и отметка «в продаже» была бы неправдой.
+    restocked = payload.restock and is_tracked(order_item.order_shop.warehouse_type)
+    if restocked:
         await record_return_from_customer(db, order_item, request.quantity)
     request.received_at = datetime.now(timezone.utc)
-    request.restocked = payload.restock
+    request.restocked = restocked
+
+    # После одобрения покупатель больше ничего не узнавал: дошёл ли товар и
+    # закрыт ли возврат.
+    await notify(
+        db,
+        user_id=request.user_id,
+        kind=NotificationKind.return_completed,
+        entity_id=request.id,
+    )
     await db.commit()
     return _to_response(await _load(db, request_id))
 

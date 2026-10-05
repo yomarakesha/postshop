@@ -65,6 +65,9 @@ class ShopBase(Base):
     # см. app/schemas/shop_base.py::ShopDocument.
     documents = Column(JSON, default=list)
     is_active = Column(Boolean, default=True)
+    # Закрыт сотрудником: владелец такой блок не снимает (свой магазин он
+    # закрывает и открывает сам, но решение платформы — не его).
+    blocked_by_staff = Column(Boolean, nullable=False, default=False, server_default="0")
     registration_status = Column(Enum(RegistrationStatus), default=RegistrationStatus.pending)
     # Причина отказа или замечание модератора. Раньше поля не было вовсе:
     # заявку отклоняли, а владелец не узнавал причину — после подачи наступала

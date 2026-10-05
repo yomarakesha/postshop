@@ -100,6 +100,8 @@ class ProductResponse(BaseModel):
     rating_avg:   Optional[Decimal] = None
     rating_count: int = 0
     is_active:    bool
+    # Снят с продажи сотрудником: вернуть в продажу владелец не может.
+    blocked_by_staff: bool = False
     status:       ProductStatus
     moderation_comment: Optional[str] = None
     created_at:   datetime
