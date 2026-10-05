@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { ExpandableStore } from './ui/ExpandableStore'
 import type { ReactNode } from 'react'
@@ -10,6 +10,7 @@ import InProgressIcon from '#/shared/assets/icons/order-statuses/in-progress.svg
 import PendingIcon from '#/shared/assets/icons/order-statuses/pending.svg?react'
 import { Button } from '#/shared/ui/Button'
 import { Modal } from '#/shared/ui/Modal'
+import { TextArea } from '#/shared/ui/TextArea'
 
 export type OrderStatus = 'done' | 'cancelled' | 'pending' | 'in_progress' | 'attention'
 
@@ -37,6 +38,8 @@ interface OrderStore {
   logo?: string
   products: Array<OrderProduct>
   collapsed?: boolean
+  rejected?: boolean
+  rejectReason?: string | null
 }
 
 interface Props {
@@ -45,12 +48,20 @@ interface Props {
   stores: Array<OrderStore>
   subtotal: number
   discount: number
+  /**
+   * Сумма товаров отказавшихся магазинов: в «К оплате» она не входит. Раньше
+   * итог считался по всем товарам, и покупатель видел сумму больше той,
+   * которую заплатит.
+   */
+  rejectedTotal?: number
   total: number
   deliveryPrice?: number | null
   paymentType?: PaymentType | null
   deliveryAddress?: string | null
   pickupPoint?: PickupPointResponse | null
-  onCancel?: () => void
+  onCancel?: (reason: string | null) => void
+  /** Решение платформы по заказу — например, причина отказа. */
+  statusComment?: string | null
   isCancelling?: boolean
   cancelError?: string | null
   /**
@@ -101,7 +112,9 @@ export const OrderDetails = ({
   stores,
   subtotal,
   discount,
+  rejectedTotal = 0,
   total,
+  statusComment,
   deliveryPrice,
   paymentType,
   deliveryAddress,
@@ -118,6 +131,9 @@ export const OrderDetails = ({
   const { t } = useTranslation()
   const cancelModalRef = useRef<ModalRef>(null)
   const wasCancelling = useRef(false)
+  // Причину отмены сервер принимал всегда, а спросить её было негде:
+  // магазин, уже собиравший заказ, не понимал, что случилось.
+  const [cancelReason, setCancelReason] = useState('')
 
   useEffect(() => {
     if (wasCancelling.current && !isCancelling) {
@@ -141,6 +157,13 @@ export const OrderDetails = ({
               {t('orders.detail.cancelConfirmSubtitle')}
             </p>
           </div>
+          <TextArea
+            rows={3}
+            label={t('orders.detail.cancelReason')}
+            placeholder={t('orders.detail.cancelReasonPlaceholder')}
+            value={cancelReason}
+            onChange={(e) => setCancelReason(e.target.value)}
+          />
           <div className="flex gap-3">
             <Button
               variant="tertiary"
@@ -156,7 +179,7 @@ export const OrderDetails = ({
               size="md"
               className="flex-1"
               disabled={isCancelling}
-              onClick={() => onCancel?.()}
+              onClick={() => onCancel?.(cancelReason.trim() || null)}
             >
               {isCancelling ? '...' : t('orders.detail.cancelConfirmButton')}
             </Button>
@@ -175,6 +198,7 @@ export const OrderDetails = ({
             {partiallyRejected && (
               <p className="t1 text-failure">{t('orders.partiallyRejected')}</p>
             )}
+            {statusComment && <p className="t1 text-center text-passive2">{statusComment}</p>}
             {canCancel && (
               <Button size="md" variant="danger" onClick={() => cancelModalRef.current?.open()}>
                 {t('orders.detail.cancelOrder')}
@@ -248,13 +272,32 @@ export const OrderDetails = ({
             </>
           )}
 
-          {deliveryPrice != null && (
+          {rejectedTotal > 0 && (
+            <div className="flex justify-between p3">
+              <p className="font-medium text-failure">{t('orders.detail.rejectedStores')}</p>
+              <p className="font-semibold text-failure">
+                -{rejectedTotal.toFixed(2)} {t('dashboard.revenue.currency')}
+              </p>
+            </div>
+          )}
+
+          {deliveryPrice != null ? (
             <div className="flex justify-between p3">
               <p className="font-medium">{t('orders.detail.deliveryPrice')}</p>
               <p className="font-semibold">
                 {deliveryPrice.toFixed(2)} {t('dashboard.revenue.currency')}
               </p>
             </div>
+          ) : (
+            // Цену доставки назначает оператор при подтверждении. Без этой
+            // строки итог выглядел окончательным, а потом вырастал.
+            deliveryAddress &&
+            status === 'pending' && (
+              <div className="flex justify-between gap-4 p3">
+                <p className="font-medium">{t('orders.detail.deliveryPrice')}</p>
+                <p className="text-right text-passive2">{t('orders.detail.deliveryPending')}</p>
+              </div>
+            )
           )}
 
           <div className="flex justify-between p3">

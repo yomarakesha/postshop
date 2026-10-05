@@ -2442,7 +2442,9 @@ export const NotificationKindSchema = {
         'return_received',
         'shop_blocked',
         'product_out_of_stock',
-        'order_shop_rejected'
+        'order_shop_rejected',
+        'product_blocked',
+        'return_completed'
     ],
     title: 'NotificationKind',
     description: 'О чём уведомление.\n\nХранится вид, а не готовый текст: витрина работает на четырёх языках, и\nтекст, записанный в базу, был бы всегда на одном из них — том, что был\nвыбран в момент события, а не тем, на котором человек читает.'
@@ -2853,6 +2855,17 @@ export const OrderResponseSchema = {
                 }
             ],
             title: 'Comment'
+        },
+        status_comment: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Status Comment'
         },
         items: {
             items: {
@@ -3720,6 +3733,11 @@ export const ProductResponseSchema = {
         is_active: {
             type: 'boolean',
             title: 'Is Active'
+        },
+        blocked_by_staff: {
+            type: 'boolean',
+            title: 'Blocked By Staff',
+            default: false
         },
         status: {
             $ref: '#/components/schemas/ProductStatus'
@@ -4803,6 +4821,11 @@ export const ShopBaseResponseSchema = {
             type: 'boolean',
             title: 'Is Active'
         },
+        blocked_by_staff: {
+            type: 'boolean',
+            title: 'Blocked By Staff',
+            default: false
+        },
         registration_status: {
             $ref: '#/components/schemas/RegistrationStatus'
         },
@@ -4999,6 +5022,11 @@ export const ShopFullResponseSchema = {
             type: 'boolean',
             title: 'Is Active'
         },
+        blocked_by_staff: {
+            type: 'boolean',
+            title: 'Blocked By Staff',
+            default: false
+        },
         registration_status: {
             $ref: '#/components/schemas/RegistrationStatus'
         },
@@ -5149,6 +5177,11 @@ export const ShopMeResponseSchema = {
         is_active: {
             type: 'boolean',
             title: 'Is Active'
+        },
+        blocked_by_staff: {
+            type: 'boolean',
+            title: 'Blocked By Staff',
+            default: false
         },
         name: {
             anyOf: [
@@ -5519,6 +5552,31 @@ export const StockReceiptItemResponseSchema = {
         'quantity'
     ],
     title: 'StockReceiptItemResponse'
+} as const;
+
+export const StockReceiptItemUpdateSchema = {
+    properties: {
+        quantity: {
+            anyOf: [
+                {
+                    type: 'number',
+                    maximum: 999999999.999,
+                    exclusiveMinimum: 0
+                },
+                {
+                    type: 'string',
+                    pattern: '^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$'
+                }
+            ],
+            title: 'Quantity'
+        }
+    },
+    type: 'object',
+    required: [
+        'quantity'
+    ],
+    title: 'StockReceiptItemUpdate',
+    description: 'Фактическое количество позиции: привезли не столько, сколько заявили.'
 } as const;
 
 export const StockReceiptResponseSchema = {
@@ -7202,6 +7260,17 @@ export const OrderResponseWritableSchema = {
             ],
             title: 'Comment'
         },
+        status_comment: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Status Comment'
+        },
         items: {
             items: {
                 $ref: '#/components/schemas/OrderItemResponseWritable'
@@ -7493,6 +7562,11 @@ export const ProductResponseWritableSchema = {
         is_active: {
             type: 'boolean',
             title: 'Is Active'
+        },
+        blocked_by_staff: {
+            type: 'boolean',
+            title: 'Blocked By Staff',
+            default: false
         },
         status: {
             $ref: '#/components/schemas/ProductStatus'

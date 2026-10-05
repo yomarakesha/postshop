@@ -231,19 +231,25 @@ export const ProductsPage = () => {
                         {t('stock.addOperation', { count: available })}
                       </Button>
                     )}
-                    <Button
-                      variant="tertiary"
-                      size="sm"
-                      className="w-full justify-center"
-                      disabled={busy}
-                      onClick={() =>
-                        product.is_active
-                          ? hide.mutate({ path: { product_id: product.id } })
-                          : show.mutate({ path: { product_id: product.id } })
-                      }
-                    >
-                      {product.is_active ? t('products.hide') : t('products.show')}
-                    </Button>
+                    {/* Снятый платформой товар продавец не возвращает —
+                        сервер ответит 403. Вместо кнопки — почему. */}
+                    {product.blocked_by_staff ? (
+                      <p className="t2 text-center text-failure">{t('products.blockedByStaff')}</p>
+                    ) : (
+                      <Button
+                        variant="tertiary"
+                        size="sm"
+                        className="w-full justify-center"
+                        disabled={busy}
+                        onClick={() =>
+                          product.is_active
+                            ? hide.mutate({ path: { product_id: product.id } })
+                            : show.mutate({ path: { product_id: product.id } })
+                        }
+                      >
+                        {product.is_active ? t('products.hide') : t('products.show')}
+                      </Button>
+                    )}
                   </div>
                 }
               />

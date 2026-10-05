@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getStatusColor, getStatusIcon, sellerOrderStatus } from '../model/statusMeta'
 import type { OrderResponse } from '#/shared/openapi/requests/types.gen'
@@ -10,12 +10,13 @@ import {
 } from '#/shared/openapi/requests/types.gen'
 import { Button } from '#/shared/ui/Button'
 import { Modal } from '#/shared/ui/Modal'
+import { TextArea } from '#/shared/ui/TextArea'
 import { getImageUrl } from '#/shared/utils/getImageUrl'
 
 interface Props {
   order: OrderResponse
   storeId: number
-  onStatusUpdate: (orderId: number, status: LocalOrderStatusCode) => void
+  onStatusUpdate: (orderId: number, status: LocalOrderStatusCode, comment?: string | null) => void
   isUpdating: boolean
   updateError: string | null
 }
@@ -36,6 +37,9 @@ export const StoreOrderDetails = ({
   const { t, i18n } = useTranslation()
   const rejectModalRef = useRef<ModalRef>(null)
   const wasUpdating = useRef(false)
+  // Причина отказа уходит покупателю в уведомлении. Раньше её негде было
+  // указать, и покупатель получал «магазин отказался» без объяснения.
+  const [rejectReason, setRejectReason] = useState('')
 
   useEffect(() => {
     if (wasUpdating.current && !isUpdating) {
@@ -89,6 +93,13 @@ export const StoreOrderDetails = ({
             <h2 className="p1 font-bold text-center">{t('storeOrders.rejectConfirmTitle')}</h2>
             <p className="p3 text-passive2 text-center">{t('storeOrders.rejectConfirmSubtitle')}</p>
           </div>
+          <TextArea
+            rows={3}
+            label={t('storeOrders.rejectReason')}
+            placeholder={t('storeOrders.rejectReasonPlaceholder')}
+            value={rejectReason}
+            onChange={(e) => setRejectReason(e.target.value)}
+          />
           <div className="flex gap-3">
             <Button
               variant="tertiary"
@@ -104,7 +115,9 @@ export const StoreOrderDetails = ({
               size="md"
               className="flex-1"
               disabled={isUpdating}
-              onClick={() => onStatusUpdate(order.id, LocalOrderStatusCode.REJECTED)}
+              onClick={() =>
+                onStatusUpdate(order.id, LocalOrderStatusCode.REJECTED, rejectReason.trim() || null)
+              }
             >
               {isUpdating ? '...' : t('storeOrders.rejectConfirmButton')}
             </Button>

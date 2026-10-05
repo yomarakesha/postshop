@@ -43,6 +43,7 @@ export function notificationTarget(
       return '/profile'
     case NotificationKind.RETURN_APPROVED:
     case NotificationKind.RETURN_REJECTED:
+    case NotificationKind.RETURN_COMPLETED:
       return '/profile/returns'
 
     // Продавцу.
@@ -62,7 +63,9 @@ export function notificationTarget(
     // Товар закончился: ведём в список товаров — там его пополняют или
     // снимают с продажи. Сразу на сам товар: у продавца их сотни, и искать
     // тот, про который уведомление, пришлось бы глазами.
+    // Снятый платформой товар ищут там же — в списке, с отметкой о блоке.
     case NotificationKind.PRODUCT_OUT_OF_STOCK:
+    case NotificationKind.PRODUCT_BLOCKED:
       return store(entityId ? `/products?product=${entityId}` : '/products')
 
     // Здесь entity_id — сам магазин, и искать его по профилю не нужно.

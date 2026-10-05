@@ -144,6 +144,10 @@ export const tk = {
     },
   },
   storeClose: {
+    hasOpenWork:
+      'Açyk sargytlar ýa-da tamamlanmadyk gaýtarmalar bar wagty dükany ýapyp bolmaýar. Olary tamamlaň we täzeden synanyşyň.',
+    closedByStaff:
+      'Dükan platforma tarapyndan ýapyldy. Ony diňe platforma açyp biler — goldaw gullugyna ýazyň.',
     title: 'Dükany ýapmak',
     subtitle:
       'Ýapyk dükan katalogdan aýrylýar: alyjylar harytlary görmeýär we sargyt edip bilmeýär. Öň edilen sargytlary tamamlamaly. Dükany islendik wagt şu ýerde gaýtadan açyp bilersiňiz.',
@@ -306,6 +310,7 @@ export const tk = {
   },
   orders: {
     orderNumber: 'Sargyt #{{id}}',
+    storeRejected: 'Dükan ret etdi',
     partiallyRejected: 'Sargydyň bir bölegini dükan ret etdi',
     months: {
       1: 'Ýanwar',
@@ -339,6 +344,10 @@ export const tk = {
       total: 'Jemi:',
       discount: 'Arzanladyş:',
       deliveryPrice: 'Eltip bermegiň bahasy',
+      rejectedStores: 'Dükanlaryň ret edeni',
+      deliveryPending: 'Bahasyny operator tassyklanda belleýär',
+      cancelReason: 'Ýatyrmagyň sebäbi',
+      cancelReasonPlaceholder: 'Hökmany däl — dükan näme bolandygyna düşüner',
       grandTotal: 'Umumy jemi:',
       pieces: 'sany',
     },
@@ -393,6 +402,8 @@ export const tk = {
       'Operator sargydy kabul edenden soň, sargyt bilen baglanyşykly hereketler elýeterli bolar.',
     markPacked: 'Ýygnaldy',
     rejectConfirmTitle: 'Sargydy ret etmek',
+    rejectReason: 'Ret etmegiň sebäbi',
+    rejectReasonPlaceholder: 'Ony alyjy görer — meselem, «ýok»',
     rejectConfirmSubtitle: 'Bu sargydy ret etmek isleýärsiňizmi?',
     rejectConfirmButton: 'Hawa, ret etmek',
     status: {
@@ -623,6 +634,7 @@ export const tk = {
     declined: 'Ret edildi',
     hide: 'Satuwdan aýyrmak',
     show: 'Satuwa gaýtarmak',
+    blockedByStaff: 'Platforma tarapyndan satuwdan aýryldy',
     addButton: 'Haryt goşmak',
     empty: 'Haryt ýok',
     inReview: 'Barlanýar',
@@ -886,7 +898,8 @@ export const tk = {
     loadMore: 'Ýene görkez',
     kind: {
       order_created: 'Täze sargyt — açyň: haryt sizde bolsa, kabul ediň we ýygnaň',
-      order_cancelled: 'Alyjy sargydy ýatyrdy',
+      order_cancelled: 'Sargyt ýatyryldy',
+      product_blocked: 'Platforma harydy satuwdan aýyrdy',
       receipt_confirmed: 'Kabul ediliş tassyklandy, haryt galyndyda',
       product_out_of_stock: 'Haryt gutardy — ony täzeden getiriň ýa-da satuwdan aýryň',
       review_received: 'Harydyňyz barada täze syn',
@@ -903,6 +916,7 @@ export const tk = {
       review_rejected: 'Synyňyz kabul edilmedi',
       return_approved: 'Yzyna gaýtarmak tassyklandy',
       return_rejected: 'Yzyna gaýtarmak kabul edilmedi',
+      return_completed: 'Gaýtarma kabul edildi we ýapyldy',
     },
   },
 
@@ -947,7 +961,10 @@ export const tk = {
     sending: 'Ugradylýar...',
     sent: 'Yzyna gaýtarmak arzasy ugradyldy',
     notAllowed: 'Bu satyn alyş boýunça gaýtarmak eýýäm dowam edýär ýa-da mümkin däl',
+    awaitingItem: 'Gaýtarma tassyklandy — haryda garaşýarys. Kabul edilende habar geler.',
+    receivedOn: 'Haryt kabul edildi {{date}}',
     status: {
+      received: 'Gaýtarma tamamlandy',
       pending: 'Gaýtarmak seredilýär',
       approved: 'Gaýtarmak tassyklandy',
       rejected: 'Gaýtarmak kabul edilmedi',

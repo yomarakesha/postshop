@@ -10,15 +10,18 @@ import type { OrderResponse } from '#/shared/openapi/requests/types.gen'
 import type { OrderStatus } from '#/widgets/OrderDetails'
 import type { ReviewModalRef } from './ui/ReviewModal'
 import type { ReturnModalRef } from './ui/ReturnModal'
-import { ORDERS_PAGE_SIZE, REFERENCE_LIST_LIMIT } from '#/shared/constants/pagination'
+import { ORDERS_PAGE_SIZE } from '#/shared/constants/pagination'
 import {
   useCancelOrderOrdersOrderIdCancelPost,
-  useGetShopAdditionalsShopAdditionalsGet,
   useListOwnReturnsReturnsMyGet,
   useListOwnReviewsReviewsMyGet,
 } from '#/shared/openapi/queries'
 import { useGetMyOrdersOrdersMyGetKey } from '#/shared/openapi/queries/common'
-import { OrderStatusCode, ReturnStatus } from '#/shared/openapi/requests/types.gen'
+import {
+  LocalOrderStatusCode,
+  OrderStatusCode,
+  ReturnStatus,
+} from '#/shared/openapi/requests/types.gen'
 import { OrderCard } from '#/widgets/OrderCard'
 import { OrderDetails } from '#/widgets/OrderDetails'
 import { Button } from '#/shared/ui/Button'
@@ -32,6 +35,10 @@ import { orderStatusKey } from '#/shared/lib/orderStatus'
 // Отмену сервер разрешает до того, как заказ собран: «ожидает» и
 // «подтверждён» (CUSTOMER_CANCELLABLE_STATUSES в app/routers/orders.py).
 const CANCELLABLE: Array<OrderStatusCode> = [OrderStatusCode.PENDING, OrderStatusCode.APPROVED]
+
+// Префикс, которым сервер помечает отмену покупателем (CUSTOMER_CANCEL_MARKER
+// в app/routers/orders.py).
+const CUSTOMER_CANCEL_MARKER = 'Отменён покупателем'
 
 /**
  * Состояние заказа глазами покупателя.
@@ -86,7 +93,7 @@ const groupByMonth = (orders: Array<OrderResponse>) => {
 }
 
 export const OrdersPage = () => {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
 
   const reviewModalRef = useRef<ReviewModalRef>(null)
   const returnModalRef = useRef<ReturnModalRef>(null)
@@ -140,7 +147,11 @@ export const OrdersPage = () => {
                     : 'text-passive2',
                 )}
               >
-                {t(`returns.status.${existingReturn.status}`)}
+                {/* Одобренный возврат, товар по которому уже получен, —
+                    закрыт. Раньше покупатель видел «одобрен» навсегда. */}
+                {existingReturn.received_at
+                  ? t('returns.status.received')
+                  : t(`returns.status.${existingReturn.status}`)}
               </p>
               {existingReturn.resolution_comment && (
                 <p className="t2 max-w-50 text-right text-passive2">
@@ -247,65 +258,61 @@ export const OrdersPage = () => {
     return t('login.errors.general')
   })()
 
-  const handleCancel = (orderId: number) => {
-    cancelOrder({ path: { order_id: orderId } })
+  const handleCancel = (orderId: number, reason: string | null) => {
+    cancelOrder({ path: { order_id: orderId }, body: { reason } })
   }
-
-  const { data: shopAdditionals = [] } = useGetShopAdditionalsShopAdditionalsGet({
-    query: { limit: REFERENCE_LIST_LIMIT },
-  })
-
-  const shopMap = new Map(shopAdditionals.map((s) => [s.shop_base_id, s]))
 
   const grouped = groupByMonth(orders)
   const selectedOrder = orders.find((o) => o.id === selectedId) ?? null
 
-  const buildStores = (order: OrderResponse) => {
-    const storeMap = new Map<
-      number,
-      {
-        id: number
-        name: string
-        logo?: string
-        products: Array<{
-          id: number
-          productId: number
-          name: string
-          price: number
-          quantity: number
-          image?: string
-        }>
-      }
-    >()
-    for (const item of order.items) {
-      const shopBaseId = item.product.shop_base_id
-      const shop = shopMap.get(shopBaseId)
-      if (!storeMap.has(shopBaseId)) {
-        storeMap.set(shopBaseId, {
-          id: shopBaseId,
-          name: shop?.name ?? t('orders.detail.unnamedStore'),
-          logo: getImageUrl(shop?.logo_path),
-          products: [],
-        })
-      }
-      const productName = item.product.translations[0]?.name ?? ''
-      storeMap.get(shopBaseId)!.products.push({
+  // Название товара — на языке интерфейса: раньше бралась первая запись,
+  // какой бы язык в ней ни был.
+  const productName = (translations: Array<{ language: string; name: string }>) =>
+    (translations.find((tr) => tr.language === i18n.language) ?? translations.at(0))?.name ?? ''
+
+  /**
+   * Магазины заказа — по его частям (`order_shops`), а не по товарам.
+   *
+   * Раньше магазины собирались из товаров, а название и логотип брались из
+   * отдельного справочника с лимитом: магазин за его пределами или закрытый
+   * показывался «без названия». И не было видно, какой магазин отказался и
+   * почему, — данные для этого приходят в самой части заказа.
+   */
+  const buildStores = (order: OrderResponse) =>
+    (order.order_shops ?? []).map((orderShop) => ({
+      id: orderShop.shop_base_id,
+      name: orderShop.shop.additional?.name ?? t('orders.detail.unnamedStore'),
+      logo: getImageUrl(orderShop.shop.additional?.logo_path),
+      rejected: orderShop.status === LocalOrderStatusCode.REJECTED,
+      rejectReason: orderShop.comment,
+      products: orderShop.items.map((item) => ({
         id: item.id,
         productId: item.product.id,
-        name: productName,
+        name: productName(item.product.translations),
         price: parseFloat(item.price_at_order),
         quantity: item.quantity,
         image: getImageUrl(item.product.images?.[0]),
-      })
-    }
-    return Array.from(storeMap.values())
-  }
+      })),
+    }))
 
-  const calcSubtotal = (order: OrderResponse) =>
-    order.items.reduce((sum, item) => sum + parseFloat(item.price_at_order) * item.quantity, 0)
+  // Суммы считает сервер: `total` — все товары, `effective_total` — к оплате,
+  // без отказавшихся магазинов и с доставкой. Раньше итог складывался здесь
+  // из всех товаров, и при отказе магазина был больше настоящего.
+  const goodsTotal = (order: OrderResponse) => parseFloat(order.total)
+  const payTotal = (order: OrderResponse) => parseFloat(order.effective_total)
 
   const getDeliveryPrice = (order: OrderResponse) =>
     order.delivery_price != null ? parseFloat(order.delivery_price) : null
+
+  const rejectedTotal = (order: OrderResponse) =>
+    goodsTotal(order) - (payTotal(order) - (getDeliveryPrice(order) ?? 0))
+
+  // Отметку «Отменён покупателем» показываем только при отказе платформы:
+  // о своей отмене покупатель знает и так.
+  const statusComment = (order: OrderResponse) =>
+    order.status_comment && !order.status_comment.startsWith(CUSTOMER_CANCEL_MARKER)
+      ? order.status_comment
+      : null
 
   if (isLoading) {
     return (
@@ -349,7 +356,7 @@ export const OrdersPage = () => {
                 <OrderCard
                   key={order.id}
                   id={order.id}
-                  price={calcSubtotal(order)}
+                  price={payTotal(order)}
                   date={formatNumericDateTime(order.created_at)}
                   status={statusMap[buyerStatusCode(order)]}
                   label={statusLabel(order)}
@@ -384,14 +391,16 @@ export const OrdersPage = () => {
               canCancel={CANCELLABLE.includes(buyerStatusCode(selectedOrder))}
               partiallyRejected={isPartiallyRejected(selectedOrder)}
               stores={buildStores(selectedOrder)}
-              subtotal={calcSubtotal(selectedOrder)}
+              subtotal={goodsTotal(selectedOrder)}
               discount={0}
-              total={calcSubtotal(selectedOrder) + (getDeliveryPrice(selectedOrder) ?? 0)}
+              rejectedTotal={rejectedTotal(selectedOrder)}
+              total={payTotal(selectedOrder)}
+              statusComment={statusComment(selectedOrder)}
               deliveryPrice={getDeliveryPrice(selectedOrder)}
               paymentType={selectedOrder.payment_type}
               deliveryAddress={selectedOrder.delivery_address}
               pickupPoint={selectedOrder.pickup_point}
-              onCancel={() => handleCancel(selectedOrder.id)}
+              onCancel={(reason) => handleCancel(selectedOrder.id, reason)}
               isCancelling={isCancelling}
               cancelError={cancelError}
               renderProductAction={renderProductActions(selectedOrder)}
@@ -442,14 +451,16 @@ export const OrdersPage = () => {
                 canCancel={CANCELLABLE.includes(buyerStatusCode(selectedOrder))}
                 partiallyRejected={isPartiallyRejected(selectedOrder)}
                 stores={buildStores(selectedOrder)}
-                subtotal={calcSubtotal(selectedOrder)}
+                subtotal={goodsTotal(selectedOrder)}
                 discount={0}
-                total={calcSubtotal(selectedOrder) + (getDeliveryPrice(selectedOrder) ?? 0)}
+                rejectedTotal={rejectedTotal(selectedOrder)}
+                total={payTotal(selectedOrder)}
+                statusComment={statusComment(selectedOrder)}
                 deliveryPrice={getDeliveryPrice(selectedOrder)}
                 paymentType={selectedOrder.payment_type}
                 deliveryAddress={selectedOrder.delivery_address}
                 pickupPoint={selectedOrder.pickup_point}
-                onCancel={() => handleCancel(selectedOrder.id)}
+                onCancel={(reason) => handleCancel(selectedOrder.id, reason)}
                 isCancelling={isCancelling}
                 cancelError={cancelError}
                 renderProductAction={renderProductActions(selectedOrder)}

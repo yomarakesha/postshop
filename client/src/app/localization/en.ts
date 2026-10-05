@@ -144,6 +144,10 @@ export const en = {
     },
   },
   storeClose: {
+    hasOpenWork:
+      "The shop can't be closed while it has open orders or unfinished returns. Finish them and try again.",
+    closedByStaff:
+      'The shop was closed by the platform. Only the platform can reopen it — contact support.',
     title: 'Close the store',
     subtitle:
       'A closed store disappears from the catalog: customers cannot see its products or place orders. Orders already placed must be completed. You can reopen the store here at any time.',
@@ -306,6 +310,7 @@ export const en = {
   },
   orders: {
     orderNumber: 'Order #{{id}}',
+    storeRejected: 'The shop declined',
     partiallyRejected: 'Part of the order was rejected by the store',
     months: {
       1: 'January',
@@ -339,6 +344,10 @@ export const en = {
       total: 'Total:',
       discount: 'Discount:',
       deliveryPrice: 'Delivery price',
+      rejectedStores: 'Declined by shops',
+      deliveryPending: 'The operator sets the price on confirmation',
+      cancelReason: 'Reason for cancelling',
+      cancelReasonPlaceholder: 'Optional — helps the shop understand what happened',
       grandTotal: 'Grand total:',
       pieces: 'pieces',
     },
@@ -392,6 +401,8 @@ export const en = {
     notApproved: 'Order actions will be available once an operator accepts the order.',
     markPacked: 'Packed',
     rejectConfirmTitle: 'Reject order',
+    rejectReason: 'Reason',
+    rejectReasonPlaceholder: 'The customer will see it — e.g. “out of stock”',
     rejectConfirmSubtitle: 'Are you sure you want to reject this order?',
     rejectConfirmButton: 'Yes, reject',
     status: {
@@ -621,6 +632,7 @@ export const en = {
     declined: 'Rejected',
     hide: 'Remove from sale',
     show: 'Return to sale',
+    blockedByStaff: 'Taken off sale by the platform',
     addButton: 'Add product',
     empty: 'No products',
     inReview: 'In review',
@@ -885,7 +897,8 @@ export const en = {
     loadMore: 'Show more',
     kind: {
       order_created: 'New order — open it: if the item is with you, accept and pack it',
-      order_cancelled: 'The customer cancelled an order',
+      order_cancelled: 'An order was cancelled',
+      product_blocked: 'The platform took a product off sale',
       receipt_confirmed: 'Receipt confirmed, stock updated',
       product_out_of_stock: 'A product has run out — replenish it or take it off sale',
       review_received: 'New review of your product',
@@ -902,6 +915,7 @@ export const en = {
       review_rejected: 'Your review was rejected',
       return_approved: 'Return approved',
       return_rejected: 'Return declined',
+      return_completed: 'Your return was received and closed',
     },
   },
 
@@ -946,7 +960,11 @@ export const en = {
     sending: 'Sending...',
     sent: 'Return request sent',
     notAllowed: 'A return for this purchase is already in progress or not possible',
+    awaitingItem:
+      'Return approved — we are waiting for the item. You will be notified when it arrives.',
+    receivedOn: 'Item received {{date}}',
     status: {
+      received: 'Return completed',
       pending: 'Return under review',
       approved: 'Return approved',
       rejected: 'Return declined',

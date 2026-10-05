@@ -21,6 +21,8 @@ export const StoreClosePage = () => {
 
   const shop = useProfileStore((s) => s.profile?.shops?.find((x) => x.id === Number(storeId)))
   const isClosed = Boolean(shop && !shop.is_active)
+  // Закрытый платформой магазин владелец не открывает — сервер ответит 403.
+  const isClosedByStaff = isClosed && Boolean(shop?.blocked_by_staff)
 
   // Профиль — источник признака is_active для всего кабинета (сайдбар, баннер
   // над страницами), поэтому после переключения его нужно перечитать.
@@ -33,7 +35,14 @@ export const StoreClosePage = () => {
       toast.success(t('storeClose.closed'))
       refreshProfile()
     },
-    onError: () => toast.error(t('storeClose.failed')),
+    // 409 — у магазина есть незавершённые дела: открытые заказы или
+    // возвраты. Общее «не удалось» не объясняло, что сделать.
+    onError: (error) =>
+      toast.error(
+        (error as { status?: number } | undefined)?.status === 409
+          ? t('storeClose.hasOpenWork')
+          : t('storeClose.failed'),
+      ),
   })
 
   const reopen = useUnblockShopBaseShopBasesShopIdUnblockPatch(undefined, {
@@ -53,11 +62,15 @@ export const StoreClosePage = () => {
           {isClosed ? t('storeClose.reopenTitle') : t('storeClose.title')}
         </h1>
         <p className="p3 text-passive2">
-          {isClosed ? t('storeClose.reopenSubtitle') : t('storeClose.subtitle')}
+          {isClosedByStaff
+            ? t('storeClose.closedByStaff')
+            : isClosed
+              ? t('storeClose.reopenSubtitle')
+              : t('storeClose.subtitle')}
         </p>
       </div>
 
-      {isClosed ? (
+      {isClosedByStaff ? null : isClosed ? (
         <Button
           disabled={isPending}
           onClick={() => reopen.mutate({ path: { shop_id: Number(storeId) } })}

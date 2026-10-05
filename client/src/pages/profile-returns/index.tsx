@@ -85,9 +85,23 @@ export const ProfileReturnsPage = () => {
                   statusClass[request.status],
                 )}
               >
-                {t(`returns.status.${request.status}`)}
+                {request.received_at
+                  ? t('returns.status.received')
+                  : t(`returns.status.${request.status}`)}
               </span>
             </div>
+
+            {/* Что дальше с одобренным возвратом: раньше покупатель видел
+                «подтверждён» навсегда и не знал, дошёл ли товар. */}
+            {request.status === ReturnStatus.APPROVED && (
+              <p className="t1 mt-2 text-passive2">
+                {request.received_at
+                  ? t('returns.receivedOn', {
+                      date: formatDate(request.received_at, i18n.language),
+                    })
+                  : t('returns.awaitingItem')}
+              </p>
+            )}
 
             <p className="t1 mt-3 whitespace-pre-line">{request.reason}</p>
 

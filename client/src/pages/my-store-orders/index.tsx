@@ -110,10 +110,14 @@ export const OrdersPage = () => {
     return t('login.errors.general')
   })()
 
-  const handleStatusUpdate = (orderId: number, status: LocalOrderStatusCode) => {
+  const handleStatusUpdate = (
+    orderId: number,
+    status: LocalOrderStatusCode,
+    comment?: string | null,
+  ) => {
     updateStatus({
       path: { order_id: orderId, shop_id: Number(storeId) },
-      body: { status_code: status },
+      body: { status_code: status, comment },
     })
   }
 

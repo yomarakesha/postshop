@@ -143,6 +143,10 @@ export const tr = {
     },
   },
   storeClose: {
+    hasOpenWork:
+      'Açık siparişler veya tamamlanmamış iadeler varken mağaza kapatılamaz. Bunları tamamlayıp tekrar deneyin.',
+    closedByStaff:
+      'Mağaza platform tarafından kapatıldı. Yalnızca platform yeniden açabilir — destekle iletişime geçin.',
     title: 'Mağazayı kapat',
     subtitle:
       'Kapalı mağaza katalogdan kaybolur: müşteriler ürünleri göremez ve sipariş veremez. Verilmiş siparişlerin tamamlanması gerekir. Mağazayı istediğiniz zaman buradan yeniden açabilirsiniz.',
@@ -305,6 +309,7 @@ export const tr = {
   },
   orders: {
     orderNumber: 'Sipariş #{{id}}',
+    storeRejected: 'Mağaza reddetti',
     partiallyRejected: 'Siparişin bir kısmı mağaza tarafından reddedildi',
     months: {
       1: 'Ocak',
@@ -338,6 +343,10 @@ export const tr = {
       total: 'Toplam:',
       discount: 'İndirim:',
       deliveryPrice: 'Teslimat ücreti',
+      rejectedStores: 'Mağazaların reddettiği',
+      deliveryPending: 'Fiyatı operatör onayda belirler',
+      cancelReason: 'İptal nedeni',
+      cancelReasonPlaceholder: 'İsteğe bağlı — mağaza ne olduğunu anlar',
       grandTotal: 'Genel toplam:',
       pieces: 'adet',
     },
@@ -391,6 +400,8 @@ export const tr = {
     notApproved: 'Operatör siparişi kabul ettikten sonra sipariş işlemleri kullanılabilir olacak.',
     markPacked: 'Hazırlandı',
     rejectConfirmTitle: 'Siparişi reddet',
+    rejectReason: 'Ret nedeni',
+    rejectReasonPlaceholder: 'Müşteri görecek — örn. “stokta yok”',
     rejectConfirmSubtitle: 'Bu siparişi reddetmek istediğinizden emin misiniz?',
     rejectConfirmButton: 'Evet, reddet',
     status: {
@@ -621,6 +632,7 @@ export const tr = {
     declined: 'Reddedildi',
     hide: 'Satıştan kaldır',
     show: 'Satışa döndür',
+    blockedByStaff: 'Platform tarafından satıştan kaldırıldı',
     addButton: 'Ürün ekle',
     empty: 'Ürün yok',
     inReview: 'İncelemede',
@@ -885,7 +897,8 @@ export const tr = {
     loadMore: 'Daha fazla göster',
     kind: {
       order_created: 'Yeni sipariş — açın: ürün sizdeyse kabul edip hazırlayın',
-      order_cancelled: 'Müşteri siparişi iptal etti',
+      order_cancelled: 'Sipariş iptal edildi',
+      product_blocked: 'Platform bir ürünü satıştan kaldırdı',
       receipt_confirmed: 'Kabul onaylandı, stok güncellendi',
       product_out_of_stock: 'Ürün tükendi — yeniden tedarik edin ya da satıştan kaldırın',
       review_received: 'Ürününüze yeni yorum',
@@ -902,6 +915,7 @@ export const tr = {
       review_rejected: 'Yorumunuz reddedildi',
       return_approved: 'İade onaylandı',
       return_rejected: 'İade reddedildi',
+      return_completed: 'İadeniz teslim alındı ve kapatıldı',
     },
   },
 
@@ -946,7 +960,10 @@ export const tr = {
     sending: 'Gönderiliyor...',
     sent: 'İade talebi gönderildi',
     notAllowed: 'Bu satın alma için iade zaten sürüyor veya mümkün değil',
+    awaitingItem: 'İade onaylandı — ürünü bekliyoruz. Ulaştığında bildirim gelecek.',
+    receivedOn: 'Ürün teslim alındı {{date}}',
     status: {
+      received: 'İade tamamlandı',
       pending: 'İade inceleniyor',
       approved: 'İade onaylandı',
       rejected: 'İade reddedildi',
