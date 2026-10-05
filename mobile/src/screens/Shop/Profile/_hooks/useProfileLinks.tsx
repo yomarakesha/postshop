@@ -45,6 +45,8 @@ const useProfileLinks = (t: TFunction, language: AppLang) => {
   });
   const setOpen = shopBaseApi.useSetOpen(shopBaseId!);
   const isClosed = shopBaseQuery.data?.is_active === false;
+  // Закрытый платформой магазин владелец не открывает — сервер ответит 403.
+  const isClosedByStaff = isClosed && !!shopBaseQuery.data?.blocked_by_staff;
   const shop = useShopStore((s) => s.shop);
   const { fboEnabled } = useFeatures();
   // FBS и FBO — разные способы работы, и у каждого свои разделы, как на
@@ -65,7 +67,12 @@ const useProfileLinks = (t: TFunction, language: AppLang) => {
             type: "success",
             text1: t(open ? "store.close.reopened" : "store.close.closed"),
           }),
-        onError: (error) => ErrorAlert(t, error),
+        // 409 — открытые заказы или незавершённые возвраты: текст сервера
+        // английский и со счётчиками, продавцу нужен понятный.
+        onError: (error) =>
+          error.response?.status === 409
+            ? Toast.show({ type: "error", text1: t("store.close.hasOpenWork") })
+            : ErrorAlert(t, error),
       });
 
     if (isClosed) {
@@ -169,12 +176,16 @@ const useProfileLinks = (t: TFunction, language: AppLang) => {
             icon: PackageCheckIcon,
             onPress: () => router.push("/(shop-tabs)/(profile)/returns"),
           },
-          {
-            title: t(isClosed ? "store.close.reopen" : "store.close.close"),
-            icon: StoreFrontIcon,
-            onPress: onToggleOpen,
-            isDanger: !isClosed,
-          },
+          ...(isClosedByStaff
+            ? []
+            : [
+                {
+                  title: t(isClosed ? "store.close.reopen" : "store.close.close"),
+                  icon: StoreFrontIcon,
+                  onPress: onToggleOpen,
+                  isDanger: !isClosed,
+                },
+              ]),
           {
             title: t("profile.links.logout"),
             icon: SignOut,
@@ -191,7 +202,7 @@ const useProfileLinks = (t: TFunction, language: AppLang) => {
         isVisible: true,
       },
     ],
-    [language, isClosed, isFbs, hasWarehouse],
+    [language, isClosed, isClosedByStaff, isFbs, hasWarehouse],
   );
 
   return { links, langSheetRef };

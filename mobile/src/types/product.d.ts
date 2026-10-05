@@ -35,6 +35,8 @@ declare namespace Product {
     rating_avg?: string | null;
     rating_count?: number;
     is_active: boolean;
+    /** Снят с продажи платформой: вернуть его продавец не может. */
+    blocked_by_staff?: boolean;
     /** Штрихкод Postshop (EAN-13): выдаёт сервер, всегда есть, менять нельзя. */
     barcode: string;
     /** Заводской штрихкод производителя (8/12/13/14 цифр) или null. */

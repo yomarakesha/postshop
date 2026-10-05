@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import CustomTextInput from "@/ui/CustomTextInput";
 import Typography from "@/ui/Typography";
 import { View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
@@ -24,7 +25,9 @@ const ConfirmationModal = () => {
     cancelTitle,
     okTitle,
     animation,
+    inputPlaceholder,
   } = useConfirmationModal();
+  const [inputText, setInputText] = useState("");
   const trueSheetRef = React.useRef<TrueSheet | null>(null);
   const isPresentedRef = React.useRef(false);
   const { t } = useTranslation();
@@ -41,12 +44,14 @@ const ConfirmationModal = () => {
       confirmTitle: "",
       cancelTitle: "",
       okTitle: "",
+      inputPlaceholder: undefined,
     });
+    setInputText("");
   };
 
   // любое действие просто закрывает лист
   const handleConfirm = () => {
-    onConfirm?.();
+    onConfirm?.(inputText.trim() || undefined);
     trueSheetRef.current?.dismiss();
     clearData()
   };
@@ -112,6 +117,15 @@ const ConfirmationModal = () => {
         <Typography isCentered color="secondary">
           {description}
         </Typography>
+        {inputPlaceholder !== undefined && (
+          <CustomTextInput
+            value={inputText}
+            onChangeText={setInputText}
+            placeholder={inputPlaceholder}
+            multiline
+            maxLength={1000}
+          />
+        )}
 
         <View style={styles.footer}>
           {onConfirm ? (

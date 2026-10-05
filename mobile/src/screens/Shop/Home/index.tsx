@@ -35,6 +35,8 @@ const HomeScreen = () => {
   });
   const setOpen = shopBaseApi.useSetOpen(shopBaseId!);
   const isClosed = shopBaseQuery.data?.is_active === false;
+  // Закрытый платформой магазин владелец не открывает — сервер ответит 403.
+  const isClosedByStaff = isClosed && !!shopBaseQuery.data?.blocked_by_staff;
 
   const reopen = () =>
     setOpen.mutate(true, {
@@ -93,14 +95,20 @@ const HomeScreen = () => {
         {isClosed && (
           <View style={styles.closed}>
             <Typography variant="p3" weight="medium">
-              {t("store.close.reopenSubtitle")}
+              {t(
+                isClosedByStaff
+                  ? "store.close.closedByStaff"
+                  : "store.close.reopenSubtitle",
+              )}
             </Typography>
-            <Button
-              title={t("store.close.reopen")}
-              variant="primary"
-              disabled={setOpen.isPending}
-              onPress={reopen}
-            />
+            {!isClosedByStaff && (
+              <Button
+                title={t("store.close.reopen")}
+                variant="primary"
+                disabled={setOpen.isPending}
+                onPress={reopen}
+              />
+            )}
           </View>
         )}
         <SummaryWidget shopBaseId={shopBaseId} t={t} language={lang} />

@@ -96,8 +96,14 @@ const OrderScreen = () => {
   const handleCancel = () => {
     useConfirmationModal.setState({
       isOpen: true,
-      onConfirm: () =>
-        updateOrderShopStatusMutation.mutate({ status_code: "rejected" }),
+      // Причина уходит покупателю: раньше он получал «магазин отказался»
+      // без объяснения.
+      onConfirm: (reason) =>
+        updateOrderShopStatusMutation.mutate({
+          status_code: "rejected",
+          comment: reason ?? null,
+        }),
+      inputPlaceholder: t("store.order.rejectReasonPlaceholder"),
       Icon: OctagonXIcon,
       title: t("confirmCancelOrder.title"),
       description: t("confirmCancelOrder.description"),

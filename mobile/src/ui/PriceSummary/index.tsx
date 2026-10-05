@@ -51,6 +51,11 @@ type Props = {
   deliveryPrice?: number;
   /** Валюта из данных корзины; при отсутствии formatMoney подставит TMT. */
   currency?: CurrencySource;
+  /**
+   * Подпись строки вычета. По умолчанию «Скидка»; в заказе вычитаются товары
+   * отказавшихся магазинов, и называть их скидкой — неправда.
+   */
+  discountLabel?: string;
 };
 
 const PriceSummary = ({
@@ -67,6 +72,7 @@ const PriceSummary = ({
   withoutSummary,
   deliveryPrice,
   currency,
+  discountLabel,
 }: Props) => {
   const hasDiscount = discountPrice > 0;
   const hasDelivery = typeof deliveryPrice === "number" && deliveryPrice > 0;
@@ -116,7 +122,7 @@ const PriceSummary = ({
                 color="secondary"
                 style={styles.label}
               >
-                {t("client.cart.footer.discount")}
+                {discountLabel ?? t("client.cart.footer.discount")}
               </Typography>
               <Typography
                 variant="p3"

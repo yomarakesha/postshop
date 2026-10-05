@@ -181,7 +181,8 @@ const useUpdateShopStatus = ({
   const mutation = useMutation<
     undefined,
     AxiosError<ApiErrorResponse>,
-    { status_code: Order.ShopOrderStatus }
+    // comment — причина отказа: уходит покупателю в уведомлении.
+    { status_code: Order.ShopOrderStatus; comment?: string | null }
   >({
     mutationKey: ["update-shop-status", orderId, shopId],
     mutationFn: async (data) => {
@@ -210,12 +211,19 @@ const useUpdateShopStatus = ({
 
 const useUpdateStatus = (orderId: number) => {
   const queryClient = useQueryClient();
-  const mutation = useMutation<undefined, AxiosError<ApiErrorResponse>>({
+  // reason — причина отмены: уходит магазинам, которые уже могли собирать
+  // заказ.
+  const mutation = useMutation<
+    undefined,
+    AxiosError<ApiErrorResponse>,
+    string | undefined
+  >({
     mutationKey: ["update-status", orderId],
-    mutationFn: async () => {
+    mutationFn: async (reason) => {
       const query = await api.req({
         method: "POST",
         url: `/orders/${orderId}/cancel`,
+        data: { reason: reason ?? null },
       });
       return query.data;
     },

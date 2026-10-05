@@ -113,6 +113,13 @@ const MyProductsScreen = () => {
               </CardButtonLabel>
             </Button>
           )}
+          {/* Снятый платформой товар продавец не возвращает — сервер
+              ответит 403. Вместо кнопки — почему. */}
+          {product.blocked_by_staff ? (
+            <Typography variant="t2" color="error" style={styles.blockedNote}>
+              {t("store.myProducts.blockedByStaff")}
+            </Typography>
+          ) : (
           <Button
             variant="secondary"
             style={styles.footerButton}
@@ -132,6 +139,7 @@ const MyProductsScreen = () => {
               )}
             </CardButtonLabel>
           </Button>
+          )}
         </View>
       );
     },
@@ -220,6 +228,9 @@ const styles = StyleSheet.create((theme) => ({
   footer: {
     marginTop: theme.spacing(2),
     gap: theme.spacing(2),
+  },
+  blockedNote: {
+    textAlign: "center",
   },
   footerButton: {
     minHeight: theme.spacing(10),

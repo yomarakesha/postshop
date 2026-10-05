@@ -4,7 +4,13 @@ export type ConfirmationModalState = {
   isOpen: boolean;
   title: string;
   description: string;
-  onConfirm?: () => void;
+  /** text — то, что ввели в поле (если поле показано). */
+  onConfirm?: (text?: string) => void;
+  /**
+   * Необязательное поле ввода — например, причина отказа. Без него окно
+   * только спрашивает «да / нет».
+   */
+  inputPlaceholder?: string;
   animation: boolean;
   type: "danger" | "warning" | "success" | "info";
   Icon: SvgType | null;

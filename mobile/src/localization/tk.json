@@ -448,6 +448,7 @@
       "footer": {
         "title": "Umumy baha",
         "goodsPrice": "Harytlaryň bahasy",
+        "rejectedStores": "Dükanlaryň ret edeni:",
         "discount": "Arzanladyş",
         "grandTotal": "Umumy jemi"
       },
@@ -465,9 +466,14 @@
         "status": {
           "pending": "Gaýtarmak seredilýär",
           "approved": "Gaýtarmak tassyklandy",
-          "rejected": "Gaýtarmak kabul edilmedi"
-        }
-      }
+          "rejected": "Gaýtarmak kabul edilmedi",
+          "received": "Gaýtarma tamamlandy"
+        },
+        "cancel": "Yzyna al",
+        "cancelTitle": "Gaýtarma arzasyny yzyna almalymy?",
+        "cancelText": "Arza entek seredilmedi. Soňra ony täzeden berip bolar."
+      },
+      "cancelReasonPlaceholder": "Ýatyrmagyň sebäbi (hökmany däl)"
     },
     "selectLanguage": {
       "title": "Dili saýlaň",
@@ -525,7 +531,8 @@
     "order": {
       "noApproved": "Operator sargydy kabul edenden soň, sargyt bilen baglanyşykly hereketler elýeterli bolar.",
       "readyToPickup": "Ýygnaldy",
-      "fboNote": "Sargydy Postshop ammary ýygnaýar — sizden hiç zat talap edilmeýär"
+      "fboNote": "Sargydy Postshop ammary ýygnaýar — sizden hiç zat talap edilmeýär",
+      "rejectReasonPlaceholder": "Ret etmegiň sebäbi — ony alyjy görer"
     },
     "add": "Haryt goş",
     "shopAdditional": {
@@ -602,6 +609,7 @@
       },
       "hide": "Satuwdan aýyrmak",
       "show": "Satuwa gaýtarmak",
+      "blockedByStaff": "Platforma tarapyndan satuwdan aýryldy",
       "hidden": "Satuwdan aýryldy"
     },
     "addEditProduct": {
@@ -667,6 +675,8 @@
     },
     "close": {
       "close": "Dükany ýapmak",
+      "hasOpenWork": "Açyk sargytlar ýa-da tamamlanmadyk gaýtarmalar bar wagty dükany ýapyp bolmaýar. Olary tamamlaň we täzeden synanyşyň.",
+      "closedByStaff": "Dükan platforma tarapyndan ýapyldy. Ony diňe platforma açyp biler — goldaw gullugyna ýazyň.",
       "closed": "Dükan ýapyldy",
       "reopen": "Dükany açmak",
       "reopened": "Dükan açyldy",
@@ -770,7 +780,8 @@
     "dismiss": "Habarnamany aýyrmak",
     "loadMore": "Ýene görkez",
     "kind": {
-      "order_cancelled": "Alyjy sargydy ýatyrdy",
+      "order_cancelled": "Sargyt ýatyryldy",
+      "product_blocked": "Platforma harydy satuwdan aýyrdy",
       "order_created": "Dükanyňyzda täze sargyt — satyjy tertibinde «Sargytlar» bölüminde kabul ediň",
       "order_shop_rejected": "Dükan sargydyň bir böleginden ýüz öwürdi",
       "order_status": "Sargydyň ýagdaýy üýtgedi",
@@ -781,6 +792,7 @@
       "return_approved": "Yzyna gaýtarmak tassyklandy",
       "return_received": "Gaýtarma tassyklandy — haryt size gaýdyp geler; «Yzyna gaýtarmalar» bölüminde alnandygyny belläň",
       "return_rejected": "Yzyna gaýtarmak kabul edilmedi",
+      "return_completed": "Gaýtarma kabul edildi we ýapyldy",
       "review_approved": "Synyňyz ýerleşdirildi",
       "review_received": "Harydyňyz barada täze syn",
       "review_rejected": "Synyňyz kabul edilmedi",

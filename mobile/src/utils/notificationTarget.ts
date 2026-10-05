@@ -49,6 +49,7 @@ export const notificationTarget = (
     case "return_approved":
     case "return_rejected":
     case "return_received":
+    case "return_completed":
     case "review_approved":
     case "review_rejected":
     case "review_received":
@@ -59,6 +60,7 @@ export const notificationTarget = (
     case "order_cancelled":
     case "receipt_confirmed":
     case "product_out_of_stock":
+    case "product_blocked":
       return null;
 
     default:

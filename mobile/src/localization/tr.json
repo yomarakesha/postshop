@@ -448,6 +448,7 @@
       "footer": {
         "title": "Sipariş özeti",
         "goodsPrice": "Ürün fiyatı",
+        "rejectedStores": "Mağazaların reddettiği:",
         "discount": "İndirim",
         "grandTotal": "Genel toplam"
       },
@@ -465,9 +466,14 @@
         "status": {
           "pending": "İade inceleniyor",
           "approved": "İade onaylandı",
-          "rejected": "İade reddedildi"
-        }
-      }
+          "rejected": "İade reddedildi",
+          "received": "İade tamamlandı"
+        },
+        "cancel": "Geri çek",
+        "cancelTitle": "İade talebi geri çekilsin mi?",
+        "cancelText": "Henüz incelenmedi. Daha sonra yeniden gönderebilirsiniz."
+      },
+      "cancelReasonPlaceholder": "İptal nedeni (isteğe bağlı)"
     },
     "selectLanguage": {
       "title": "Dilinizi seçin",
@@ -526,7 +532,8 @@
     "order": {
       "noApproved": "Sipariş işlemleri, bir operatör siparişi kabul ettikten sonra kullanılabilir olacaktır.",
       "readyToPickup": "Hazırlandı",
-      "fboNote": "Sipariş Postshop deposu tarafından hazırlanıyor — sizden bir şey yapmanız gerekmiyor"
+      "fboNote": "Sipariş Postshop deposu tarafından hazırlanıyor — sizden bir şey yapmanız gerekmiyor",
+      "rejectReasonPlaceholder": "Ret nedeni — müşteri görecek"
     },
     "shopAdditional": {
       "onboarding": {
@@ -602,6 +609,7 @@
       },
       "hide": "Satıştan kaldır",
       "show": "Satışa döndür",
+      "blockedByStaff": "Platform tarafından satıştan kaldırıldı",
       "hidden": "Satışta değil"
     },
     "addEditProduct": {
@@ -667,6 +675,8 @@
     },
     "close": {
       "close": "Mağazayı kapat",
+      "hasOpenWork": "Açık siparişler veya tamamlanmamış iadeler varken mağaza kapatılamaz. Bunları tamamlayıp tekrar deneyin.",
+      "closedByStaff": "Mağaza platform tarafından kapatıldı. Yalnızca platform yeniden açabilir — destekle iletişime geçin.",
       "closed": "Mağaza kapatıldı",
       "reopen": "Mağazayı aç",
       "reopened": "Mağaza açıldı",
@@ -770,7 +780,8 @@
     "dismiss": "Bildirimi kaldır",
     "loadMore": "Daha fazla göster",
     "kind": {
-      "order_cancelled": "Müşteri siparişi iptal etti",
+      "order_cancelled": "Sipariş iptal edildi",
+      "product_blocked": "Platform bir ürünü satıştan kaldırdı",
       "order_created": "Mağazanızda yeni sipariş — satıcı modunda «Siparişler»den kabul edin",
       "order_shop_rejected": "Bir mağaza siparişinizin bir kısmını reddetti",
       "order_status": "Sipariş durumu değişti",
@@ -781,6 +792,7 @@
       "return_approved": "İade onaylandı",
       "return_received": "İade onaylandı — ürün size geri dönecek; teslim almayı «İadeler»de işaretleyin",
       "return_rejected": "İade reddedildi",
+      "return_completed": "İadeniz teslim alındı ve kapatıldı",
       "review_approved": "Yorumunuz yayınlandı",
       "review_received": "Ürününüze yeni yorum",
       "review_rejected": "Yorumunuz reddedildi",

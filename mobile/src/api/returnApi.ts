@@ -85,9 +85,26 @@ const useCreate = () => {
   });
 };
 
+/**
+ * Отозвать свою заявку, пока её не рассмотрели. На витрине это было, в
+ * приложении — нет: ошибочную заявку оставалось только ждать.
+ */
+const useCancel = () => {
+  const queryClient = useQueryClient();
+  return useMutation<void, AxiosError<ApiErrorResponse>, number>({
+    mutationFn: async (id) => {
+      await api.req({ method: "DELETE", url: `/returns/${id}` });
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: [MY_RETURNS_KEY] });
+    },
+  });
+};
+
 export const returnApi = {
   useShopReturns,
   useReceive,
   useMyReturns,
   useCreate,
+  useCancel,
 };

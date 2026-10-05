@@ -59,18 +59,36 @@ const OrderScreen = () => {
   const handleReject = () => {
     useConfirmationModal.setState({
       isOpen: true,
-      onConfirm: async () => {
+      onConfirm: async (reason) => {
         try {
-          await updateOrderStatusMutation.mutateAsync();
+          await updateOrderStatusMutation.mutateAsync(reason);
           router.back();
         } catch (e) {
           ErrorAlert(t, e as any);
         }
       },
+      // Причину сервер принимал всегда, а спросить её было негде.
+      inputPlaceholder: t("client.order.cancelReasonPlaceholder"),
       Icon: OctagonXIcon,
       title: t("confirmCancelOrder.title"),
       description: t("confirmCancelOrder.description"),
       confirmTitle: t("confirmCancelOrder.cancel"),
+      cancelTitle: t("common.no"),
+    });
+  };
+
+  const cancelReturn = returnApi.useCancel();
+  const handleCancelReturn = (returnId: number) => {
+    useConfirmationModal.setState({
+      isOpen: true,
+      onConfirm: () =>
+        cancelReturn.mutate(returnId, {
+          onError: (error) => ErrorAlert(t, error),
+        }),
+      Icon: OctagonXIcon,
+      title: t("client.order.returns.cancelTitle"),
+      description: t("client.order.returns.cancelText"),
+      confirmTitle: t("client.order.returns.cancel"),
       cancelTitle: t("common.no"),
     });
   };
@@ -213,7 +231,11 @@ const OrderScreen = () => {
                 t={t}
                 returns={
                   isCompleted
-                    ? { byItemId: returnsByItemId, onReturn: handleReturn }
+                    ? {
+                        byItemId: returnsByItemId,
+                        onReturn: handleReturn,
+                        onCancelReturn: handleCancelReturn,
+                      }
                     : undefined
                 }
               />
@@ -225,6 +247,7 @@ const OrderScreen = () => {
           <PriceSummary
             price={price}
             discountPrice={rejected}
+            discountLabel={t("client.order.footer.rejectedStores")}
             deliveryPrice={delivery}
             total={effectiveTotal}
             // Без alwaysShowSubtotal: когда скидки нет, «Общая стоимость» и

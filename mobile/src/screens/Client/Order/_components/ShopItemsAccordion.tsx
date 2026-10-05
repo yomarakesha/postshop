@@ -35,6 +35,8 @@ type Props = {
     /** Последняя заявка по строке заказа, если была. */
     byItemId: Map<number, ReturnRequest.Item>;
     onReturn: (item: Order.ItemProduct) => void;
+    /** Отозвать нерассмотренную заявку. */
+    onCancelReturn: (returnId: number) => void;
   };
 };
 
@@ -244,13 +246,28 @@ const ShopItemsAccordion = ({
                         }
                         style={styles.returnStatus}
                       >
-                        {t(`client.order.returns.status.${lastReturn.status}`)}
+                        {/* Получённый назад товар закрывает возврат: раньше
+                          «одобрен» висел навсегда. */}
+                        {lastReturn.received_at
+                          ? t("client.order.returns.status.received")
+                          : t(`client.order.returns.status.${lastReturn.status}`)}
                       </Typography>
                     ) : (
                       <View style={styles.returnStatus} />
                     )}
                     {/* После отказа можно попросить снова — например, с
                       другой причиной; сервер это допускает. */}
+                    {lastReturn?.status === "pending" ? (
+                      <Pressable
+                        onPress={() => returns?.onCancelReturn(lastReturn.id)}
+                        hitSlop={10}
+                        accessibilityRole="button"
+                      >
+                        <Typography variant="t1" weight="semiBold" color="error">
+                          {t("client.order.returns.cancel")}
+                        </Typography>
+                      </Pressable>
+                    ) : null}
                     {!hasActiveReturn ? (
                       <Pressable
                         onPress={() => returns?.onReturn(item)}

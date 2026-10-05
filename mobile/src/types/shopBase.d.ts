@@ -40,6 +40,8 @@ declare namespace ShopBase {
     legal_entity_type: Type;
     documents: Document[];
     is_active: boolean;
+    /** Закрыт платформой: открыть его владелец не может. */
+    blocked_by_staff?: boolean;
     registration_status: Status;
     created_at: Date;
     updated_at: Date;

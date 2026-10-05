@@ -448,6 +448,7 @@
       "footer": {
         "title": "Order summary",
         "goodsPrice": "Goods price",
+        "rejectedStores": "Declined by shops:",
         "discount": "Discount",
         "grandTotal": "Grand total"
       },
@@ -465,9 +466,14 @@
         "status": {
           "pending": "Return under review",
           "approved": "Return approved",
-          "rejected": "Return declined"
-        }
-      }
+          "rejected": "Return declined",
+          "received": "Return completed"
+        },
+        "cancel": "Withdraw",
+        "cancelTitle": "Withdraw the return request?",
+        "cancelText": "It has not been reviewed yet. You can submit it again later."
+      },
+      "cancelReasonPlaceholder": "Reason for cancelling (optional)"
     },
     "selectLanguage": {
       "title": "Choose your language",
@@ -526,7 +532,8 @@
     "order": {
       "noApproved": "Order actions will be available once an operator accepts the order.",
       "readyToPickup": "Packed",
-      "fboNote": "The order is fulfilled by the Postshop warehouse — nothing is required from you"
+      "fboNote": "The order is fulfilled by the Postshop warehouse — nothing is required from you",
+      "rejectReasonPlaceholder": "Reason — the customer will see it"
     },
     "shopAdditional": {
       "onboarding": {
@@ -602,6 +609,7 @@
       },
       "hide": "Remove from sale",
       "show": "Return to sale",
+      "blockedByStaff": "Taken off sale by the platform",
       "hidden": "Not for sale"
     },
     "addEditProduct": {
@@ -667,6 +675,8 @@
     },
     "close": {
       "close": "Close the store",
+      "hasOpenWork": "The shop can't be closed while it has open orders or unfinished returns. Finish them and try again.",
+      "closedByStaff": "The shop was closed by the platform. Only the platform can reopen it — contact support.",
       "closed": "The store is closed",
       "reopen": "Reopen the store",
       "reopened": "The store is open",
@@ -770,7 +780,8 @@
     "dismiss": "Dismiss notification",
     "loadMore": "Show more",
     "kind": {
-      "order_cancelled": "The customer cancelled an order",
+      "order_cancelled": "An order was cancelled",
+      "product_blocked": "The platform took a product off sale",
       "order_created": "New order in your shop — accept it in seller mode, «Orders»",
       "order_shop_rejected": "A store rejected part of your order",
       "order_status": "Order status changed",
@@ -781,6 +792,7 @@
       "return_approved": "Return approved",
       "return_received": "Return approved — the item is coming back to you; mark it received in “Returns”",
       "return_rejected": "Return declined",
+      "return_completed": "Your return was received and closed",
       "review_approved": "Your review is published",
       "review_received": "New review of your product",
       "review_rejected": "Your review was rejected",
