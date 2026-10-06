@@ -24,6 +24,7 @@ export const notificationTarget = (
     // Покупателю.
     case "order_status":
     case "order_shop_rejected":
+    case "order_approved_delivery":
       return entityId
         ? { pathname: "/(client-tabs)/(orders)/order/[id]", params: { id: String(entityId) } }
         : "/(client-tabs)/(orders)";

@@ -37,6 +37,8 @@ type Props = {
     onReturn: (item: Order.ItemProduct) => void;
     /** Отозвать нерассмотренную заявку. */
     onCancelReturn: (returnId: number) => void;
+    /** Срок подачи возврата; после него кнопки нет. */
+    returnUntil: string | null;
   };
 };
 
@@ -164,6 +166,11 @@ const ShopItemsAccordion = ({
             // Отклонённую магазином часть покупатель не получал — возвращать
             // нечего.
             const canRequestReturn = !!returns && !isRejected;
+            // Возврат — 14 дней после завершения: сервер позднюю заявку не
+            // примет, поэтому и кнопку не предлагаем.
+            const returnClosed =
+              !!returns?.returnUntil &&
+              new Date(returns.returnUntil).getTime() < Date.now();
             const lastReturn = returns?.byItemId.get(item.id);
             const hasActiveReturn =
               !!lastReturn &&
@@ -268,7 +275,12 @@ const ShopItemsAccordion = ({
                         </Typography>
                       </Pressable>
                     ) : null}
-                    {!hasActiveReturn ? (
+                    {!hasActiveReturn && returnClosed ? (
+                      <Typography variant="t2" color="secondary">
+                        {t("client.order.returns.periodOver")}
+                      </Typography>
+                    ) : null}
+                    {!hasActiveReturn && !returnClosed ? (
                       <Pressable
                         onPress={() => returns?.onReturn(item)}
                         hitSlop={10}
@@ -280,6 +292,19 @@ const ShopItemsAccordion = ({
                       </Pressable>
                     ) : null}
                   </View>
+                ) : null}
+                {/* Одобренный возврат: куда нести товар и сколько вернут. */}
+                {canRequestReturn &&
+                lastReturn?.status === "approved" &&
+                !lastReturn.received_at ? (
+                  <Typography variant="t2" color="secondary">
+                    {t("client.order.returns.bringToPickup")}
+                    {lastReturn.amount
+                      ? ` ${t("client.order.returns.amount", {
+                          amount: Number(lastReturn.amount).toFixed(2),
+                        })}`
+                      : ""}
+                  </Typography>
                 ) : null}
               </View>
             );

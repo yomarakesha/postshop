@@ -42,12 +42,20 @@ const NotificationRow = ({
       ? orderStatus.buyer.getLabelKey(data.comment as Order.StatusCode, null)
       : "";
 
+  // Заказ с доставкой подтверждён: в comment «доставка|итог». Цену
+  // доставки назначает оператор, и раньше сумма просто вырастала.
+  const [deliveryPrice, orderTotal] = (data.comment ?? "").split("|");
   const detail = data.comment
     ? STATUS_COMMENT_KINDS.has(data.kind)
       ? statusLabelKey
         ? t(statusLabelKey)
         : null
-      : data.comment
+      : data.kind === "order_approved_delivery" && orderTotal
+        ? t("notifications.deliveryDetail", {
+            delivery: deliveryPrice,
+            total: orderTotal,
+          })
+        : data.comment
     : null;
 
   // Без даты лучше пустая строка, чем 01.01.1970: у старых уведомлений

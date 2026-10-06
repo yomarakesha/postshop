@@ -1,4 +1,14 @@
 declare namespace Stock {
+  /** Остаток FBS в разрезе — для пересчёта полки. */
+  type Summary = {
+    product_id: number;
+    balance: string;
+    /** Что должно лежать на полке: журнал минус собранные, но не проданные заказы. */
+    on_shelf: string;
+    reserved: string;
+    available: string;
+  };
+
   /**
    * Остаток одного товара.
    *

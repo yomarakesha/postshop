@@ -471,7 +471,10 @@
         },
         "cancel": "Geri çek",
         "cancelTitle": "İade talebi geri çekilsin mi?",
-        "cancelText": "Henüz incelenmedi. Daha sonra yeniden gönderebilirsiniz."
+        "cancelText": "Henüz incelenmedi. Daha sonra yeniden gönderebilirsiniz.",
+        "periodOver": "İade süresi doldu",
+        "amount": "İade tutarı: {{amount}} TMT.",
+        "bringToPickup": "Ürünü herhangi bir Postshop teslim noktasına getirin."
       },
       "cancelReasonPlaceholder": "İptal nedeni (isteğe bağlı)"
     },
@@ -658,7 +661,7 @@
       "operationsHint": {
         "income": "Ürün depoya geldi ve satışa hazır",
         "return_to_supplier": "Ürün depodan tedarikçiye dönüyor",
-        "set": "Saydıysanız, şu anda satışa kaç adet hazır olduğunu yazın. Farkı biz kaydederiz."
+        "set": "Rafı saydınız — üzerinde ne kadar olduğunu girin. Paketlenmiş siparişleri saymayın. Farkı biz kaydederiz."
       },
       "quantityPlaceholder": "Miktar",
       "quantityRequired": "Sıfırdan büyük bir miktar girin",
@@ -671,7 +674,8 @@
       "title": "Stok",
       "subtitle": "Satışa ne kadar ürün hazır. Açık siparişlerin tuttuğu miktar düşülür.",
       "edit": "Değiştir",
-      "fbsOnly": "Bu bölüm FBS mağazaları içindir: ürünlerini kendileri saklar. FBO mağazasının stoku «Depo» bölümündedir."
+      "fbsOnly": "Bu bölüm FBS mağazaları içindir: ürünlerini kendileri saklar. FBO mağazasının stoku «Depo» bölümündedir.",
+      "breakdown": "Rafta: {{shelf}} · siparişlerde: {{reserved}} · mevcut: {{available}}"
     },
     "close": {
       "close": "Mağazayı kapat",
@@ -798,8 +802,10 @@
       "review_rejected": "Yorumunuz reddedildi",
       "shop_approved": "Mağaza başvurusu onaylandı",
       "shop_blocked": "Mağaza platform tarafından kapatıldı",
-      "shop_rejected": "Mağaza başvurusu reddedildi"
-    }
+      "shop_rejected": "Mağaza başvurusu reddedildi",
+      "order_approved_delivery": "Sipariş onaylandı — teslimat ücreti belirlendi"
+    },
+    "deliveryDetail": "Teslimat {{delivery}} TMT, toplam {{total}} TMT. Kabul etmiyorsanız siparişi paketlenmeden iptal edin."
   },
   "orderStatus": {
     "buyer": {

@@ -149,6 +149,7 @@ const ShopReturnsScreen = () => {
                 {item.order_id
                   ? ` · ${t("store.returns.fromOrder", { id: item.order_id })}`
                   : ""}
+                {item.amount ? ` · ${Number(item.amount).toFixed(2)} TMT` : ""}
               </Typography>
             </View>
             <View style={styles.status(item.status)}>

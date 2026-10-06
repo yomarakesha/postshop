@@ -75,6 +75,13 @@ declare namespace Order {
     /** Может не прийти от старого сервера — тогда подписи нейтральные. */
     delivery_method?: DeliveryMethod;
     comment: string | null;
+    /** Решение платформы или отметка отмены покупателем. */
+    status_comment?: string | null;
+    /** Когда оператор отметил оплату; null — не оплачен. */
+    paid_at?: string | null;
+    completed_at?: string | null;
+    /** До какого момента можно подать заявку на возврат. */
+    return_until?: string | null;
     items: Order.ItemProduct[];
     shops: (ShopBase.Item & {
       additional: ShopAdditional.Item | null;

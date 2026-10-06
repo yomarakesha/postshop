@@ -471,7 +471,10 @@
         },
         "cancel": "Yzyna al",
         "cancelTitle": "Gaýtarma arzasyny yzyna almalymy?",
-        "cancelText": "Arza entek seredilmedi. Soňra ony täzeden berip bolar."
+        "cancelText": "Arza entek seredilmedi. Soňra ony täzeden berip bolar.",
+        "periodOver": "Gaýtarma möhleti geçdi",
+        "amount": "Gaýtarylýan möçber: {{amount}} TMT.",
+        "bringToPickup": "Harydy islendik Postshop bermek nokadyna getiriň."
       },
       "cancelReasonPlaceholder": "Ýatyrmagyň sebäbi (hökmany däl)"
     },
@@ -658,7 +661,7 @@
       "operationsHint": {
         "income": "Haryt ammara geldi we satuwa elýeterli",
         "return_to_supplier": "Haryt ammardan üpjün edijä gaýdýar",
-        "set": "Sanadyňyzmy — häzir satuwa näçesi elýeterli, şony ýazyň. Tapawudyny özümiz ýazarys."
+        "set": "Tekjäni sanadyňyz — onda näçe haryt bardygyny ýazyň. Ýygnalan sargytlary sanamaň. Tapawudy özümiz ýazarys."
       },
       "quantityPlaceholder": "Mukdary",
       "quantityRequired": "Nolýdan uly mukdar giriziň",
@@ -671,7 +674,8 @@
       "title": "Galyndylar",
       "subtitle": "Satuwa näçe haryt elýeterli. Açyk sargytlaryň eýeleýäni aýrylýar.",
       "edit": "Üýtgetmek",
-      "fbsOnly": "Bu bölüm FBS dükanlary üçin: olar harydy özleri saklaýar. FBO dükanyň galyndylary «Ammar» bölüminde."
+      "fbsOnly": "Bu bölüm FBS dükanlary üçin: olar harydy özleri saklaýar. FBO dükanyň galyndylary «Ammar» bölüminde.",
+      "breakdown": "Tekjede: {{shelf}} · sargytlarda: {{reserved}} · elýeterli: {{available}}"
     },
     "close": {
       "close": "Dükany ýapmak",
@@ -798,8 +802,10 @@
       "review_rejected": "Synyňyz kabul edilmedi",
       "shop_approved": "Dükan arzasy tassyklandy",
       "shop_blocked": "Dükan platforma tarapyndan ýapyldy",
-      "shop_rejected": "Dükan arzasy kabul edilmedi"
-    }
+      "shop_rejected": "Dükan arzasy kabul edilmedi",
+      "order_approved_delivery": "Sargyt tassyklandy — eltip bermegiň bahasy bellendi"
+    },
+    "deliveryDetail": "Eltip bermek {{delivery}} TMT, jemi {{total}} TMT. Razy däl bolsaňyz, sargydy ýygnalmazdan öň ýatyryň."
   },
   "orderStatus": {
     "buyer": {

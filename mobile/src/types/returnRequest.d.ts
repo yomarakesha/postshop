@@ -13,6 +13,8 @@ declare namespace ReturnRequest {
     /** Пусто, если товар с тех пор удалён. */
     product_name: string | null;
     quantity: string;
+    /** Сумма к возврату: цена покупки × количество. */
+    amount?: string | null;
     reason: string;
     status: Status;
     resolution_comment: string | null;

@@ -71,6 +71,7 @@ const StockSheet = ({
   savedText,
 }: Props) => {
   const [mode, setMode] = useState<StockMode>(modes[0]);
+  const summary = stockApi.useSummary(target?.productId, mode === "set");
   const [quantity, setQuantity] = useState("");
   const createOperation = stockApi.useCreateOperation();
   const setStock = stockApi.useSetStock();
@@ -153,7 +154,13 @@ const StockSheet = ({
               {target.name}
             </Typography>
             <Typography variant="t1" color="secondary">
-              {t("store.stock.available", { count: target.available })}
+              {mode === "set" && summary.data
+                ? t("store.stock.breakdown", {
+                    shelf: Number(summary.data.on_shelf),
+                    reserved: Number(summary.data.reserved),
+                    available: Number(summary.data.available),
+                  })
+                : t("store.stock.available", { count: target.available })}
             </Typography>
           </View>
         )}

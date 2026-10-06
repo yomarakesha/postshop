@@ -17,6 +17,8 @@ export type ReturnTarget = {
   name: string;
   /** Сколько куплено — больше вернуть сервер не даст. */
   purchased: number;
+  /** Цена покупки — для суммы к возврату. */
+  price: number;
 };
 
 type Props = {
@@ -125,6 +127,15 @@ const ReturnSheet = ({ ref, target, t }: Props) => {
             keyboardType="decimal-pad"
           />
         </View>
+
+        {/* Сумма к возврату — по цене покупки, как её посчитает сервер. */}
+        {target && Number(quantity) > 0 ? (
+          <Typography variant="p3" weight="medium">
+            {t("client.order.returns.amount", {
+              amount: (target.price * Number(quantity)).toFixed(2),
+            })}
+          </Typography>
+        ) : null}
 
         <View style={styles.field}>
           <Typography variant="t1" color="secondary">

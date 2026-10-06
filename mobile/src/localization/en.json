@@ -471,7 +471,10 @@
         },
         "cancel": "Withdraw",
         "cancelTitle": "Withdraw the return request?",
-        "cancelText": "It has not been reviewed yet. You can submit it again later."
+        "cancelText": "It has not been reviewed yet. You can submit it again later.",
+        "periodOver": "Return period is over",
+        "amount": "Refund: {{amount}} TMT.",
+        "bringToPickup": "Bring the item to any Postshop pickup point."
       },
       "cancelReasonPlaceholder": "Reason for cancelling (optional)"
     },
@@ -658,7 +661,7 @@
       "operationsHint": {
         "income": "Goods arrived at the warehouse and are available for sale",
         "return_to_supplier": "Goods leave the warehouse back to the supplier",
-        "set": "Counted the shelf — enter how many are available for sale now. We will record the difference."
+        "set": "Counted the shelf — enter how much is on it. Do not count packed orders. We record the difference."
       },
       "quantityPlaceholder": "Quantity",
       "quantityRequired": "Enter a quantity greater than zero",
@@ -671,7 +674,8 @@
       "title": "Stock",
       "subtitle": "How much is available for sale. What open orders already hold is subtracted.",
       "edit": "Change",
-      "fbsOnly": "This section is for FBS shops: they store goods themselves. FBO shop stock is under “Warehouse”."
+      "fbsOnly": "This section is for FBS shops: they store goods themselves. FBO shop stock is under “Warehouse”.",
+      "breakdown": "On shelf: {{shelf}} · in orders: {{reserved}} · available: {{available}}"
     },
     "close": {
       "close": "Close the store",
@@ -798,8 +802,10 @@
       "review_rejected": "Your review was rejected",
       "shop_approved": "Shop application approved",
       "shop_blocked": "The shop was closed by the platform",
-      "shop_rejected": "Shop application rejected"
-    }
+      "shop_rejected": "Shop application rejected",
+      "order_approved_delivery": "Order confirmed — delivery price set"
+    },
+    "deliveryDetail": "Delivery {{delivery}} TMT, total {{total}} TMT. Disagree? Cancel the order before it is packed."
   },
   "orderStatus": {
     "buyer": {

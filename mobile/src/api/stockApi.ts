@@ -45,9 +45,29 @@ const useAvailability = (productIds: number[], options?: AvailabilityOptions) =>
 /** После любого движения остаток на экранах нужно перечитать. */
 const useInvalidateAvailability = () => {
   const queryClient = useQueryClient();
-  return () =>
+  return () => {
     queryClient.invalidateQueries({ queryKey: ["stock-availability"] });
+    queryClient.invalidateQueries({ queryKey: ["stock-summary"] });
+  };
 };
+
+/**
+ * Остаток в разрезе для пересчёта: полка, резерв, доступно. Пересчёт
+ * сравнивает с полкой — раньше с «доступно», и несобранный заказ, ещё
+ * лежащий на полке, прибавлялся второй раз.
+ */
+const useSummary = (productId: number | undefined, enabled: boolean) =>
+  useQuery<Stock.Summary, AxiosError<ApiErrorResponse>>({
+    queryKey: ["stock-summary", productId],
+    queryFn: async () => {
+      const res = await api.req({
+        method: "GET",
+        url: `/stock-operations/${productId}/summary`,
+      });
+      return res.data;
+    },
+    enabled: enabled && !!productId,
+  });
 
 /** Приход или возврат поставщику: продавец называет, сколько штук. */
 const useCreateOperation = () => {
@@ -80,6 +100,7 @@ const useSetStock = () => {
 
 export const stockApi = {
   useAvailability,
+  useSummary,
   useCreateOperation,
   useSetStock,
 };

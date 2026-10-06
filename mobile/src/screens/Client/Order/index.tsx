@@ -52,6 +52,7 @@ const OrderScreen = () => {
       orderItemId: item.id,
       name: item.product.translations[0]?.name ?? "",
       purchased: Number(item.quantity),
+      price: Number(item.price_at_order),
     });
     returnSheetRef.current?.present();
   };
@@ -235,6 +236,7 @@ const OrderScreen = () => {
                         byItemId: returnsByItemId,
                         onReturn: handleReturn,
                         onCancelReturn: handleCancelReturn,
+                        returnUntil: data.return_until ?? null,
                       }
                     : undefined
                 }
