@@ -2484,7 +2484,9 @@ export const NotificationKindSchema = {
         'order_shop_rejected',
         'product_blocked',
         'return_completed',
-        'order_approved_delivery'
+        'order_approved_delivery',
+        'withdrawal_completed',
+        'withdrawal_rejected'
     ],
     title: 'NotificationKind',
     description: 'О чём уведомление.\n\nХранится вид, а не готовый текст: витрина работает на четырёх языках, и\nтекст, записанный в базу, был бы всегда на одном из них — том, что был\nвыбран в момент события, а не тем, на котором человек читает.'
@@ -7029,6 +7031,233 @@ export const WarehouseUpdateSchema = {
     },
     type: 'object',
     title: 'WarehouseUpdate'
+} as const;
+
+export const WithdrawalCreateSchema = {
+    properties: {
+        shop_id: {
+            type: 'integer',
+            title: 'Shop Id'
+        },
+        items: {
+            items: {
+                $ref: '#/components/schemas/WithdrawalItemCreate'
+            },
+            type: 'array',
+            maxItems: 100,
+            minItems: 1,
+            title: 'Items'
+        },
+        comment: {
+            anyOf: [
+                {
+                    type: 'string',
+                    maxLength: 1000
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Comment'
+        }
+    },
+    type: 'object',
+    required: [
+        'shop_id',
+        'items'
+    ],
+    title: 'WithdrawalCreate'
+} as const;
+
+export const WithdrawalItemCreateSchema = {
+    properties: {
+        product_id: {
+            type: 'integer',
+            title: 'Product Id'
+        },
+        quantity: {
+            anyOf: [
+                {
+                    type: 'number',
+                    maximum: 999999999.999,
+                    exclusiveMinimum: 0
+                },
+                {
+                    type: 'string',
+                    pattern: '^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$'
+                }
+            ],
+            title: 'Quantity'
+        }
+    },
+    type: 'object',
+    required: [
+        'product_id',
+        'quantity'
+    ],
+    title: 'WithdrawalItemCreate'
+} as const;
+
+export const WithdrawalItemResponseSchema = {
+    properties: {
+        id: {
+            type: 'integer',
+            title: 'Id'
+        },
+        product_id: {
+            type: 'integer',
+            title: 'Product Id'
+        },
+        product_name: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Product Name'
+        },
+        measure_unit_code: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Measure Unit Code'
+        },
+        quantity: {
+            type: 'string',
+            pattern: '^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$',
+            title: 'Quantity'
+        }
+    },
+    type: 'object',
+    required: [
+        'id',
+        'product_id',
+        'quantity'
+    ],
+    title: 'WithdrawalItemResponse'
+} as const;
+
+export const WithdrawalRejectSchema = {
+    properties: {
+        resolution_comment: {
+            type: 'string',
+            maxLength: 1000,
+            minLength: 1,
+            title: 'Resolution Comment'
+        }
+    },
+    type: 'object',
+    required: [
+        'resolution_comment'
+    ],
+    title: 'WithdrawalReject'
+} as const;
+
+export const WithdrawalResponseSchema = {
+    properties: {
+        id: {
+            type: 'integer',
+            title: 'Id'
+        },
+        shop_id: {
+            type: 'integer',
+            title: 'Shop Id'
+        },
+        shop_name: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Shop Name'
+        },
+        status: {
+            $ref: '#/components/schemas/WithdrawalStatus'
+        },
+        comment: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Comment'
+        },
+        resolution_comment: {
+            anyOf: [
+                {
+                    type: 'string'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Resolution Comment'
+        },
+        created_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Created At'
+        },
+        resolved_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Resolved At'
+        },
+        items: {
+            items: {
+                $ref: '#/components/schemas/WithdrawalItemResponse'
+            },
+            type: 'array',
+            title: 'Items'
+        }
+    },
+    type: 'object',
+    required: [
+        'id',
+        'shop_id',
+        'status',
+        'items'
+    ],
+    title: 'WithdrawalResponse'
+} as const;
+
+export const WithdrawalStatusSchema = {
+    type: 'string',
+    enum: [
+        'pending',
+        'completed',
+        'rejected',
+        'cancelled'
+    ],
+    title: 'WithdrawalStatus'
 } as const;
 
 export const app__schemas__product__MeasureUnitShortSchema = {

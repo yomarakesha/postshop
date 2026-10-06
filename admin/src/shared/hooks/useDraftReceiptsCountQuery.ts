@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { ADMIN_LIST_LIMIT } from '@/shared/constants/pagination'
+import { readTotalCount } from '@/shared/hooks/useListControls'
 import { ReceiptStatus, listReceiptsStockReceiptsGet } from '@/shared/openapi/requests'
 
 /**
@@ -16,14 +16,14 @@ export function useDraftReceiptsCountQuery(enabled = true) {
     enabled,
     queryKey: ['stock-receipts', 'draft-count'],
     queryFn: async () => {
+      // Черновик — это документ, отправленный продавцом и ещё не принятый:
+      // ровно то, что требует действия сотрудника. Считает сервер (заголовок
+      // X-Total-Count): раньше считались черновики среди первых 500 приходов.
       const response = await listReceiptsStockReceiptsGet({
-        query: { limit: ADMIN_LIST_LIMIT },
+        query: { status: ReceiptStatus.DRAFT, limit: 1 },
         throwOnError: true,
       })
-      // Черновик — это документ, отправленный продавцом и ещё не принятый:
-      // ровно то, что требует действия сотрудника.
-      return (response.data ?? []).filter((receipt) => receipt.status === ReceiptStatus.DRAFT)
-        .length
+      return readTotalCount(response.response.headers, response.data.length)
     },
     refetchInterval: 60_000,
   })

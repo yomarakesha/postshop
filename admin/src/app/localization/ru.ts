@@ -94,6 +94,7 @@ export const ru = {
 
   // pages
   pages: {
+    withdrawals: 'Вывоз товара',
     dashboard: 'Главная',
     brands: 'Бренды',
     categories: 'Категории',
@@ -287,6 +288,25 @@ export const ru = {
     productPrice: 'Цена',
     productQuantity: 'Остаток',
     noProducts: 'На складе нет товаров',
+  },
+  withdrawals: {
+    shop: 'Магазин',
+    items: 'Товары',
+    comment: 'Комментарий продавца',
+    complete: 'Выполнить',
+    reject: 'Отклонить',
+    completeTitle: 'Выполнить заявку №{{id}}?',
+    completeText:
+      'Товар передан продавцу: он уйдёт со складов Postshop. Если часть товара уже занята заказами, сервер откажет.',
+    rejectTitle: 'Отклонить заявку №{{id}}?',
+    rejectText: 'Причину увидит продавец.',
+    rejectPlaceholder: 'Причина отказа',
+    status: {
+      pending: 'Ждут',
+      completed: 'Выполнены',
+      rejected: 'Отклонены',
+      cancelled: 'Отозваны',
+    },
   },
   goodsReceiving: {
     cancel: 'Отменить приёмку',

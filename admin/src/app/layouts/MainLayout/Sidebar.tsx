@@ -12,6 +12,7 @@ import {
   MapPin,
   MessageSquareText,
   PackageCheck,
+  PackageMinus,
   Ruler,
   ShieldCheck,
   PackageX,
@@ -41,6 +42,7 @@ import { usePendingOrdersCountQuery } from '@/shared/hooks/usePendingOrdersCount
 import { usePendingShopsCountQuery } from '@/shared/hooks/usePendingShopsCountQuery'
 import { useReturnsCountQuery } from '@/shared/hooks/useReturnsCountQuery'
 import { useReviewModerationCountQuery } from '@/shared/hooks/useReviewModerationCountQuery'
+import { useWithdrawalsCountQuery } from '@/shared/hooks/useWithdrawalsCountQuery'
 import { useSidebarStore } from '@/shared/store/sidebarStore'
 import { cn } from '@/shared/utils'
 
@@ -67,6 +69,12 @@ export const Sidebar = ({ headerHeight, open, onClose }: Props) => {
   const reviewCount = (reviewCountData?.data as { count: number } | undefined)?.count ?? 0
   const returnsCount = (returnsCountData?.data as { count: number } | undefined)?.count ?? 0
   const receiptsCount = draftReceipts ?? 0
+  // Заявки на вывоз ждут сотрудника склада — счётчик только у того, кто их
+  // выполняет: без права ручка отвечает 403.
+  const { data: withdrawalsCountData } = useWithdrawalsCountQuery(
+    fboEnabled && hasPermission(PERMISSION_KEYS.WAREHOUSE_OPERATIONS.create),
+  )
+  const withdrawalsCount = (withdrawalsCountData?.data as { count: number } | undefined)?.count ?? 0
   // Счётчик новых заказов видит только тот, кто может их принять: ручка
   // отвечает 403 без права менять статус заказа.
   const { data: ordersCountData } = usePendingOrdersCountQuery(
@@ -270,6 +278,13 @@ export const Sidebar = ({ headerHeight, open, onClose }: Props) => {
                 // Документ приёмки ждёт действия сотрудника, как заявка или
                 // товар на модерации, — без отметки его не замечали.
                 badge: receiptsCount,
+              },
+              {
+                href: '/withdrawals',
+                icon: <PackageMinus size={18} />,
+                title: t('pages.withdrawals'),
+                permission: PERMISSION_KEYS.WAREHOUSE_OPERATIONS.create,
+                badge: withdrawalsCount,
               },
             ])}
 

@@ -93,6 +93,7 @@ export const tk = {
 
   // pages
   pages: {
+    withdrawals: 'Harydy çykarmak',
     dashboard: 'Baş sahypa',
     brands: 'Brendler',
     categories: 'Kategoriýalar',
@@ -287,6 +288,25 @@ export const tk = {
     productPrice: 'Bahasy',
     productQuantity: 'Galyndy',
     noProducts: 'Ammarda haryt ýok',
+  },
+  withdrawals: {
+    shop: 'Dükan',
+    items: 'Harytlar',
+    comment: 'Satyjynyň teswiri',
+    complete: 'Ýerine ýetir',
+    reject: 'Ret et',
+    completeTitle: '№{{id}} arzany ýerine ýetirmelimi?',
+    completeText:
+      'Haryt satyja berildi: ol Postshop ammarlaryndan aýrylar. Harydyň bir bölegi sargytlar bilen eýelenen bolsa, serwer ret eder.',
+    rejectTitle: '№{{id}} arzany ret etmelimi?',
+    rejectText: 'Sebäbi satyjy görer.',
+    rejectPlaceholder: 'Ret etmegiň sebäbi',
+    status: {
+      pending: 'Garaşýar',
+      completed: 'Ýerine ýetirildi',
+      rejected: 'Ret edildi',
+      cancelled: 'Yzyna alyndy',
+    },
   },
   goodsReceiving: {
     cancel: 'Kabul etmegi ýatyr',

@@ -58,6 +58,7 @@ import { CreateWarehousePage } from '@/pages/warehouse-create'
 import { WarehouseDetailPage } from '@/pages/warehouse-detail'
 import { EditWarehousePage } from '@/pages/warehouse-edit'
 import { WarehousesPage } from '@/pages/warehouses'
+import { WithdrawalsPage } from '@/pages/withdrawals'
 import { RequireFbo } from '@/shared/lib/RequireFbo'
 
 export default function App() {
@@ -134,6 +135,14 @@ export default function App() {
             element={
               <RequireFbo>
                 <EditWarehousePage />
+              </RequireFbo>
+            }
+          />
+          <Route
+            path="withdrawals"
+            element={
+              <RequireFbo>
+                <WithdrawalsPage />
               </RequireFbo>
             }
           />
