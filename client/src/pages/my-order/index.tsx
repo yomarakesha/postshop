@@ -118,7 +118,14 @@ export const OrdersPage = () => {
    */
   const renderProductActions = (order: OrderResponse) => {
     if (order.order_status.code !== OrderStatusCode.COMPLETED) return undefined
-    return (product: { id: number; productId: number; name: string; quantity: number }) => {
+    const returnClosed = order.return_until != null && new Date(order.return_until) < new Date()
+    return (product: {
+      id: number
+      productId: number
+      name: string
+      quantity: number
+      price: number
+    }) => {
       const existingReturn = returnByOrderItem.get(product.id)
 
       return (
@@ -159,13 +166,22 @@ export const OrdersPage = () => {
                 </p>
               )}
             </div>
+          ) : returnClosed ? (
+            // Срок возврата — 14 дней после завершения заказа. Сервер позднюю
+            // заявку не примет, поэтому и кнопку не предлагаем.
+            <p className="t2 text-passive2">{t('returns.periodOver')}</p>
           ) : (
             <Button
               variant="tertiary"
               size="sm"
               className="text-failure"
               onClick={() =>
-                returnModalRef.current?.open(product.id, product.name, product.quantity)
+                returnModalRef.current?.open(
+                  product.id,
+                  product.name,
+                  product.quantity,
+                  product.price,
+                )
               }
             >
               {t('returns.action')}
@@ -179,8 +195,14 @@ export const OrdersPage = () => {
   // Кнопка «Вернуть» стоит у каждого товара, но тестировщик её не нашёл: мелкая
   // красная надпись рядом с «Оценить» не читается как путь к возврату. Над
   // товарами завершённого заказа теперь прямо сказано, где она и что дальше.
-  const itemsNotice = (order: OrderResponse) =>
-    order.order_status.code === OrderStatusCode.COMPLETED ? t('returns.hint') : undefined
+  const itemsNotice = (order: OrderResponse) => {
+    if (order.order_status.code !== OrderStatusCode.COMPLETED) return undefined
+    if (order.return_until == null) return t('returns.hint')
+    // Срок называем датой: «14 дней» без точки отсчёта ничего не говорит.
+    return new Date(order.return_until) < new Date()
+      ? undefined
+      : t('returns.hintUntil', { date: formatNumericDateTime(order.return_until) })
+  }
 
   // Подпись статуса — своя, по коду и способу получения. Раньше она бралась с
   // сервера, если там был перевод, а переводы в базе звучат языком оператора:

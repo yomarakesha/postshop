@@ -103,6 +103,12 @@ export const ProfileReturnsPage = () => {
               </p>
             )}
 
+            {request.amount != null && (
+              <p className="t1 mt-2 font-medium">
+                {t('returns.amount', { amount: parseFloat(request.amount).toFixed(2) })}
+              </p>
+            )}
+
             <p className="t1 mt-3 whitespace-pre-line">{request.reason}</p>
 
             {/* Ответ платформы: при отказе он и есть объяснение, при

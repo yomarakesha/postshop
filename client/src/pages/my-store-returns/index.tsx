@@ -132,6 +132,9 @@ export const MyStoreReturnsPage = () => {
                   </p>
                   <p className="t1 text-passive2">
                     {t('returns.quantityShort', { count: Number(request.quantity) })}
+                    {request.amount != null
+                      ? ` · ${parseFloat(request.amount).toFixed(2)} ${t('dashboard.revenue.currency')}`
+                      : ''}
                     {request.order_id
                       ? ` · ${t('returns.fromOrder', { id: request.order_id })}`
                       : ''}

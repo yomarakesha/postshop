@@ -211,6 +211,20 @@ export const tk = {
     office: 'Türkmenpoçtanyň baş edarasy',
     city: 'Aşgabat, Türkmenistan',
   },
+  stockHistory: {
+    open: 'Taryh',
+    title: 'Hereketleriň taryhy',
+    empty: 'Entek hereket ýok',
+    op: {
+      income: 'Girdeji',
+      sold: 'Satuw',
+      return_from_customer: 'Alyjydan gaýtarma',
+      return_to_supplier: 'Üpjün edijä gaýtarma',
+      return_to_shop: 'Ammardan size gaýtarma',
+      write_off: 'Hasapdan aýyrma (kemçilik, ýitgi)',
+      correction: 'Gaýtadan sanamak',
+    },
+  },
   stock: {
     title: 'Galyndylar',
     subtitle: 'Satuwa näçe haryt elýeterli. Açyk sargytlaryň eýeleýäni aýrylýar.',
@@ -227,10 +241,11 @@ export const tk = {
       return_to_supplier: 'Üpjün edijä yzyna',
       set: 'Galyndyny görkeziň',
     },
+    breakdown: 'Tekjede: {{shelf}} · sargytlarda: {{reserved}} · elýeterli: {{available}}',
     operationsHint: {
       income: 'Haryt ammara geldi we satuwa elýeterli',
       return_to_supplier: 'Haryt ammardan üpjün edijä gaýdýar',
-      set: 'Sanadyňyzmy — häzir satuwa näçesi elýeterli, şony ýazyň. Tapawudyny özümiz ýazarys.',
+      set: 'Tekjäni sanadyňyz — onda näçe haryt bardygyny ýazyň. Ýygnalan sargytlary sanamaň. Tapawudy özümiz ýazarys.',
     },
     quantityPlaceholder: 'Mukdary',
     quantityRequired: 'Nolýdan uly mukdar giriziň',
@@ -896,6 +911,8 @@ export const tk = {
     seeAll: 'Ählisini görmek',
     dismiss: 'Habarnamany aýyrmak',
     loadMore: 'Ýene görkez',
+    deliveryDetail:
+      'Eltip bermek {{delivery}} TMT, jemi {{total}} TMT. Razy däl bolsaňyz, sargydy ýygnalmazdan öň ýatyryň.',
     kind: {
       order_created: 'Täze sargyt — açyň: haryt sizde bolsa, kabul ediň we ýygnaň',
       order_cancelled: 'Sargyt ýatyryldy',
@@ -912,6 +929,7 @@ export const tk = {
       shop_rejected: 'Dükan arzasy kabul edilmedi',
       order_status: 'Sargydyň ýagdaýy üýtgedi',
       order_shop_rejected: 'Dükan sargydyň bir böleginden ýüz öwürdi',
+      order_approved_delivery: 'Sargyt tassyklandy — eltip bermegiň bahasy bellendi',
       review_approved: 'Synyňyz ýerleşdirildi',
       review_rejected: 'Synyňyz kabul edilmedi',
       return_approved: 'Yzyna gaýtarmak tassyklandy',
@@ -936,6 +954,10 @@ export const tk = {
     receivedSaved: 'Gaýtarma alnan diýip bellendi',
   },
   returns: {
+    periodOver: 'Gaýtarma möhleti geçdi',
+    hintUntil:
+      'Haryt laýyk gelmedimi? Onuň ýanyndaky «Gaýtar» düwmesine basyň — {{date}} çenli. Arza Postshop seredýär',
+    amount: 'Gaýtarylýan möçber: {{amount}} TMT',
     title: 'Gaýtarmalarym',
     subtitle: 'Yzyna gaýtarmak arzalary we olar boýunça çözgütler.',
     empty: 'Gaýtarmak arzasy ýok',
@@ -961,7 +983,8 @@ export const tk = {
     sending: 'Ugradylýar...',
     sent: 'Yzyna gaýtarmak arzasy ugradyldy',
     notAllowed: 'Bu satyn alyş boýunça gaýtarmak eýýäm dowam edýär ýa-da mümkin däl',
-    awaitingItem: 'Gaýtarma tassyklandy — haryda garaşýarys. Kabul edilende habar geler.',
+    awaitingItem:
+      'Gaýtarma tassyklandy. Harydy islendik Postshop bermek nokadyna getiriň — kabul edilende habar geler.',
     receivedOn: 'Haryt kabul edildi {{date}}',
     status: {
       received: 'Gaýtarma tamamlandy',

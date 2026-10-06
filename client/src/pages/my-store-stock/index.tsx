@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query'
 import { useTranslation } from 'react-i18next'
 import type { ModalRef } from '#/shared/ui/Modal'
 import type { StockMode, StockTarget } from '#/widgets/StockModal'
+import type { StockHistoryTarget } from '#/widgets/StockHistoryModal'
 import { useGetProductsAvailabilityStockOperationsAvailabilityGetKey } from '#/shared/openapi/queries/common'
 import { OperationType, WarehouseType } from '#/shared/openapi/requests'
 import { useShopAdditional } from '#/shared/hooks/useShopAdditional'
@@ -11,6 +12,7 @@ import { Button } from '#/shared/ui/Button'
 import { Spinner } from '#/shared/ui/Spinner'
 import { SET, StockModal } from '#/widgets/StockModal'
 import { ShopStockList } from '#/widgets/ShopStockList'
+import { StockHistoryModal } from '#/widgets/StockHistoryModal'
 
 /** Приход живёт в «Приёме товара»; здесь — сверка полки и возврат поставщику. */
 const STOCK_MODES: ReadonlyArray<StockMode> = [SET, OperationType.RETURN_TO_SUPPLIER]
@@ -29,6 +31,8 @@ export const StoreStockPage = () => {
   const queryClient = useQueryClient()
   const modalRef = useRef<ModalRef>(null)
   const [target, setTarget] = useState<StockTarget | null>(null)
+  const historyRef = useRef<ModalRef>(null)
+  const [historyTarget, setHistoryTarget] = useState<StockHistoryTarget | null>(null)
 
   const { data: additional, isLoading } = useShopAdditional(shopId)
 
@@ -58,18 +62,32 @@ export const StoreStockPage = () => {
       <ShopStockList
         shopId={shopId}
         action={(row) => (
-          <Button
-            variant="tertiary"
-            size="sm"
-            onClick={() => {
-              setTarget(row)
-              modalRef.current?.open()
-            }}
-          >
-            {t('stock.edit')}
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="tertiary"
+              size="sm"
+              onClick={() => {
+                setHistoryTarget({ productId: row.productId, name: row.name })
+                historyRef.current?.open()
+              }}
+            >
+              {t('stockHistory.open')}
+            </Button>
+            <Button
+              variant="tertiary"
+              size="sm"
+              onClick={() => {
+                setTarget(row)
+                modalRef.current?.open()
+              }}
+            >
+              {t('stock.edit')}
+            </Button>
+          </div>
         )}
       />
+
+      <StockHistoryModal ref={historyRef} shopId={shopId} target={historyTarget} isFbo={false} />
 
       <StockModal
         ref={modalRef}

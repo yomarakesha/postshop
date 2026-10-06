@@ -14,7 +14,7 @@ import { getErrorMessage } from '#/shared/lib/apiError'
 
 export interface ReturnModalRef {
   /** Возврат заводится на строку заказа, а не на товар: возвращают покупку. */
-  open: (orderItemId: number, productName: string, purchased: number) => void
+  open: (orderItemId: number, productName: string, purchased: number, price: number) => void
 }
 
 /**
@@ -29,13 +29,18 @@ export const ReturnModal = forwardRef<ReturnModalRef>((_, ref) => {
   const queryClient = useQueryClient()
   const modalRef = useRef<ModalRef>(null)
 
-  const [target, setTarget] = useState<{ id: number; name: string; purchased: number } | null>(null)
+  const [target, setTarget] = useState<{
+    id: number
+    name: string
+    purchased: number
+    price: number
+  } | null>(null)
   const [quantity, setQuantity] = useState('')
   const [reason, setReason] = useState('')
 
   useImperativeHandle(ref, () => ({
-    open: (orderItemId, productName, purchased) => {
-      setTarget({ id: orderItemId, name: productName, purchased })
+    open: (orderItemId, productName, purchased, price) => {
+      setTarget({ id: orderItemId, name: productName, purchased, price })
       // Чаще всего возвращают всю покупку — подставляем её целиком.
       setQuantity(String(purchased))
       setReason('')
@@ -115,6 +120,14 @@ export const ReturnModal = forwardRef<ReturnModalRef>((_, ref) => {
           value={reason}
           onChange={(e) => setReason(e.target.value)}
         />
+        {/* Сумма к возврату — по цене покупки, как её посчитает сервер. */}
+        {target && Number(quantity) > 0 && (
+          <p className="p3 font-medium">
+            {t('returns.amount', {
+              amount: (target.price * Number(quantity)).toFixed(2),
+            })}
+          </p>
+        )}
         <p className="t2 text-passive2">{t('returns.notice')}</p>
 
         <div className="flex gap-3">

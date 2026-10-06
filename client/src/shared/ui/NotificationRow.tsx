@@ -38,8 +38,17 @@ export const NotificationRow = ({ notification, href, onRead, onDismiss, classNa
   const detail = notification.comment
     ? STATUS_KINDS.has(notification.kind)
       ? t(orderStatusKey(notification.comment as OrderStatusCode))
-      : notification.comment
+      : notification.kind === NotificationKind.ORDER_APPROVED_DELIVERY
+        ? deliveryDetail(notification.comment)
+        : notification.comment
     : null
+
+  // Заказ с доставкой подтверждён: сервер кладёт в comment «доставка|итог».
+  // Цену доставки назначает оператор, и раньше сумма просто вырастала.
+  function deliveryDetail(comment: string) {
+    const [delivery, total] = comment.split('|')
+    return total ? t('notifications.deliveryDetail', { delivery, total }) : comment
+  }
 
   const body = (
     <>

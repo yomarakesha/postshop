@@ -1,11 +1,14 @@
 import { forwardRef, useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import type { ModalRef } from '#/shared/ui/Modal'
 import {
   useCreateStockOperationStockOperationsPost,
+  useGetProductStockSummaryStockOperationsProductIdSummaryGet,
   useSetStockStockOperationsSetPost,
 } from '#/shared/openapi/queries'
+import { useGetProductStockSummaryStockOperationsProductIdSummaryGetKey } from '#/shared/openapi/queries/common'
 import { OperationType } from '#/shared/openapi/requests'
 import { Modal } from '#/shared/ui/Modal'
 import { Button } from '#/shared/ui/Button'
@@ -64,7 +67,17 @@ interface Props {
 export const StockModal = forwardRef<ModalRef, Props>(
   ({ shopId, target, onDone, modes = ALL_MODES, title, savedText }, ref) => {
     const { t } = useTranslation()
+    const queryClient = useQueryClient()
     const [mode, setMode] = useState<StockMode>(modes[0])
+
+    // Для пересчёта нужна полка, а не «доступно»: собранный заказ с полки уже
+    // ушёл, а несобранный ещё лежит на ней. Раньше пересчёт сравнивал с
+    // «доступно» и прибавлял несобранные заказы второй раз.
+    const { data: summary } = useGetProductStockSummaryStockOperationsProductIdSummaryGet(
+      { path: { product_id: target?.productId ?? 0 } },
+      undefined,
+      { enabled: target !== null && mode === SET },
+    )
     const [quantity, setQuantity] = useState('')
 
     // Каждый товар открывается с чистой формой: остаток прошлого товара в поле
@@ -79,6 +92,9 @@ export const StockModal = forwardRef<ModalRef, Props>(
       toast.success(message)
       close()
       setQuantity('')
+      void queryClient.invalidateQueries({
+        queryKey: [useGetProductStockSummaryStockOperationsProductIdSummaryGetKey],
+      })
       onDone()
     }
     const fail = (error: unknown) => toast.error(getErrorMessage(error))
@@ -119,9 +135,19 @@ export const StockModal = forwardRef<ModalRef, Props>(
           {target && (
             <div className="flex flex-col gap-0.5">
               <p className="p3 text-passive2">{target.name}</p>
-              <p className="t1 text-passive2">
-                {t('stock.available', { count: target.available })}
-              </p>
+              {mode === SET && summary ? (
+                <p className="t1 text-passive2">
+                  {t('stock.breakdown', {
+                    shelf: Number(summary.on_shelf),
+                    reserved: Number(summary.reserved),
+                    available: Number(summary.available),
+                  })}
+                </p>
+              ) : (
+                <p className="t1 text-passive2">
+                  {t('stock.available', { count: target.available })}
+                </p>
+              )}
             </div>
           )}
 

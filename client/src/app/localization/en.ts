@@ -211,6 +211,20 @@ export const en = {
     office: 'Turkmenpost head office',
     city: 'Ashgabat, Turkmenistan',
   },
+  stockHistory: {
+    open: 'History',
+    title: 'Stock history',
+    empty: 'No movements yet',
+    op: {
+      income: 'Income',
+      sold: 'Sale',
+      return_from_customer: 'Customer return',
+      return_to_supplier: 'Return to supplier',
+      return_to_shop: 'Returned to you from the warehouse',
+      write_off: 'Write-off (defect, loss)',
+      correction: 'Recount',
+    },
+  },
   stock: {
     title: 'Stock',
     subtitle: 'How much is available for sale. What open orders already hold is subtracted.',
@@ -227,10 +241,11 @@ export const en = {
       return_to_supplier: 'Return to supplier',
       set: 'Set the stock',
     },
+    breakdown: 'On shelf: {{shelf}} · in orders: {{reserved}} · available: {{available}}',
     operationsHint: {
       income: 'Goods arrived at the warehouse and are available for sale',
       return_to_supplier: 'Goods leave the warehouse back to the supplier',
-      set: 'Counted the shelf — enter how many are available for sale now. We will record the difference.',
+      set: 'Counted the shelf — enter how much is on it. Do not count packed orders. We record the difference.',
     },
     quantityPlaceholder: 'Quantity',
     quantityRequired: 'Enter a quantity greater than zero',
@@ -895,6 +910,8 @@ export const en = {
     seeAll: 'See all',
     dismiss: 'Dismiss notification',
     loadMore: 'Show more',
+    deliveryDetail:
+      'Delivery {{delivery}} TMT, total {{total}} TMT. Disagree? Cancel the order before it is packed.',
     kind: {
       order_created: 'New order — open it: if the item is with you, accept and pack it',
       order_cancelled: 'An order was cancelled',
@@ -911,6 +928,7 @@ export const en = {
       shop_rejected: 'Shop application rejected',
       order_status: 'Order status changed',
       order_shop_rejected: 'A store rejected part of your order',
+      order_approved_delivery: 'Order confirmed — delivery price set',
       review_approved: 'Your review is published',
       review_rejected: 'Your review was rejected',
       return_approved: 'Return approved',
@@ -935,6 +953,10 @@ export const en = {
     receivedSaved: 'Return marked as received',
   },
   returns: {
+    periodOver: 'Return period is over',
+    hintUntil:
+      'Not right? Press “Return” next to the item — until {{date}}. Postshop will review the request',
+    amount: 'Refund: {{amount}} TMT',
     title: 'My returns',
     subtitle: 'Return requests and the decisions on them.',
     empty: 'No return requests yet',
@@ -961,7 +983,7 @@ export const en = {
     sent: 'Return request sent',
     notAllowed: 'A return for this purchase is already in progress or not possible',
     awaitingItem:
-      'Return approved — we are waiting for the item. You will be notified when it arrives.',
+      'Return approved. Bring the item to any Postshop pickup point — you will be notified when it is received.',
     receivedOn: 'Item received {{date}}',
     status: {
       received: 'Return completed',

@@ -40,6 +40,7 @@ export function notificationTarget(
     // ведём туда же, куда и смену статуса, — в его заказы.
     case NotificationKind.ORDER_STATUS:
     case NotificationKind.ORDER_SHOP_REJECTED:
+    case NotificationKind.ORDER_APPROVED_DELIVERY:
       return '/profile'
     case NotificationKind.RETURN_APPROVED:
     case NotificationKind.RETURN_REJECTED:

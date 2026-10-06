@@ -1,10 +1,15 @@
+import { useRef, useState } from 'react'
 import { Link, useParams, useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import type { StockHistoryTarget } from '#/widgets/StockHistoryModal'
+import type { ModalRef } from '#/shared/ui/Modal'
 import { WarehouseType } from '#/shared/openapi/requests'
 import { useShopAdditional } from '#/shared/hooks/useShopAdditional'
 import { Spinner } from '#/shared/ui/Spinner'
 import { cn } from '#/shared/utils/cn'
 import { ShopStockList } from '#/widgets/ShopStockList'
+import { StockHistoryModal } from '#/widgets/StockHistoryModal'
+import { Button } from '#/shared/ui/Button'
 import { StoreReceiptsPage } from '#/pages/my-store-receipts'
 
 export type WarehouseTab = 'stock' | 'shipments'
@@ -22,6 +27,8 @@ export const StoreWarehousePage = () => {
   const shopId = Number(storeId)
 
   const { data: additional, isLoading } = useShopAdditional(shopId)
+  const historyRef = useRef<ModalRef>(null)
+  const [historyTarget, setHistoryTarget] = useState<StockHistoryTarget | null>(null)
 
   if (isLoading) return <Spinner />
 
@@ -67,7 +74,24 @@ export const StoreWarehousePage = () => {
       {tab === 'stock' ? (
         <>
           <p className="t1 px-1 text-passive2">{t('stock.fboSubtitle')}</p>
-          <ShopStockList shopId={shopId} />
+          {/* Списания брака и возврат товара платформой продавец раньше не
+              видел вовсе — только итоговое число. */}
+          <ShopStockList
+            shopId={shopId}
+            action={(row) => (
+              <Button
+                variant="tertiary"
+                size="sm"
+                onClick={() => {
+                  setHistoryTarget({ productId: row.productId, name: row.name })
+                  historyRef.current?.open()
+                }}
+              >
+                {t('stockHistory.open')}
+              </Button>
+            )}
+          />
+          <StockHistoryModal ref={historyRef} shopId={shopId} target={historyTarget} isFbo />
         </>
       ) : (
         <StoreReceiptsPage />

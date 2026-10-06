@@ -1236,6 +1236,34 @@ export type FavoriteResponse = {
 };
 
 /**
+ * FbsStockSummary
+ *
+ * Остаток FBS в разрезе: журнал, полка, резерв, доступно.
+ */
+export type FbsStockSummary = {
+    /**
+     * Product Id
+     */
+    product_id: number;
+    /**
+     * Balance
+     */
+    balance: string;
+    /**
+     * On Shelf
+     */
+    on_shelf: string;
+    /**
+     * Reserved
+     */
+    reserved: string;
+    /**
+     * Available
+     */
+    available: string;
+};
+
+/**
  * Features
  *
  * Возможности, которые фронтенды показывают или прячут.
@@ -1415,7 +1443,8 @@ export enum NotificationKind {
     PRODUCT_OUT_OF_STOCK = 'product_out_of_stock',
     ORDER_SHOP_REJECTED = 'order_shop_rejected',
     PRODUCT_BLOCKED = 'product_blocked',
-    RETURN_COMPLETED = 'return_completed'
+    RETURN_COMPLETED = 'return_completed',
+    ORDER_APPROVED_DELIVERY = 'order_approved_delivery'
 }
 
 /**
@@ -1603,6 +1632,18 @@ export type OrderItemResponse = {
 };
 
 /**
+ * OrderPaymentUpdate
+ *
+ * Отметка оператора: деньги за заказ получены (или отметка снята).
+ */
+export type OrderPaymentUpdate = {
+    /**
+     * Paid
+     */
+    paid: boolean;
+};
+
+/**
  * OrderResponse
  */
 export type OrderResponse = {
@@ -1634,6 +1675,14 @@ export type OrderResponse = {
      * Status Comment
      */
     status_comment?: string | null;
+    /**
+     * Paid At
+     */
+    paid_at?: string | null;
+    /**
+     * Completed At
+     */
+    completed_at?: string | null;
     /**
      * Items
      */
@@ -1678,6 +1727,12 @@ export type OrderResponse = {
      * плюс цена доставки, если назначена (NULL — не назначена или самовывоз).
      */
     readonly effective_total: string;
+    /**
+     * Return Until
+     *
+     * До какого момента можно подать заявку на возврат; None — заказ не завершён.
+     */
+    readonly return_until: string | null;
     /**
      * Has Rejected Shops
      */
@@ -2377,6 +2432,10 @@ export type ReturnResponse = {
      */
     quantity: string;
     /**
+     * Amount
+     */
+    amount?: string | null;
+    /**
      * Reason
      */
     reason: string;
@@ -2903,6 +2962,26 @@ export type ShopOrderStatusUpdate = {
      * Comment
      */
     comment?: string | null;
+};
+
+/**
+ * ShopProductWarehouseHistory
+ *
+ * Движения товара магазина по всем складам платформы — для продавца FBO.
+ */
+export type ShopProductWarehouseHistory = {
+    /**
+     * Product Id
+     */
+    product_id: number;
+    /**
+     * Balance
+     */
+    balance: string;
+    /**
+     * Operations
+     */
+    operations: Array<WarehouseOperationResponse>;
 };
 
 /**
@@ -4071,6 +4150,14 @@ export type OrderResponseWritable = {
      * Status Comment
      */
     status_comment?: string | null;
+    /**
+     * Paid At
+     */
+    paid_at?: string | null;
+    /**
+     * Completed At
+     */
+    completed_at?: string | null;
     /**
      * Items
      */
@@ -9321,6 +9408,36 @@ export type GetProductStockStockOperationsProductIdGetResponses = {
 
 export type GetProductStockStockOperationsProductIdGetResponse = GetProductStockStockOperationsProductIdGetResponses[keyof GetProductStockStockOperationsProductIdGetResponses];
 
+export type GetProductStockSummaryStockOperationsProductIdSummaryGetData = {
+    body?: never;
+    path: {
+        /**
+         * Product Id
+         */
+        product_id: number;
+    };
+    query?: never;
+    url: '/stock-operations/{product_id}/summary';
+};
+
+export type GetProductStockSummaryStockOperationsProductIdSummaryGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetProductStockSummaryStockOperationsProductIdSummaryGetError = GetProductStockSummaryStockOperationsProductIdSummaryGetErrors[keyof GetProductStockSummaryStockOperationsProductIdSummaryGetErrors];
+
+export type GetProductStockSummaryStockOperationsProductIdSummaryGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: FbsStockSummary;
+};
+
+export type GetProductStockSummaryStockOperationsProductIdSummaryGetResponse = GetProductStockSummaryStockOperationsProductIdSummaryGetResponses[keyof GetProductStockSummaryStockOperationsProductIdSummaryGetResponses];
+
 export type GetProductBalanceStockOperationsProductIdBalanceGetData = {
     body?: never;
     path: {
@@ -9527,6 +9644,40 @@ export type GetWarehouseProductBalanceWarehouseOperationsWarehouseWarehouseIdPro
 };
 
 export type GetWarehouseProductBalanceWarehouseOperationsWarehouseWarehouseIdProductProductIdBalanceGetResponse = GetWarehouseProductBalanceWarehouseOperationsWarehouseWarehouseIdProductProductIdBalanceGetResponses[keyof GetWarehouseProductBalanceWarehouseOperationsWarehouseWarehouseIdProductProductIdBalanceGetResponses];
+
+export type GetShopProductHistoryWarehouseOperationsShopShopIdProductProductIdGetData = {
+    body?: never;
+    path: {
+        /**
+         * Shop Id
+         */
+        shop_id: number;
+        /**
+         * Product Id
+         */
+        product_id: number;
+    };
+    query?: never;
+    url: '/warehouse-operations/shop/{shop_id}/product/{product_id}';
+};
+
+export type GetShopProductHistoryWarehouseOperationsShopShopIdProductProductIdGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type GetShopProductHistoryWarehouseOperationsShopShopIdProductProductIdGetError = GetShopProductHistoryWarehouseOperationsShopShopIdProductProductIdGetErrors[keyof GetShopProductHistoryWarehouseOperationsShopShopIdProductProductIdGetErrors];
+
+export type GetShopProductHistoryWarehouseOperationsShopShopIdProductProductIdGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: ShopProductWarehouseHistory;
+};
+
+export type GetShopProductHistoryWarehouseOperationsShopShopIdProductProductIdGetResponse = GetShopProductHistoryWarehouseOperationsShopShopIdProductProductIdGetResponses[keyof GetShopProductHistoryWarehouseOperationsShopShopIdProductProductIdGetResponses];
 
 export type ListReceiptsStockReceiptsGetData = {
     body?: never;
@@ -10181,6 +10332,12 @@ export type GetOrdersOrdersGetData = {
          */
         fbo_attention?: boolean;
         /**
+         * Paid
+         *
+         * true — оплаченные, false — без отметки об оплате
+         */
+        paid?: boolean | null;
+        /**
          * Sort
          */
         sort?: 'status_asc' | 'status_desc' | 'newest' | 'oldest';
@@ -10584,6 +10741,36 @@ export type UpdateOrderStatusOrdersOrderIdStatusPatchResponses = {
 };
 
 export type UpdateOrderStatusOrdersOrderIdStatusPatchResponse = UpdateOrderStatusOrdersOrderIdStatusPatchResponses[keyof UpdateOrderStatusOrdersOrderIdStatusPatchResponses];
+
+export type UpdateOrderPaymentOrdersOrderIdPaymentPatchData = {
+    body: OrderPaymentUpdate;
+    path: {
+        /**
+         * Order Id
+         */
+        order_id: number;
+    };
+    query?: never;
+    url: '/orders/{order_id}/payment';
+};
+
+export type UpdateOrderPaymentOrdersOrderIdPaymentPatchErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type UpdateOrderPaymentOrdersOrderIdPaymentPatchError = UpdateOrderPaymentOrdersOrderIdPaymentPatchErrors[keyof UpdateOrderPaymentOrdersOrderIdPaymentPatchErrors];
+
+export type UpdateOrderPaymentOrdersOrderIdPaymentPatchResponses = {
+    /**
+     * Successful Response
+     */
+    200: OrderResponse;
+};
+
+export type UpdateOrderPaymentOrdersOrderIdPaymentPatchResponse = UpdateOrderPaymentOrdersOrderIdPaymentPatchResponses[keyof UpdateOrderPaymentOrdersOrderIdPaymentPatchResponses];
 
 export type UpdateShopOrderStatusOrdersOrderIdShopShopIdStatusPatchData = {
     body: ShopOrderStatusUpdate;

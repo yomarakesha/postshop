@@ -210,6 +210,20 @@ export const tr = {
     office: 'Türkmenpoçta merkez ofisi',
     city: 'Aşkabat, Türkmenistan',
   },
+  stockHistory: {
+    open: 'Geçmiş',
+    title: 'Stok hareketleri',
+    empty: 'Henüz hareket yok',
+    op: {
+      income: 'Giriş',
+      sold: 'Satış',
+      return_from_customer: 'Müşteri iadesi',
+      return_to_supplier: 'Tedarikçiye iade',
+      return_to_shop: 'Depodan size iade',
+      write_off: 'Zayi (kusur, kayıp)',
+      correction: 'Sayım',
+    },
+  },
   stock: {
     title: 'Stok',
     subtitle: 'Satışa ne kadar ürün hazır. Açık siparişlerin tuttuğu miktar düşülür.',
@@ -226,10 +240,11 @@ export const tr = {
       return_to_supplier: 'Tedarikçiye iade',
       set: 'Stoğu belirt',
     },
+    breakdown: 'Rafta: {{shelf}} · siparişlerde: {{reserved}} · mevcut: {{available}}',
     operationsHint: {
       income: 'Ürün depoya geldi ve satışa hazır',
       return_to_supplier: 'Ürün depodan tedarikçiye dönüyor',
-      set: 'Saydıysanız, şu anda satışa kaç adet hazır olduğunu yazın. Farkı biz kaydederiz.',
+      set: 'Rafı saydınız — üzerinde ne kadar olduğunu girin. Paketlenmiş siparişleri saymayın. Farkı biz kaydederiz.',
     },
     quantityPlaceholder: 'Miktar',
     quantityRequired: 'Sıfırdan büyük bir miktar girin',
@@ -895,6 +910,8 @@ export const tr = {
     seeAll: 'Tümünü gör',
     dismiss: 'Bildirimi kaldır',
     loadMore: 'Daha fazla göster',
+    deliveryDetail:
+      'Teslimat {{delivery}} TMT, toplam {{total}} TMT. Kabul etmiyorsanız siparişi paketlenmeden iptal edin.',
     kind: {
       order_created: 'Yeni sipariş — açın: ürün sizdeyse kabul edip hazırlayın',
       order_cancelled: 'Sipariş iptal edildi',
@@ -911,6 +928,7 @@ export const tr = {
       shop_rejected: 'Mağaza başvurusu reddedildi',
       order_status: 'Sipariş durumu değişti',
       order_shop_rejected: 'Bir mağaza siparişinizin bir kısmını reddetti',
+      order_approved_delivery: 'Sipariş onaylandı — teslimat ücreti belirlendi',
       review_approved: 'Yorumunuz yayınlandı',
       review_rejected: 'Yorumunuz reddedildi',
       return_approved: 'İade onaylandı',
@@ -935,6 +953,10 @@ export const tr = {
     receivedSaved: 'İade teslim alındı olarak işaretlendi',
   },
   returns: {
+    periodOver: 'İade süresi doldu',
+    hintUntil:
+      'Uymadı mı? Ürünün yanındaki «İade et»e basın — {{date}} tarihine kadar. Talebi Postshop inceleyecek',
+    amount: 'İade tutarı: {{amount}} TMT',
     title: 'İadelerim',
     subtitle: 'İade talepleri ve bunlarla ilgili kararlar.',
     empty: 'Henüz iade talebi yok',
@@ -960,7 +982,8 @@ export const tr = {
     sending: 'Gönderiliyor...',
     sent: 'İade talebi gönderildi',
     notAllowed: 'Bu satın alma için iade zaten sürüyor veya mümkün değil',
-    awaitingItem: 'İade onaylandı — ürünü bekliyoruz. Ulaştığında bildirim gelecek.',
+    awaitingItem:
+      'İade onaylandı. Ürünü herhangi bir Postshop teslim noktasına getirin — teslim alındığında bildirim gelecek.',
     receivedOn: 'Ürün teslim alındı {{date}}',
     status: {
       received: 'İade tamamlandı',
