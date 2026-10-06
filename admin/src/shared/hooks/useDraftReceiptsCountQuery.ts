@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { COUNTER_REFETCH_MS } from '@/shared/constants/counters'
 import { readTotalCount } from '@/shared/hooks/useListControls'
 import { ReceiptStatus, listReceiptsStockReceiptsGet } from '@/shared/openapi/requests'
 
@@ -25,6 +26,7 @@ export function useDraftReceiptsCountQuery(enabled = true) {
       })
       return readTotalCount(response.response.headers, response.data.length)
     },
-    refetchInterval: 60_000,
+    refetchInterval: COUNTER_REFETCH_MS,
+    refetchOnWindowFocus: true,
   })
 }

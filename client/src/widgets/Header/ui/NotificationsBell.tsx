@@ -8,6 +8,7 @@ import {
   useListNotificationsNotificationsGet,
   useMarkAllReadNotificationsReadAllPatch,
   useMarkReadNotificationsNotificationIdReadPatch,
+  useMeAuthMeGetKey,
   useUnreadCountNotificationsUnreadCountGet,
 } from '#/shared/openapi/queries'
 import {
@@ -20,8 +21,12 @@ import { cn } from '#/shared/utils/cn'
 import { EmptyState } from '#/shared/ui/EmptyState'
 import { NotificationRow } from '#/shared/ui/NotificationRow'
 
-/** Как часто перечитывать счётчик: событие приходит извне, само оно не всплывёт. */
-const REFETCH_MS = 60_000
+/**
+ * Как часто перечитывать счётчик: событие приходит извне, само оно не всплывёт.
+ * Раз в минуту было слишком редко — уведомление уже лежало, а числа на
+ * колокольчике не было, и казалось, что его нет вовсе.
+ */
+const REFETCH_MS = 20_000
 
 interface Props {
   className?: string
@@ -48,7 +53,23 @@ export const NotificationsBell = ({ className }: Props) => {
   const { data: unread } = useUnreadCountNotificationsUnreadCountGet({}, undefined, {
     enabled: Boolean(profile),
     refetchInterval: REFETCH_MS,
+    // Во всём приложении перечитывание при возврате на вкладку выключено;
+    // счётчику оно нужно — человек возвращается проверить, что нового.
+    refetchOnWindowFocus: true,
   })
+
+  // Новое уведомление часто значит, что изменился сам профиль: магазин
+  // одобрили, отклонили или закрыли. Профиль грузится один раз при входе, и
+  // одобренный магазин оставался «на проверке» — в шапке не было входа в
+  // кабинет, и продавец не попадал на заполнение витрины.
+  const unreadCount = unread?.count ?? 0
+  const previousCount = useRef(unreadCount)
+  useEffect(() => {
+    if (unreadCount > previousCount.current) {
+      void queryClient.invalidateQueries({ queryKey: [useMeAuthMeGetKey] })
+    }
+    previousCount.current = unreadCount
+  }, [unreadCount, queryClient])
   const { data: notifications } = useListNotificationsNotificationsGet(
     { query: { limit: 20 } },
     undefined,

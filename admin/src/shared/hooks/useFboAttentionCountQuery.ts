@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { COUNTER_REFETCH_MS } from '@/shared/constants/counters'
 import { getFboAttentionCountOrdersFboAttentionCountGet } from '@/shared/openapi/requests'
 
 /**
@@ -14,7 +15,7 @@ export function useFboAttentionCountQuery(enabled = true) {
     enabled,
     queryKey: ['orders', 'fbo-attention-count'],
     queryFn: () => getFboAttentionCountOrdersFboAttentionCountGet({ throwOnError: true }),
-    refetchInterval: 30_000,
+    refetchInterval: COUNTER_REFETCH_MS,
     refetchOnWindowFocus: true,
   })
 }

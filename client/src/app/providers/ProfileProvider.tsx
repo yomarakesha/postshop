@@ -11,7 +11,14 @@ export const ProfileProvider = ({ children }: Props) => {
   const setProfile = useProfileStore((s) => s.setProfile)
   const setProfileLoading = useProfileStore((s) => s.setProfileLoading)
 
-  const { data, isLoading } = useMeAuthMeGet({}, undefined, { enabled: !!token })
+  // Профиль грузился один раз при входе: решение платформы по магазину
+  // (одобрен, отклонён, закрыт) до продавца не доходило, пока он не
+  // перезагрузит страницу. Перечитываем при возврате на вкладку; новое
+  // уведомление перечитывает его сразу (см. NotificationsBell).
+  const { data, isLoading } = useMeAuthMeGet({}, undefined, {
+    enabled: !!token,
+    refetchOnWindowFocus: true,
+  })
 
   useEffect(() => {
     setProfileLoading(isLoading)

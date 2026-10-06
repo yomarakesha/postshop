@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 
+import { COUNTER_REFETCH_MS } from '@/shared/constants/counters'
 import { getPendingOrdersCountOrdersPendingCountGet } from '@/shared/openapi/requests'
 
 /** Ключ под общим префиксом ['orders']: любая смена статуса заказа его сбрасывает. */
@@ -21,7 +22,7 @@ export function usePendingOrdersCountQuery(enabled = true) {
     enabled,
     queryKey: pendingOrdersCountKey,
     queryFn: () => getPendingOrdersCountOrdersPendingCountGet({ throwOnError: true }),
-    refetchInterval: 30_000,
+    refetchInterval: COUNTER_REFETCH_MS,
     refetchOnWindowFocus: true,
   })
 }
