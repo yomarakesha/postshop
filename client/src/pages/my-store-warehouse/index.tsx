@@ -1,8 +1,11 @@
 import { useRef, useState } from 'react'
 import { Link, useParams, useSearch } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
+import { WithdrawalModal } from './ui/WithdrawalModal'
+import { WithdrawalList } from './ui/WithdrawalList'
 import type { StockHistoryTarget } from '#/widgets/StockHistoryModal'
 import type { ModalRef } from '#/shared/ui/Modal'
+import type { WithdrawalTarget } from './ui/WithdrawalModal'
 import { WarehouseType } from '#/shared/openapi/requests'
 import { useShopAdditional } from '#/shared/hooks/useShopAdditional'
 import { Spinner } from '#/shared/ui/Spinner'
@@ -12,7 +15,7 @@ import { StockHistoryModal } from '#/widgets/StockHistoryModal'
 import { Button } from '#/shared/ui/Button'
 import { StoreReceiptsPage } from '#/pages/my-store-receipts'
 
-export type WarehouseTab = 'stock' | 'shipments'
+export type WarehouseTab = 'stock' | 'shipments' | 'withdrawals'
 
 /**
  * «Склад» магазина FBO — всё, что связано со складом Postshop, в одном месте:
@@ -29,6 +32,8 @@ export const StoreWarehousePage = () => {
   const { data: additional, isLoading } = useShopAdditional(shopId)
   const historyRef = useRef<ModalRef>(null)
   const [historyTarget, setHistoryTarget] = useState<StockHistoryTarget | null>(null)
+  const withdrawalRef = useRef<ModalRef>(null)
+  const [withdrawalTarget, setWithdrawalTarget] = useState<WithdrawalTarget | null>(null)
 
   if (isLoading) return <Spinner />
 
@@ -44,6 +49,7 @@ export const StoreWarehousePage = () => {
   const tabs: ReadonlyArray<{ key: WarehouseTab; label: string }> = [
     { key: 'stock', label: t('warehouse.tabStock') },
     { key: 'shipments', label: t('warehouse.tabShipments') },
+    { key: 'withdrawals', label: t('warehouse.tabWithdrawals') },
   ]
 
   return (
@@ -53,7 +59,7 @@ export const StoreWarehousePage = () => {
           <h1 className="p1 font-bold">{t('warehouse.title')}</h1>
           <p className="t1 mt-1 text-passive2">{t('warehouse.subtitle')}</p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           {tabs.map((item) => (
             <Link
               key={item.key}
@@ -79,20 +85,48 @@ export const StoreWarehousePage = () => {
           <ShopStockList
             shopId={shopId}
             action={(row) => (
-              <Button
-                variant="tertiary"
-                size="sm"
-                onClick={() => {
-                  setHistoryTarget({ productId: row.productId, name: row.name })
-                  historyRef.current?.open()
-                }}
-              >
-                {t('stockHistory.open')}
-              </Button>
+              <div className="flex gap-2">
+                <Button
+                  variant="tertiary"
+                  size="sm"
+                  onClick={() => {
+                    setHistoryTarget({ productId: row.productId, name: row.name })
+                    historyRef.current?.open()
+                  }}
+                >
+                  {t('stockHistory.open')}
+                </Button>
+                {/* Забрать свой товар со склада — раньше этого нельзя было
+                    попросить вовсе. */}
+                {row.available > 0 && (
+                  <Button
+                    variant="tertiary"
+                    size="sm"
+                    onClick={() => {
+                      setWithdrawalTarget({
+                        productId: row.productId,
+                        name: row.name,
+                        available: row.available,
+                      })
+                      withdrawalRef.current?.open()
+                    }}
+                  >
+                    {t('withdrawal.action')}
+                  </Button>
+                )}
+              </div>
             )}
           />
           <StockHistoryModal ref={historyRef} shopId={shopId} target={historyTarget} isFbo />
+          <WithdrawalModal
+            ref={withdrawalRef}
+            shopId={shopId}
+            target={withdrawalTarget}
+            onDone={() => setWithdrawalTarget(null)}
+          />
         </>
+      ) : tab === 'withdrawals' ? (
+        <WithdrawalList shopId={shopId} />
       ) : (
         <StoreReceiptsPage />
       )}

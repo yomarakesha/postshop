@@ -1444,7 +1444,9 @@ export enum NotificationKind {
     ORDER_SHOP_REJECTED = 'order_shop_rejected',
     PRODUCT_BLOCKED = 'product_blocked',
     RETURN_COMPLETED = 'return_completed',
-    ORDER_APPROVED_DELIVERY = 'order_approved_delivery'
+    ORDER_APPROVED_DELIVERY = 'order_approved_delivery',
+    WITHDRAWAL_COMPLETED = 'withdrawal_completed',
+    WITHDRAWAL_REJECTED = 'withdrawal_rejected'
 }
 
 /**
@@ -3926,6 +3928,123 @@ export type WarehouseUpdate = {
      */
     phone_numbers?: Array<string> | null;
 };
+
+/**
+ * WithdrawalCreate
+ */
+export type WithdrawalCreate = {
+    /**
+     * Shop Id
+     */
+    shop_id: number;
+    /**
+     * Items
+     */
+    items: Array<WithdrawalItemCreate>;
+    /**
+     * Comment
+     */
+    comment?: string | null;
+};
+
+/**
+ * WithdrawalItemCreate
+ */
+export type WithdrawalItemCreate = {
+    /**
+     * Product Id
+     */
+    product_id: number;
+    /**
+     * Quantity
+     */
+    quantity: number | string;
+};
+
+/**
+ * WithdrawalItemResponse
+ */
+export type WithdrawalItemResponse = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Product Id
+     */
+    product_id: number;
+    /**
+     * Product Name
+     */
+    product_name?: string | null;
+    /**
+     * Measure Unit Code
+     */
+    measure_unit_code?: string | null;
+    /**
+     * Quantity
+     */
+    quantity: string;
+};
+
+/**
+ * WithdrawalReject
+ */
+export type WithdrawalReject = {
+    /**
+     * Resolution Comment
+     */
+    resolution_comment: string;
+};
+
+/**
+ * WithdrawalResponse
+ */
+export type WithdrawalResponse = {
+    /**
+     * Id
+     */
+    id: number;
+    /**
+     * Shop Id
+     */
+    shop_id: number;
+    /**
+     * Shop Name
+     */
+    shop_name?: string | null;
+    status: WithdrawalStatus;
+    /**
+     * Comment
+     */
+    comment?: string | null;
+    /**
+     * Resolution Comment
+     */
+    resolution_comment?: string | null;
+    /**
+     * Created At
+     */
+    created_at?: string | null;
+    /**
+     * Resolved At
+     */
+    resolved_at?: string | null;
+    /**
+     * Items
+     */
+    items: Array<WithdrawalItemResponse>;
+};
+
+/**
+ * WithdrawalStatus
+ */
+export enum WithdrawalStatus {
+    PENDING = 'pending',
+    COMPLETED = 'completed',
+    REJECTED = 'rejected',
+    CANCELLED = 'cancelled'
+}
 
 /**
  * MeasureUnitShort
@@ -9992,6 +10111,252 @@ export type ConfirmReceiptStockReceiptsReceiptIdConfirmPostResponses = {
 };
 
 export type ConfirmReceiptStockReceiptsReceiptIdConfirmPostResponse = ConfirmReceiptStockReceiptsReceiptIdConfirmPostResponses[keyof ConfirmReceiptStockReceiptsReceiptIdConfirmPostResponses];
+
+export type ListWithdrawalsWithdrawalsGetData = {
+    body?: never;
+    path?: never;
+    query?: {
+        /**
+         * Skip
+         *
+         * Смещение выдачи
+         */
+        skip?: number;
+        /**
+         * Limit
+         *
+         * Размер страницы, максимум 500
+         */
+        limit?: number;
+        /**
+         * Status
+         */
+        status?: WithdrawalStatus | null;
+        /**
+         * Lang
+         */
+        lang?: string;
+    };
+    url: '/withdrawals/';
+};
+
+export type ListWithdrawalsWithdrawalsGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ListWithdrawalsWithdrawalsGetError = ListWithdrawalsWithdrawalsGetErrors[keyof ListWithdrawalsWithdrawalsGetErrors];
+
+export type ListWithdrawalsWithdrawalsGetResponses = {
+    /**
+     * Response List Withdrawals Withdrawals  Get
+     *
+     * Successful Response
+     */
+    200: Array<WithdrawalResponse>;
+};
+
+export type ListWithdrawalsWithdrawalsGetResponse = ListWithdrawalsWithdrawalsGetResponses[keyof ListWithdrawalsWithdrawalsGetResponses];
+
+export type CreateWithdrawalWithdrawalsPostData = {
+    body: WithdrawalCreate;
+    path?: never;
+    query?: {
+        /**
+         * Lang
+         */
+        lang?: string;
+    };
+    url: '/withdrawals/';
+};
+
+export type CreateWithdrawalWithdrawalsPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CreateWithdrawalWithdrawalsPostError = CreateWithdrawalWithdrawalsPostErrors[keyof CreateWithdrawalWithdrawalsPostErrors];
+
+export type CreateWithdrawalWithdrawalsPostResponses = {
+    /**
+     * Successful Response
+     */
+    201: WithdrawalResponse;
+};
+
+export type CreateWithdrawalWithdrawalsPostResponse = CreateWithdrawalWithdrawalsPostResponses[keyof CreateWithdrawalWithdrawalsPostResponses];
+
+export type ListShopWithdrawalsWithdrawalsShopShopIdGetData = {
+    body?: never;
+    path: {
+        /**
+         * Shop Id
+         */
+        shop_id: number;
+    };
+    query?: {
+        /**
+         * Skip
+         *
+         * Смещение выдачи
+         */
+        skip?: number;
+        /**
+         * Limit
+         *
+         * Размер страницы, максимум 500
+         */
+        limit?: number;
+        /**
+         * Lang
+         */
+        lang?: string;
+    };
+    url: '/withdrawals/shop/{shop_id}';
+};
+
+export type ListShopWithdrawalsWithdrawalsShopShopIdGetErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type ListShopWithdrawalsWithdrawalsShopShopIdGetError = ListShopWithdrawalsWithdrawalsShopShopIdGetErrors[keyof ListShopWithdrawalsWithdrawalsShopShopIdGetErrors];
+
+export type ListShopWithdrawalsWithdrawalsShopShopIdGetResponses = {
+    /**
+     * Response List Shop Withdrawals Withdrawals Shop  Shop Id  Get
+     *
+     * Successful Response
+     */
+    200: Array<WithdrawalResponse>;
+};
+
+export type ListShopWithdrawalsWithdrawalsShopShopIdGetResponse = ListShopWithdrawalsWithdrawalsShopShopIdGetResponses[keyof ListShopWithdrawalsWithdrawalsShopShopIdGetResponses];
+
+export type CancelWithdrawalWithdrawalsRequestIdCancelPostData = {
+    body?: never;
+    path: {
+        /**
+         * Request Id
+         */
+        request_id: number;
+    };
+    query?: {
+        /**
+         * Lang
+         */
+        lang?: string;
+    };
+    url: '/withdrawals/{request_id}/cancel';
+};
+
+export type CancelWithdrawalWithdrawalsRequestIdCancelPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CancelWithdrawalWithdrawalsRequestIdCancelPostError = CancelWithdrawalWithdrawalsRequestIdCancelPostErrors[keyof CancelWithdrawalWithdrawalsRequestIdCancelPostErrors];
+
+export type CancelWithdrawalWithdrawalsRequestIdCancelPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: WithdrawalResponse;
+};
+
+export type CancelWithdrawalWithdrawalsRequestIdCancelPostResponse = CancelWithdrawalWithdrawalsRequestIdCancelPostResponses[keyof CancelWithdrawalWithdrawalsRequestIdCancelPostResponses];
+
+export type PendingWithdrawalsCountWithdrawalsCountGetData = {
+    body?: never;
+    path?: never;
+    query?: never;
+    url: '/withdrawals/count';
+};
+
+export type PendingWithdrawalsCountWithdrawalsCountGetResponses = {
+    /**
+     * Successful Response
+     */
+    200: unknown;
+};
+
+export type CompleteWithdrawalWithdrawalsRequestIdCompletePostData = {
+    body?: never;
+    path: {
+        /**
+         * Request Id
+         */
+        request_id: number;
+    };
+    query?: {
+        /**
+         * Lang
+         */
+        lang?: string;
+    };
+    url: '/withdrawals/{request_id}/complete';
+};
+
+export type CompleteWithdrawalWithdrawalsRequestIdCompletePostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type CompleteWithdrawalWithdrawalsRequestIdCompletePostError = CompleteWithdrawalWithdrawalsRequestIdCompletePostErrors[keyof CompleteWithdrawalWithdrawalsRequestIdCompletePostErrors];
+
+export type CompleteWithdrawalWithdrawalsRequestIdCompletePostResponses = {
+    /**
+     * Successful Response
+     */
+    200: WithdrawalResponse;
+};
+
+export type CompleteWithdrawalWithdrawalsRequestIdCompletePostResponse = CompleteWithdrawalWithdrawalsRequestIdCompletePostResponses[keyof CompleteWithdrawalWithdrawalsRequestIdCompletePostResponses];
+
+export type RejectWithdrawalWithdrawalsRequestIdRejectPostData = {
+    body: WithdrawalReject;
+    path: {
+        /**
+         * Request Id
+         */
+        request_id: number;
+    };
+    query?: {
+        /**
+         * Lang
+         */
+        lang?: string;
+    };
+    url: '/withdrawals/{request_id}/reject';
+};
+
+export type RejectWithdrawalWithdrawalsRequestIdRejectPostErrors = {
+    /**
+     * Validation Error
+     */
+    422: HttpValidationError;
+};
+
+export type RejectWithdrawalWithdrawalsRequestIdRejectPostError = RejectWithdrawalWithdrawalsRequestIdRejectPostErrors[keyof RejectWithdrawalWithdrawalsRequestIdRejectPostErrors];
+
+export type RejectWithdrawalWithdrawalsRequestIdRejectPostResponses = {
+    /**
+     * Successful Response
+     */
+    200: WithdrawalResponse;
+};
+
+export type RejectWithdrawalWithdrawalsRequestIdRejectPostResponse = RejectWithdrawalWithdrawalsRequestIdRejectPostResponses[keyof RejectWithdrawalWithdrawalsRequestIdRejectPostResponses];
 
 export type ReadFeaturesFeaturesGetData = {
     body?: never;

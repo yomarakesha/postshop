@@ -53,6 +53,10 @@ export function notificationTarget(
       return store('/orders')
     case NotificationKind.RECEIPT_CONFIRMED:
       return store('/warehouse?tab=shipments')
+    // Решение по заявке на вывоз — на вкладку заявок.
+    case NotificationKind.WITHDRAWAL_COMPLETED:
+    case NotificationKind.WITHDRAWAL_REJECTED:
+      return store('/warehouse?tab=withdrawals')
     // Раньше вести было некуда — экрана возвратов у продавца не существовало.
     // Теперь уведомление приходит, когда возврат одобрен, и продавцу там же
     // отмечать, что товар до него доехал.
