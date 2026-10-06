@@ -732,7 +732,8 @@
       "tabShipments": "Ammara ugratmak",
       "stockHint": "Harydyňyz Postshop ammarlarynda saklanýar. Platforma ugradyş resminamasyny kabul edende galyndy artýar, her tamamlanan sargyt bilen azalýar.",
       "fboOnly": "Bu bölüm FBO dükanlary üçin: olaryň harydy Postshop ammarynda saklanýar. FBS dükany hasaby özi alyp barýar — «Galyndylar» we «Haryt kabul etmek» bölümlerinde.",
-      "disabled": "Platformanyň ammary öçürilen: platforma häzir harydy saklamaga kabul etmeýär."
+      "disabled": "Platformanyň ammary öçürilen: platforma häzir harydy saklamaga kabul etmeýär.",
+      "tabWithdrawals": "Çykarmak"
     },
     "receipts": {
       "title": "Ammara ugratmak",
@@ -761,6 +762,41 @@
       "quantityPlaceholder": "Mukdary",
       "quantityRequired": "Nolýdan uly mukdar giriziň",
       "save": "Ýazmak"
+    },
+    "stockHistory": {
+      "open": "Taryh",
+      "title": "Hereketleriň taryhy",
+      "empty": "Entek hereket ýok",
+      "op": {
+        "income": "Girdeji",
+        "sold": "Satuw",
+        "return_from_customer": "Alyjydan gaýtarma",
+        "return_to_supplier": "Üpjün edijä gaýtarma",
+        "return_to_shop": "Ammardan size gaýtarma",
+        "write_off": "Hasapdan aýyrma (kemçilik, ýitgi)",
+        "correction": "Gaýtadan sanamak"
+      }
+    },
+    "withdrawal": {
+      "action": "Alyp git",
+      "title": "Harydy ammardan alyp gitmek",
+      "free": "Ammarda boş: {{count}}",
+      "quantity": "Näçesini almaly",
+      "commentPlaceholder": "Ammar üçin teswir: haçan we kim alyp gider",
+      "notice": "Arza Postshop ammary seredýär. Açyk sargytlaryň saklaýan harydyny alyp bolmaýar.",
+      "send": "Arzany ugrat",
+      "sent": "Çykarmak arzasy ugradyldy",
+      "quantityInvalid": "1-den {{count}} çenli mukdar giriziň",
+      "hint": "Harydyňyzy Postshop ammaryndan çykarmak arzalary. Täzesi — «Galyndylar» bölüminde «Alyp git» düwmesi.",
+      "empty": "Çykarmak arzasy ýok",
+      "number": "Arza №{{id}}",
+      "cancel": "Yzyna al",
+      "status": {
+        "pending": "Seredilýär",
+        "completed": "Haryt berildi",
+        "rejected": "Ret edildi",
+        "cancelled": "Yzyna alyndy"
+      }
     }
   },
   "serverSetup": {
@@ -803,7 +839,9 @@
       "shop_approved": "Dükan arzasy tassyklandy",
       "shop_blocked": "Dükan platforma tarapyndan ýapyldy",
       "shop_rejected": "Dükan arzasy kabul edilmedi",
-      "order_approved_delivery": "Sargyt tassyklandy — eltip bermegiň bahasy bellendi"
+      "order_approved_delivery": "Sargyt tassyklandy — eltip bermegiň bahasy bellendi",
+      "withdrawal_completed": "Ammar harydyňyzy berdi",
+      "withdrawal_rejected": "Ammar çykarmak arzasyny ret etdi"
     },
     "deliveryDetail": "Eltip bermek {{delivery}} TMT, jemi {{total}} TMT. Razy däl bolsaňyz, sargydy ýygnalmazdan öň ýatyryň."
   },

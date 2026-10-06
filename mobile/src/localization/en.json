@@ -732,7 +732,8 @@
       "tabShipments": "Shipments to warehouse",
       "stockHint": "Your goods are stored at Postshop warehouses. Stock grows when the platform accepts a shipment and drops with each completed order.",
       "fboOnly": "This section is for FBO shops: their goods are stored at the Postshop warehouse. An FBS shop keeps its own records in “Stock” and “Goods intake”.",
-      "disabled": "The platform warehouse is switched off: the platform is not accepting goods for storage right now."
+      "disabled": "The platform warehouse is switched off: the platform is not accepting goods for storage right now.",
+      "tabWithdrawals": "Withdrawals"
     },
     "receipts": {
       "title": "Shipments to warehouse",
@@ -761,6 +762,41 @@
       "quantityPlaceholder": "Quantity",
       "quantityRequired": "Enter a quantity greater than zero",
       "save": "Record"
+    },
+    "stockHistory": {
+      "open": "History",
+      "title": "Stock history",
+      "empty": "No movements yet",
+      "op": {
+        "income": "Income",
+        "sold": "Sale",
+        "return_from_customer": "Customer return",
+        "return_to_supplier": "Return to supplier",
+        "return_to_shop": "Returned to you from the warehouse",
+        "write_off": "Write-off (defect, loss)",
+        "correction": "Recount"
+      }
+    },
+    "withdrawal": {
+      "action": "Take back",
+      "title": "Take goods back from the warehouse",
+      "free": "Free at the warehouse: {{count}}",
+      "quantity": "How much to take",
+      "commentPlaceholder": "Comment for the warehouse: when and who will pick up",
+      "notice": "Postshop warehouse will review the request. Goods held by open orders cannot be taken.",
+      "send": "Send request",
+      "sent": "Withdrawal request sent",
+      "quantityInvalid": "Enter a quantity from 1 to {{count}}",
+      "hint": "Requests to take your goods back from the Postshop warehouse. New one — “Take back” in the Stock tab.",
+      "empty": "No withdrawal requests",
+      "number": "Request #{{id}}",
+      "cancel": "Withdraw",
+      "status": {
+        "pending": "Under review",
+        "completed": "Goods handed over",
+        "rejected": "Rejected",
+        "cancelled": "Withdrawn"
+      }
     }
   },
   "serverSetup": {
@@ -803,7 +839,9 @@
       "shop_approved": "Shop application approved",
       "shop_blocked": "The shop was closed by the platform",
       "shop_rejected": "Shop application rejected",
-      "order_approved_delivery": "Order confirmed — delivery price set"
+      "order_approved_delivery": "Order confirmed — delivery price set",
+      "withdrawal_completed": "The warehouse handed over your goods",
+      "withdrawal_rejected": "The warehouse rejected your withdrawal request"
     },
     "deliveryDetail": "Delivery {{delivery}} TMT, total {{total}} TMT. Disagree? Cancel the order before it is packed."
   },

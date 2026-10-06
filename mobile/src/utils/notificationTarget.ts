@@ -62,6 +62,8 @@ export const notificationTarget = (
     case "receipt_confirmed":
     case "product_out_of_stock":
     case "product_blocked":
+    case "withdrawal_completed":
+    case "withdrawal_rejected":
       return null;
 
     default:

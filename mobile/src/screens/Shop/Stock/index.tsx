@@ -1,5 +1,8 @@
 import Header from "@/components/Header";
 import ShopStockList from "@/components/ShopStockList";
+import StockHistorySheet, {
+  StockHistoryTarget,
+} from "@/components/StockHistorySheet";
 import StockSheet, { StockMode, StockTarget } from "@/components/StockSheet";
 import useShopStore from "@/store/useShopStore";
 import EmptyState from "@/ui/EmptyState";
@@ -24,6 +27,9 @@ const ShopStockScreen = () => {
   const shop = useShopStore((s) => s.shop);
   const sheetRef = useRef<TrueSheet>(null);
   const [target, setTarget] = useState<StockTarget | null>(null);
+  const historyRef = useRef<TrueSheet>(null);
+  const [historyTarget, setHistoryTarget] =
+    useState<StockHistoryTarget | null>(null);
 
   const isFbs = shop?.warehouse_type === "fbs";
 
@@ -44,6 +50,15 @@ const ShopStockScreen = () => {
                 {t("store.stock.subtitle")}
               </Typography>
             }
+            extraActions={[
+              {
+                title: t("store.stockHistory.open"),
+                onPress: (row) => {
+                  setHistoryTarget({ productId: row.productId, name: row.name });
+                  historyRef.current?.present();
+                },
+              },
+            ]}
             action={{
               title: t("store.stock.edit"),
               onPress: (row) => {
@@ -51,6 +66,13 @@ const ShopStockScreen = () => {
                 sheetRef.current?.present();
               },
             }}
+          />
+          <StockHistorySheet
+            ref={historyRef}
+            shopId={shopId}
+            target={historyTarget}
+            isFbo={false}
+            t={t}
           />
           <StockSheet
             ref={sheetRef}

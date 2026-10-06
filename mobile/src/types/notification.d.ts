@@ -23,7 +23,9 @@ declare namespace Notification {
     | "return_received"
     | "return_completed"
     | "product_blocked"
-    | "order_approved_delivery";
+    | "order_approved_delivery"
+    | "withdrawal_completed"
+    | "withdrawal_rejected";
 
   type Item = {
     id: number;

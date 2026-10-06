@@ -732,7 +732,8 @@
       "tabShipments": "Depoya gönderim",
       "stockHint": "Ürünleriniz Postshop depolarında saklanır. Platform gönderim belgesini kabul edince stok artar, her tamamlanan siparişle azalır.",
       "fboOnly": "Bu bölüm FBO mağazaları içindir: ürünleri Postshop deposunda saklanır. FBS mağazası kaydını kendisi tutar — «Stok» ve «Ürün kabulü» bölümlerinde.",
-      "disabled": "Platform deposu kapalı: platform şu anda ürünü depolamaya kabul etmiyor."
+      "disabled": "Platform deposu kapalı: platform şu anda ürünü depolamaya kabul etmiyor.",
+      "tabWithdrawals": "Çekme"
     },
     "receipts": {
       "title": "Depoya gönderim",
@@ -761,6 +762,41 @@
       "quantityPlaceholder": "Miktar",
       "quantityRequired": "Sıfırdan büyük bir miktar girin",
       "save": "Kaydet"
+    },
+    "stockHistory": {
+      "open": "Geçmiş",
+      "title": "Stok hareketleri",
+      "empty": "Henüz hareket yok",
+      "op": {
+        "income": "Giriş",
+        "sold": "Satış",
+        "return_from_customer": "Müşteri iadesi",
+        "return_to_supplier": "Tedarikçiye iade",
+        "return_to_shop": "Depodan size iade",
+        "write_off": "Zayi (kusur, kayıp)",
+        "correction": "Sayım"
+      }
+    },
+    "withdrawal": {
+      "action": "Geri al",
+      "title": "Ürünü depodan geri al",
+      "free": "Depoda serbest: {{count}}",
+      "quantity": "Ne kadar alınacak",
+      "commentPlaceholder": "Depo için not: ne zaman ve kim alacak",
+      "notice": "Talebi Postshop deposu inceleyecek. Açık siparişlerin tuttuğu ürün alınamaz.",
+      "send": "Talebi gönder",
+      "sent": "Çekme talebi gönderildi",
+      "quantityInvalid": "1 ile {{count}} arasında miktar girin",
+      "hint": "Ürününüzü Postshop deposundan geri alma talepleri. Yenisi — Stok sekmesinde «Geri al».",
+      "empty": "Çekme talebi yok",
+      "number": "Talep #{{id}}",
+      "cancel": "Geri çek",
+      "status": {
+        "pending": "İnceleniyor",
+        "completed": "Ürün teslim edildi",
+        "rejected": "Reddedildi",
+        "cancelled": "Geri çekildi"
+      }
     }
   },
   "serverSetup": {
@@ -803,7 +839,9 @@
       "shop_approved": "Mağaza başvurusu onaylandı",
       "shop_blocked": "Mağaza platform tarafından kapatıldı",
       "shop_rejected": "Mağaza başvurusu reddedildi",
-      "order_approved_delivery": "Sipariş onaylandı — teslimat ücreti belirlendi"
+      "order_approved_delivery": "Sipariş onaylandı — teslimat ücreti belirlendi",
+      "withdrawal_completed": "Depo ürününüzü teslim etti",
+      "withdrawal_rejected": "Depo çekme talebinizi reddetti"
     },
     "deliveryDetail": "Teslimat {{delivery}} TMT, toplam {{total}} TMT. Kabul etmiyorsanız siparişi paketlenmeden iptal edin."
   },

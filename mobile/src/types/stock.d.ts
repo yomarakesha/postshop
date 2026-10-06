@@ -1,4 +1,14 @@
 declare namespace Stock {
+  /** Одно движение товара — для истории. */
+  type Operation = {
+    id: number;
+    operation_type: string;
+    /** У пересчёта со знаком; у остальных видов — всегда положительное. */
+    quantity: string;
+    created_at: string;
+    measure_unit: { id: number; code: string };
+  };
+
   /** Остаток FBS в разрезе — для пересчёта полки. */
   type Summary = {
     product_id: number;

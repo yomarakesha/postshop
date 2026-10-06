@@ -98,9 +98,37 @@ const useSetStock = () => {
   });
 };
 
+/**
+ * История движений товара: у FBS — журнал магазина, у FBO — склады Postshop
+ * (там же списания брака и возврат товара продавцу). Продавец видел только
+ * итоговое число и не мог понять, откуда оно взялось.
+ */
+const useHistory = (
+  shopId: number | undefined,
+  productId: number | undefined,
+  isFbo: boolean,
+) =>
+  useQuery<Stock.Operation[], AxiosError<ApiErrorResponse>>({
+    queryKey: ["stock-history", shopId, productId, isFbo],
+    queryFn: async () => {
+      const res = await api.req({
+        method: "GET",
+        url: isFbo
+          ? `/warehouse-operations/shop/${shopId}/product/${productId}`
+          : `/stock-operations/${productId}`,
+      });
+      const operations: Stock.Operation[] = res.data.operations ?? [];
+      // Журнал магазина приходит по возрастанию, склад — по убыванию;
+      // показываем новые сверху.
+      return isFbo ? operations : [...operations].reverse();
+    },
+    enabled: !!shopId && !!productId,
+  });
+
 export const stockApi = {
   useAvailability,
   useSummary,
+  useHistory,
   useCreateOperation,
   useSetStock,
 };

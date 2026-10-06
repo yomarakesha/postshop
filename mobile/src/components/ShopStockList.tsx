@@ -18,6 +18,15 @@ type Props = {
   t: TFunction;
   /** Кнопка у строки; без неё список только показывает остаток. */
   action?: { title: string; onPress: (target: StockTarget) => void };
+  /**
+   * Дополнительные кнопки — например, «История» и «Забрать». `isVisible`
+   * прячет кнопку там, где действие бессмысленно (забрать нечего).
+   */
+  extraActions?: {
+    title: string;
+    onPress: (target: StockTarget) => void;
+    isVisible?: (target: StockTarget) => boolean;
+  }[];
   ListHeaderComponent?: ReactElement;
 };
 
@@ -29,7 +38,13 @@ type Props = {
  * Остаток считает сервер по журналу нужного типа — магазина для FBS, складов
  * платформы для FBO — и вычитает то, что уже держат открытые заказы.
  */
-const ShopStockList = ({ shopId, t, action, ListHeaderComponent }: Props) => {
+const ShopStockList = ({
+  shopId,
+  t,
+  action,
+  extraActions,
+  ListHeaderComponent,
+}: Props) => {
   const language = useAppStore((s) => s.lang);
   const {
     data,
@@ -56,6 +71,15 @@ const ShopStockList = ({ shopId, t, action, ListHeaderComponent }: Props) => {
   const renderItem = ({ item: product }: { item: Product.Item }) => {
     const available = Number(stockById.get(product.id)?.available ?? 0);
     const name = pickTranslatedName(product.translations, language);
+    const target: StockTarget = {
+      productId: product.id,
+      measureUnitId: product.measure_unit_id,
+      name,
+      available,
+    };
+    const extras = (extraActions ?? []).filter(
+      (extra) => !extra.isVisible || extra.isVisible(target),
+    );
     return (
       <View style={styles.row}>
         <View style={styles.flex1}>
@@ -72,21 +96,25 @@ const ShopStockList = ({ shopId, t, action, ListHeaderComponent }: Props) => {
               : t("product.outOfStock")}
           </Typography>
         </View>
-        {action && (
-          <Button
-            title={action.title}
-            variant="secondary"
-            style={styles.button}
-            onPress={() =>
-              action.onPress({
-                productId: product.id,
-                measureUnitId: product.measure_unit_id,
-                name,
-                available,
-              })
-            }
-          />
-        )}
+        <View style={styles.actions}>
+          {extras.map((extra) => (
+            <Button
+              key={extra.title}
+              title={extra.title}
+              variant="secondary"
+              style={styles.button}
+              onPress={() => extra.onPress(target)}
+            />
+          ))}
+          {action && (
+            <Button
+              title={action.title}
+              variant="secondary"
+              style={styles.button}
+              onPress={() => action.onPress(target)}
+            />
+          )}
+        </View>
       </View>
     );
   };
@@ -143,6 +171,10 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing(3),
     borderRadius: theme.radius.base,
     backgroundColor: theme.colors.white,
+  },
+  // Кнопки столбиком: в ряд с названием товара две-три не помещаются.
+  actions: {
+    gap: theme.spacing(1),
   },
   button: {
     minHeight: theme.spacing(10),
