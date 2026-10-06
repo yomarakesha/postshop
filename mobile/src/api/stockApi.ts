@@ -48,6 +48,7 @@ const useInvalidateAvailability = () => {
   return () => {
     queryClient.invalidateQueries({ queryKey: ["stock-availability"] });
     queryClient.invalidateQueries({ queryKey: ["stock-summary"] });
+    queryClient.invalidateQueries({ queryKey: ["stock-history"] });
   };
 };
 

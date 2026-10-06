@@ -6,11 +6,13 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { useApproveMutation } from '../model/useApproveMutation'
 import { useDeclineMutation } from '../model/useDeclineMutation'
 import { useProductQuery } from '../model/useProductQuery'
+import { useProductSaleMutation } from '../model/useProductSaleMutation'
 import { buildFileUrl } from '@/shared/lib/buildFileUrl'
 import { formatDate } from '@/shared/lib/formatDate'
 import { DiscountType, ProductStatus } from '@/shared/openapi/requests'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
+import { ConfirmDialog } from '@/shared/ui/confirm-dialog'
 import { Label } from '@/shared/ui/label'
 import { DeclineProductDialog } from '@/widgets/DeclineProductDialog'
 
@@ -32,6 +34,8 @@ export function ProductModerationDetailPage() {
   // Отклонение из карточки уходило одним кликом, без вопроса и без причины —
   // в отличие от очереди. Теперь тот же диалог, что и в списке.
   const [askDecline, setAskDecline] = useState(false)
+  const sale = useProductSaleMutation(productId)
+  const [askBlock, setAskBlock] = useState(false)
 
   if (isLoading) {
     return (
@@ -104,6 +108,43 @@ export function ProductModerationDetailPage() {
             </div>
           )
         })()}
+
+        {/* В продаже товар или нет — отдельно от модерации: одобренный товар
+            может снять продавец или платформа. Раньше снять его из админки
+            было негде. */}
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border px-5 py-4">
+          <div className="space-y-1">
+            <p className="text-sm font-medium text-muted-foreground">{t('products.sale.title')}</p>
+            <Badge
+              variant={
+                product.is_active ? 'success' : product.blocked_by_staff ? 'destructive' : 'default'
+              }
+            >
+              {product.is_active
+                ? t('products.sale.active')
+                : product.blocked_by_staff
+                  ? t('products.sale.blockedByStaff')
+                  : t('products.sale.hiddenByOwner')}
+            </Badge>
+          </div>
+          {product.is_active || !product.blocked_by_staff ? (
+            <Button
+              variant="destructive"
+              disabled={sale.isPending}
+              onClick={() => setAskBlock(true)}
+            >
+              {t('products.sale.block')}
+            </Button>
+          ) : (
+            <Button
+              disabled={sale.isPending}
+              isLoading={sale.isPending}
+              onClick={() => sale.mutate(true)}
+            >
+              {t('products.sale.unblock')}
+            </Button>
+          )}
+        </div>
 
         <div className="grid grid-cols-2 gap-4 rounded-xl border px-5 py-5">
           <div className="space-y-1.5">
@@ -210,6 +251,16 @@ export function ProductModerationDetailPage() {
         onOpenChange={setAskDecline}
         busy={decline.isPending}
         onConfirm={(comment) => decline.mutate({ productId, comment })}
+      />
+      <ConfirmDialog
+        open={askBlock}
+        onOpenChange={setAskBlock}
+        title={t('products.sale.blockTitle')}
+        description={t('products.sale.blockText')}
+        confirmLabel={t('products.sale.block')}
+        destructive
+        busy={sale.isPending}
+        onConfirm={() => sale.mutate(false, { onSuccess: () => setAskBlock(false) })}
       />
     </>
   )

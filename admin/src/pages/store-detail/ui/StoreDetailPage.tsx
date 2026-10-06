@@ -264,13 +264,14 @@ export function StoreDetailPage() {
                 <TableHead>{t('fields.name')}</TableHead>
                 <TableHead>{t('moderation.price')}</TableHead>
                 <TableHead>{t('fields.status')}</TableHead>
+                <TableHead>{t('products.sale.title')}</TableHead>
                 <TableHead>{t('fields.createdAt')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {productsLoading ? (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-32 text-center">
+                  <TableCell colSpan={6} className="h-32 text-center">
                     <Loader2 className="mx-auto size-5 animate-spin text-muted-foreground" />
                   </TableCell>
                 </TableRow>
@@ -308,6 +309,23 @@ export function StoreDetailPage() {
                           {t(`productStatus.${product.status}`)}
                         </Badge>
                       </TableCell>
+                      <TableCell>
+                        <Badge
+                          variant={
+                            product.is_active
+                              ? 'success'
+                              : product.blocked_by_staff
+                                ? 'destructive'
+                                : 'default'
+                          }
+                        >
+                          {product.is_active
+                            ? t('products.sale.active')
+                            : product.blocked_by_staff
+                              ? t('products.sale.blockedByStaff')
+                              : t('products.sale.hiddenByOwner')}
+                        </Badge>
+                      </TableCell>
                       <TableCell className="text-muted-foreground tabular-nums">
                         {formatDate(product.created_at)}
                       </TableCell>
@@ -316,7 +334,7 @@ export function StoreDetailPage() {
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} className="h-32 text-center text-muted-foreground">
+                  <TableCell colSpan={6} className="h-32 text-center text-muted-foreground">
                     {t('stores.noProducts')}
                   </TableCell>
                 </TableRow>

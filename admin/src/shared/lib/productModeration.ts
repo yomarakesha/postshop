@@ -62,9 +62,15 @@ export const runModerationDecision = async (
  */
 export const removeFromModerationQueue = (queryClient: QueryClient, productId: number) =>
   // Очередь кэшируется постранично: убираем товар со всех загруженных страниц.
+  // Под тем же префиксом лежат и карточки товаров (detail) — у них data не
+  // список, их не трогаем: иначе .filter падал, и одобрение, прошедшее на
+  // сервере, показывалось как «нет связи с сервером».
   queryClient.setQueriesData<ModerationQueueData>(
     { queryKey: productModerationKeys.queue },
-    (old) => (old ? { ...old, data: old.data.filter((product) => product.id !== productId) } : old),
+    (old) =>
+      old && Array.isArray(old.data)
+        ? { ...old, data: old.data.filter((product) => product.id !== productId) }
+        : old,
   )
 
 /**

@@ -368,6 +368,18 @@ export const tk = {
     mapUnavailable:
       'Karta elýeterli däl: karta serweri sazlanmadyk (VITE_MAP_TILES_URL). Giňişligi we uzynlygy ýokardaky meýdanlara giriziň.',
   },
+  products: {
+    sale: {
+      title: 'Satuw',
+      active: 'Satuwda',
+      blockedByStaff: 'Platforma aýyrdy',
+      hiddenByOwner: 'Satyjy aýyrdy',
+      block: 'Satuwdan aýyr',
+      unblock: 'Satuwa gaýtar',
+      blockTitle: 'Harydy satuwdan aýyrmalymy?',
+      blockText: 'Haryt katalogdan aýrylar. Satyja habar gider we ol harydy özi gaýtaryp bilmez.',
+    },
+  },
   stores: {
     activity: 'Sargytlar we gaýtarmalar',
     activityTab: {

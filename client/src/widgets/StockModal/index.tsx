@@ -8,7 +8,10 @@ import {
   useGetProductStockSummaryStockOperationsProductIdSummaryGet,
   useSetStockStockOperationsSetPost,
 } from '#/shared/openapi/queries'
-import { useGetProductStockSummaryStockOperationsProductIdSummaryGetKey } from '#/shared/openapi/queries/common'
+import {
+  useGetProductStockStockOperationsProductIdGetKey,
+  useGetProductStockSummaryStockOperationsProductIdSummaryGetKey,
+} from '#/shared/openapi/queries/common'
 import { OperationType } from '#/shared/openapi/requests'
 import { Modal } from '#/shared/ui/Modal'
 import { Button } from '#/shared/ui/Button'
@@ -94,6 +97,9 @@ export const StockModal = forwardRef<ModalRef, Props>(
       setQuantity('')
       void queryClient.invalidateQueries({
         queryKey: [useGetProductStockSummaryStockOperationsProductIdSummaryGetKey],
+      })
+      void queryClient.invalidateQueries({
+        queryKey: [useGetProductStockStockOperationsProductIdGetKey],
       })
       onDone()
     }

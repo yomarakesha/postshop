@@ -139,7 +139,7 @@ export function WarehouseDetailPage() {
                   <TableRow
                     key={row.product_id}
                     className="cursor-pointer"
-                    onClick={() => navigate(`/products/${row.product_id}`)}
+                    onClick={() => navigate(`/product-moderation/${row.product_id}`)}
                   >
                     <TableCell className="text-muted-foreground tabular-nums">
                       {index + 1}

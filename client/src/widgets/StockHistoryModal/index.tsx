@@ -1,4 +1,4 @@
-import { forwardRef } from 'react'
+import { forwardRef, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
 import type { ModalRef } from '#/shared/ui/Modal'
 import {
@@ -55,6 +55,13 @@ export const StockHistoryModal = forwardRef<ModalRef, Props>(({ shopId, target, 
     { enabled: target !== null && isFbo },
   )
   const query = isFbo ? fbo : fbs
+
+  // Окно всегда смонтировано, и ответ по товару брался из кэша: после
+  // пересчёта или списания история показывала старое. Каждое открытие
+  // (новый target) перечитывает её.
+  useEffect(() => {
+    if (target) void query.refetch()
+  }, [target])
   // Журнал FBS приходит по возрастанию, склад — по убыванию; показываем новые сверху.
   const rows: Array<Row> = isFbo
     ? (fbo.data?.operations ?? [])

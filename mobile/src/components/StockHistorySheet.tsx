@@ -7,7 +7,7 @@ import Typography from "@/ui/Typography";
 import { formatApiDate } from "@/utils/formatDate";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { TFunction } from "i18next";
-import React, { RefObject } from "react";
+import React, { RefObject, useEffect } from "react";
 import { ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 
@@ -40,6 +40,13 @@ const StockHistorySheet = ({ ref, shopId, target, isFbo, t }: Props) => {
   const language = useAppStore((s) => s.lang);
   const history = stockApi.useHistory(shopId, target?.productId, isFbo);
   const operations = history.data ?? [];
+
+  // Лист всегда смонтирован, и ответ брался из кэша: после пересчёта или
+  // списания история показывала старое. Каждое открытие перечитывает её.
+  useEffect(() => {
+    if (target) void history.refetch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [target]);
 
   return (
     <UniTrueSheet ref={ref} detents={[0.7, 1]} style={styles.wrapper}>
