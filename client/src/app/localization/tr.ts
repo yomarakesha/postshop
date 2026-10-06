@@ -386,6 +386,8 @@ export const tr = {
       rejectedStores: 'Mağazaların reddettiği',
       deliveryPending: 'Fiyatı operatör onayda belirler',
       cancelReason: 'İptal nedeni',
+      cancelTooLate:
+        'Sipariş zaten hazırlandı, yolda veya tamamlandı — artık iptal edilemez. Durum güncellendi.',
       cancelReasonPlaceholder: 'İsteğe bağlı — mağaza ne olduğunu anlar',
       grandTotal: 'Genel toplam:',
       pieces: 'adet',

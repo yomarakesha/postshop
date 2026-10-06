@@ -476,7 +476,8 @@
         "amount": "İade tutarı: {{amount}} TMT.",
         "bringToPickup": "Ürünü herhangi bir Postshop teslim noktasına getirin."
       },
-      "cancelReasonPlaceholder": "İptal nedeni (isteğe bağlı)"
+      "cancelReasonPlaceholder": "İptal nedeni (isteğe bağlı)",
+      "cancelTooLate": "Sipariş zaten hazırlandı, yolda veya tamamlandı — artık iptal edilemez. Durum güncellendi."
     },
     "selectLanguage": {
       "title": "Dilinizi seçin",

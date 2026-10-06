@@ -480,7 +480,8 @@
         "amount": "К возврату: {{amount}} TMT.",
         "bringToPickup": "Принесите товар в любой пункт выдачи Postshop."
       },
-      "cancelReasonPlaceholder": "Причина отмены (необязательно)"
+      "cancelReasonPlaceholder": "Причина отмены (необязательно)",
+      "cancelTooLate": "Заказ уже собран, в доставке или завершён — отменить его нельзя. Статус обновлён."
     },
     "selectLanguage": {
       "title": "Выберите язык",

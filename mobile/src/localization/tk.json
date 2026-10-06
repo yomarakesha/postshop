@@ -476,7 +476,8 @@
         "amount": "Gaýtarylýan möçber: {{amount}} TMT.",
         "bringToPickup": "Harydy islendik Postshop bermek nokadyna getiriň."
       },
-      "cancelReasonPlaceholder": "Ýatyrmagyň sebäbi (hökmany däl)"
+      "cancelReasonPlaceholder": "Ýatyrmagyň sebäbi (hökmany däl)",
+      "cancelTooLate": "Sargyt eýýäm ýygnaldy, ýolda ýa-da tamamlandy — ony ýatyryp bolmaýar. Ýagdaýy täzelendi."
     },
     "selectLanguage": {
       "title": "Dili saýlaň",

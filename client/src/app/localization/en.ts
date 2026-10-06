@@ -388,6 +388,8 @@ export const en = {
       rejectedStores: 'Declined by shops',
       deliveryPending: 'The operator sets the price on confirmation',
       cancelReason: 'Reason for cancelling',
+      cancelTooLate:
+        'The order is already packed, on its way or completed — it can no longer be cancelled. Status refreshed.',
       cancelReasonPlaceholder: 'Optional — helps the shop understand what happened',
       grandTotal: 'Grand total:',
       pieces: 'pieces',

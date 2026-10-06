@@ -61,6 +61,9 @@ export const OrdersPage = () => {
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length < ORDERS_PAGE_SIZE ? undefined : allPages.length * ORDERS_PAGE_SIZE,
+    // Заказ ведёт оператор: без перечитывания продавец видел устаревший статус.
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
   })
   const orders = orderPages?.pages.flat() ?? []
 

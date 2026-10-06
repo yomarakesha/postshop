@@ -392,6 +392,8 @@ export const ru = {
       rejectedStores: 'Отказ магазинов',
       deliveryPending: 'Цену назначит оператор при подтверждении',
       cancelReason: 'Причина отмены',
+      cancelTooLate:
+        'Заказ уже собран, в доставке или завершён — отменить его нельзя. Статус обновлён.',
       cancelReasonPlaceholder: 'Необязательно — магазин поймёт, что случилось',
       grandTotal: 'Общий итог:',
       pieces: 'штук',

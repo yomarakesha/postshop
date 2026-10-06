@@ -232,6 +232,10 @@ export const OrdersPage = () => {
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) =>
       lastPage.length < ORDERS_PAGE_SIZE ? undefined : allPages.length * ORDERS_PAGE_SIZE,
+    // Статус меняет оператор, а страница держала старый: покупатель видел
+    // «Принят» с кнопкой отмены у уже доставленного заказа.
+    refetchInterval: 30_000,
+    refetchOnWindowFocus: true,
   })
   const orders = orderPages?.pages.flat() ?? []
 
@@ -263,6 +267,11 @@ export const OrdersPage = () => {
     isPending: isCancelling,
     error: cancelMutationError,
   } = useCancelOrderOrdersOrderIdCancelPost(undefined, {
+    // Отказ — значит, статус на экране устарел: перечитываем, чтобы кнопка
+    // отмены пропала.
+    onError: () => {
+      void queryClient.invalidateQueries({ queryKey: [useGetMyOrdersOrdersMyGetKey] })
+    },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: [useGetMyOrdersOrdersMyGetKey] })
       // Раньше отмена проходила молча, и человек не понимал, случилось ли что-нибудь.
@@ -274,7 +283,10 @@ export const OrdersPage = () => {
 
   const cancelError = (() => {
     if (!cancelMutationError) return null
-    const e = cancelMutationError as { detail?: string | Array<{ msg: string }> }
+    const e = cancelMutationError as { status?: number; detail?: string | Array<{ msg: string }> }
+    // 400 — заказ уже собран, в доставке или завершён: отменять поздно.
+    // Раньше показывался английский текст сервера как есть.
+    if (e.status === 400) return t('orders.detail.cancelTooLate')
     if (typeof e.detail === 'string') return e.detail
     if (Array.isArray(e.detail) && e.detail.length > 0) return e.detail[0].msg
     return t('login.errors.general')

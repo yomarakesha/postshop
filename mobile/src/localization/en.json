@@ -476,7 +476,8 @@
         "amount": "Refund: {{amount}} TMT.",
         "bringToPickup": "Bring the item to any Postshop pickup point."
       },
-      "cancelReasonPlaceholder": "Reason for cancelling (optional)"
+      "cancelReasonPlaceholder": "Reason for cancelling (optional)",
+      "cancelTooLate": "The order is already packed, on its way or completed — it can no longer be cancelled. Status refreshed."
     },
     "selectLanguage": {
       "title": "Choose your language",

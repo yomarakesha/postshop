@@ -387,6 +387,8 @@ export const tk = {
       rejectedStores: 'Dükanlaryň ret edeni',
       deliveryPending: 'Bahasyny operator tassyklanda belleýär',
       cancelReason: 'Ýatyrmagyň sebäbi',
+      cancelTooLate:
+        'Sargyt eýýäm ýygnaldy, ýolda ýa-da tamamlandy — ony ýatyryp bolmaýar. Ýagdaýy täzelendi.',
       cancelReasonPlaceholder: 'Hökmany däl — dükan näme bolandygyna düşüner',
       grandTotal: 'Umumy jemi:',
       pieces: 'sany',

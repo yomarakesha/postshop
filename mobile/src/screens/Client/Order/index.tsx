@@ -13,6 +13,7 @@ import { StyleSheet, useUnistyles } from "react-native-unistyles";
 import ShopItemsAccordion from "./_components/ShopItemsAccordion";
 import PriceSummary from "@/ui/PriceSummary";
 import ErrorAlert from "@/utils/errorAlert";
+import Toast from "react-native-toast-message";
 import { roundMoney } from "@/utils/formatMoney";
 import { returnApi } from "@/api/returnApi";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
@@ -20,7 +21,8 @@ import ReturnSheet, { ReturnTarget } from "./_components/ReturnSheet";
 
 const OrderScreen = () => {
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { data, isLoading } = orderApi.useGet(Number(id));
+  const orderQuery = orderApi.useGet(Number(id));
+  const { data, isLoading } = orderQuery;
   const router = useRouter();
   const { t } = useTranslation();
   // Цвет шапки берём из темы, а не литералом "white".
@@ -65,6 +67,13 @@ const OrderScreen = () => {
           await updateOrderStatusMutation.mutateAsync(reason);
           router.back();
         } catch (e) {
+          // 400 — заказ уже собран или завершён: экран показывал устаревший
+          // статус. Понятный текст вместо ответа сервера и свежий заказ.
+          if ((e as any)?.response?.status === 400) {
+            Toast.show({ type: "error", text1: t("client.order.cancelTooLate") });
+            orderQuery.refetch();
+            return;
+          }
           ErrorAlert(t, e as any);
         }
       },
