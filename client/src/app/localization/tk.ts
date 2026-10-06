@@ -276,7 +276,7 @@ export const tk = {
     save: 'Ýazmak',
     saved: 'Hereket ýazyldy',
     setSaved: 'Galyndy täzelendi',
-    amountPlaceholder: 'Häzir näçe elýeterli',
+    amountPlaceholder: 'Tekjede näçe bar',
     amountRequired: 'San görkeziň: nol ýa-da köp',
     edit: 'Üýtgetmek',
     fbsOnly:

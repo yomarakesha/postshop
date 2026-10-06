@@ -277,7 +277,7 @@ export const en = {
     save: 'Record',
     saved: 'Movement recorded',
     setSaved: 'Stock updated',
-    amountPlaceholder: 'How many are available now',
+    amountPlaceholder: 'How many are on the shelf',
     amountRequired: 'Enter a number: zero or more',
     edit: 'Change',
     fbsOnly:

@@ -275,7 +275,7 @@ export const tr = {
     save: 'Kaydet',
     saved: 'Hareket kaydedildi',
     setSaved: 'Stok güncellendi',
-    amountPlaceholder: 'Şu anda kaç adet var',
+    amountPlaceholder: 'Rafta kaç adet var',
     amountRequired: 'Bir sayı girin: sıfır veya daha fazla',
     edit: 'Değiştir',
     fbsOnly:

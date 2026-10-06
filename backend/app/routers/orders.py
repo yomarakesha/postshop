@@ -970,12 +970,12 @@ async def update_order_status(
     if not allowed:
         raise HTTPException(
             status_code=400,
-            detail=f"Order is in terminal status '{current_code}', no further transitions allowed",
+            detail=f"Order is in terminal status '{current_code.value}', no further transitions allowed",
         )
     if payload.status_code not in allowed:
         raise HTTPException(
             status_code=400,
-            detail=f"Cannot transition from '{current_code}' to '{payload.status_code}'. "
+            detail=f"Cannot transition from '{current_code.value}' to '{payload.status_code.value}'. "
                    f"Allowed: {[s.value for s in allowed]}",
         )
 

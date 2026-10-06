@@ -281,7 +281,7 @@ export const ru = {
     save: 'Записать',
     saved: 'Движение записано',
     setSaved: 'Остаток обновлён',
-    amountPlaceholder: 'Сколько доступно сейчас',
+    amountPlaceholder: 'Сколько лежит на полке',
     amountRequired: 'Укажите число: ноль или больше',
     edit: 'Изменить',
     fbsOnly:
