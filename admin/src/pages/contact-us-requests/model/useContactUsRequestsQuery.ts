@@ -1,12 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { ADMIN_LIST_LIMIT } from '@/shared/constants/pagination'
 import { readContactUsContactUsGet } from '@/shared/openapi/requests'
 
-export function useContactUsRequestsQuery() {
+export function useContactUsRequestsQuery(paging: { skip: number; limit: number }) {
   return useQuery({
-    queryKey: ['contact-us-requests'],
-    queryFn: () =>
-      readContactUsContactUsGet({ query: { limit: ADMIN_LIST_LIMIT }, throwOnError: true }),
+    queryKey: ['contact-us-requests', paging],
+    queryFn: () => readContactUsContactUsGet({ query: paging, throwOnError: true }),
   })
 }

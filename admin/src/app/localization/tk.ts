@@ -251,6 +251,16 @@ export const tk = {
     selectedCount: 'Saýlanan: {{count}}',
   },
   warehouses: {
+    history: 'Taryh',
+    historyTitle: 'Taryh: {{product}}',
+    operation: 'Amal',
+    op: {
+      income: 'Girdeji',
+      sold: 'Satuw',
+      return_from_customer: 'Alyjydan gaýtarma',
+      return_to_shop: 'Dükana gaýtarma',
+      write_off: 'Hasapdan aýyrma',
+    },
     writeOff: 'Hasapdan aýyr',
     returnToShop: 'Dükana gaýtar',
     writeOffTitle: '«{{product}}» hasapdan aýyrmalymy?',
@@ -339,6 +349,12 @@ export const tk = {
       'Karta elýeterli däl: karta serweri sazlanmadyk (VITE_MAP_TILES_URL). Giňişligi we uzynlygy ýokardaky meýdanlara giriziň.',
   },
   stores: {
+    activity: 'Sargytlar we gaýtarmalar',
+    activityTab: {
+      orders: 'Sargytlar',
+      returns: 'Gaýtarmalar',
+    },
+    partTotal: 'Dükanyň möçberi',
     searchPlaceholder: 'Dükanlary gözlemek...',
     logo: 'Logotip',
     warehouseType: 'Ammar görnüşi',
@@ -423,6 +439,7 @@ export const tk = {
   orders: {
     searchPlaceholder: 'Sargyt belgisi ýa-da alyjynyň telefony boýunça gözlemek...',
     filter: {
+      unpaid: 'Tölenmedik',
       all: 'Hemmesi',
       fbo: 'Postshop ammaryna garaşýar',
     },
@@ -461,6 +478,13 @@ export const tk = {
     comment: 'Teswir',
     updatedAt: 'Täzelenen senesi',
     payment: {
+      title: 'Töleg',
+      paid: 'Tölendi',
+      unpaid: 'Tölenmedi',
+      paidAt: 'Tölendi {{date}}',
+      mark: 'Tölegi belle',
+      unmark: 'Belligi aýyr',
+      requiredToComplete: 'Diňe tölenen sargydy tamamlap bolýar',
       cash: 'Nagt',
       card: 'Bank karty',
       cashAndCard: 'Nagt we kart',
@@ -543,6 +567,7 @@ export const tk = {
   },
 
   returnRequests: {
+    amount: 'Möçber',
     buyer: 'Alyjy',
     order: 'Sargyt',
     product: 'Haryt',

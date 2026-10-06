@@ -3,15 +3,21 @@ import { useTranslation } from 'react-i18next'
 
 import { useContactUsRequestsQuery } from '../model/useContactUsRequestsQuery'
 import { useSetHandledMutation } from '../model/useSetHandledMutation'
+import { readTotalCount, useListControls } from '@/shared/hooks/useListControls'
 import { formatDate } from '@/shared/lib/formatDate'
 import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table'
+import { TablePagination } from '@/widgets/TablePagination'
 
 export function ContactUsRequestsPage() {
   const { t } = useTranslation()
 
-  const { data, isLoading } = useContactUsRequestsQuery()
+  // Списки грузились одной порцией до 500 записей без страниц: дальше
+  // запись было не найти. Теперь — постранично, с общим числом с сервера.
+  const { page, setPage, pageSize, skip, limit } = useListControls()
+  const { data, isLoading } = useContactUsRequestsQuery({ skip, limit })
+  const total = readTotalCount(data?.response.headers, data?.data.length ?? 0)
   const setHandled = useSetHandledMutation()
 
   const requests = data?.data ?? []
@@ -86,6 +92,8 @@ export function ContactUsRequestsPage() {
           </TableBody>
         </Table>
       </div>
+
+      <TablePagination page={page} pageSize={pageSize} total={total} onPageChange={setPage} />
     </div>
   )
 }

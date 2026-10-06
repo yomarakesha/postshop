@@ -1,12 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { ADMIN_LIST_LIMIT } from '@/shared/constants/pagination'
 import { listReceiptsStockReceiptsGet } from '@/shared/openapi/requests'
 
-export function useStockReceiptsQuery() {
+export function useStockReceiptsQuery(paging: { skip: number; limit: number }) {
   return useQuery({
-    queryKey: ['stock-receipts'],
-    queryFn: () =>
-      listReceiptsStockReceiptsGet({ query: { limit: ADMIN_LIST_LIMIT }, throwOnError: true }),
+    queryKey: ['stock-receipts', 'list', paging],
+    queryFn: () => listReceiptsStockReceiptsGet({ query: paging, throwOnError: true }),
   })
 }

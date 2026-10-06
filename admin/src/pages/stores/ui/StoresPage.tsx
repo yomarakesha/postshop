@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useStoresQuery } from '../model/useStoresQuery'
+import { readTotalCount, useListControls } from '@/shared/hooks/useListControls'
 import { useRowNavigation } from '@/shared/hooks/useRowNavigation'
 import { buildFileUrl } from '@/shared/lib/buildFileUrl'
 import { formatDate } from '@/shared/lib/formatDate'
@@ -15,6 +16,7 @@ import {
   InputGroupText,
 } from '@/shared/ui/input-group'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table'
+import { TablePagination } from '@/widgets/TablePagination'
 import { WarehouseTypeBadge } from '@/widgets/WarehouseTypeBadge'
 
 const statusBadgeVariant = {
@@ -30,12 +32,20 @@ export function StoresPage() {
   const [search, setSearch] = useState('')
   const [debouncedSearch, setDebouncedSearch] = useState('')
 
-  useEffect(() => {
-    const timeout = setTimeout(() => setDebouncedSearch(search), 400)
-    return () => clearTimeout(timeout)
-  }, [search])
+  // Списки грузились одной порцией до 500 записей без страниц: дальше
+  // запись было не найти. Теперь — постранично, с общим числом с сервера.
+  const { page, setPage, pageSize, skip, limit } = useListControls()
 
-  const { data, isLoading } = useStoresQuery(debouncedSearch)
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebouncedSearch(search)
+      // Новый поиск — с первой страницы.
+      setPage(1)
+    }, 400)
+    return () => clearTimeout(timeout)
+  }, [search, setPage])
+  const { data, isLoading } = useStoresQuery(debouncedSearch, { skip, limit })
+  const total = readTotalCount(data?.response.headers, data?.data.length ?? 0)
 
   const stores = data?.data ?? []
 
@@ -133,6 +143,8 @@ export function StoresPage() {
           </TableBody>
         </Table>
       </div>
+
+      <TablePagination page={page} pageSize={pageSize} total={total} onPageChange={setPage} />
     </div>
   )
 }

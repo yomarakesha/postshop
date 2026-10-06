@@ -3,17 +3,23 @@ import { useTranslation } from 'react-i18next'
 import { useNavigate } from 'react-router-dom'
 
 import { useStockReceiptsQuery } from '../model/useStockReceiptsQuery'
+import { readTotalCount, useListControls } from '@/shared/hooks/useListControls'
 import { formatDate } from '@/shared/lib/formatDate'
 import { receiptStatusVariant } from '@/shared/lib/receiptStatus'
 import { Badge } from '@/shared/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table'
 import { CreateButton } from '@/widgets/CreateButton'
+import { TablePagination } from '@/widgets/TablePagination'
 
 export function GoodsReceivingPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
 
-  const { data, isLoading } = useStockReceiptsQuery()
+  // Списки грузились одной порцией до 500 записей без страниц: дальше
+  // запись было не найти. Теперь — постранично, с общим числом с сервера.
+  const { page, setPage, pageSize, skip, limit } = useListControls()
+  const { data, isLoading } = useStockReceiptsQuery({ skip, limit })
+  const total = readTotalCount(data?.response.headers, data?.data.length ?? 0)
   const receipts = data?.data ?? []
 
   return (
@@ -90,6 +96,8 @@ export function GoodsReceivingPage() {
           </TableBody>
         </Table>
       </div>
+
+      <TablePagination page={page} pageSize={pageSize} total={total} onPageChange={setPage} />
     </div>
   )
 }

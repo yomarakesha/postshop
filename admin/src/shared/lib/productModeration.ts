@@ -61,8 +61,10 @@ export const runModerationDecision = async (
  * «Одобрить» ещё раз и получал 400 «Product is already approved».
  */
 export const removeFromModerationQueue = (queryClient: QueryClient, productId: number) =>
-  queryClient.setQueryData<ModerationQueueData>(productModerationKeys.queue, (old) =>
-    old ? { ...old, data: old.data.filter((product) => product.id !== productId) } : old,
+  // Очередь кэшируется постранично: убираем товар со всех загруженных страниц.
+  queryClient.setQueriesData<ModerationQueueData>(
+    { queryKey: productModerationKeys.queue },
+    (old) => (old ? { ...old, data: old.data.filter((product) => product.id !== productId) } : old),
   )
 
 /**

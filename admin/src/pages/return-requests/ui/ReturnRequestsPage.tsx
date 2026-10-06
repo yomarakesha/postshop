@@ -6,6 +6,7 @@ import { useReturnApproveMutation } from '../model/useReturnApproveMutation'
 import { useReturnReceiveMutation } from '../model/useReturnReceiveMutation'
 import { useReturnRejectMutation } from '../model/useReturnRejectMutation'
 import { useReturnsQuery } from '../model/useReturnsQuery'
+import { readTotalCount, useListControls } from '@/shared/hooks/useListControls'
 import { formatDate } from '@/shared/lib/formatDate'
 import { ReturnStatus, WarehouseType } from '@/shared/openapi/requests'
 import type { ReturnResponse } from '@/shared/openapi/requests'
@@ -21,6 +22,7 @@ import {
 } from '@/shared/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table'
 import { Textarea } from '@/shared/ui/textarea'
+import { TablePagination } from '@/widgets/TablePagination'
 
 const statusVariant = {
   [ReturnStatus.PENDING]: 'warning',
@@ -56,7 +58,11 @@ type Receiving = { request: ReturnResponse; restock: boolean | null }
 export function ReturnRequestsPage() {
   const { t } = useTranslation()
   const [tab, setTab] = useState<ReturnStatus>(ReturnStatus.PENDING)
-  const { data, isLoading } = useReturnsQuery(tab)
+  // Списки грузились одной порцией до 500 записей без страниц: дальше
+  // запись было не найти. Теперь — постранично, с общим числом с сервера.
+  const { page, setPage, pageSize, skip, limit } = useListControls()
+  const { data, isLoading } = useReturnsQuery(tab, { skip, limit })
+  const total = readTotalCount(data?.response.headers, data?.data.length ?? 0)
   const approve = useReturnApproveMutation()
   const reject = useReturnRejectMutation()
   const receive = useReturnReceiveMutation()
@@ -71,7 +77,7 @@ export function ReturnRequestsPage() {
   // Получение бывает только у подтверждённых возвратов: на других вкладках
   // колонка была бы пустой.
   const showReceipt = tab === ReturnStatus.APPROVED
-  const columns = showReceipt ? 10 : 9
+  const columns = showReceipt ? 11 : 10
 
   const submitReceive = (restock: boolean) => {
     if (!receiving) return
@@ -106,7 +112,10 @@ export function ReturnRequestsPage() {
             key={status}
             size="sm"
             variant={tab === status ? 'default' : 'outline'}
-            onClick={() => setTab(status)}
+            onClick={() => {
+              setTab(status)
+              setPage(1)
+            }}
           >
             {t(`returnStatus.${status}`)}
           </Button>
@@ -122,6 +131,7 @@ export function ReturnRequestsPage() {
               <TableHead>{t('returnRequests.buyer')}</TableHead>
               <TableHead>{t('returnRequests.product')}</TableHead>
               <TableHead>{t('returnRequests.quantity')}</TableHead>
+              <TableHead className="text-right">{t('returnRequests.amount')}</TableHead>
               <TableHead>{t('returnRequests.reason')}</TableHead>
               <TableHead>{t('fields.status')}</TableHead>
               <TableHead>{t('fields.createdAt')}</TableHead>
@@ -160,6 +170,10 @@ export function ReturnRequestsPage() {
                     {request.product_name ?? `#${request.product_id ?? '—'}`}
                   </TableCell>
                   <TableCell className="tabular-nums">{request.quantity}</TableCell>
+                  {/* Сумма к возврату — цена на момент заказа × количество. */}
+                  <TableCell className="tabular-nums text-right">
+                    {request.amount != null ? parseFloat(request.amount).toFixed(2) : '—'}
+                  </TableCell>
                   {/* Причину не обрезаем: решение принимается по ней. */}
                   <TableCell className="max-w-100 whitespace-pre-line align-top">
                     {request.reason}
@@ -223,6 +237,8 @@ export function ReturnRequestsPage() {
           </TableBody>
         </Table>
       </div>
+
+      <TablePagination page={page} pageSize={pageSize} total={total} onPageChange={setPage} />
 
       <Dialog open={decision !== null} onOpenChange={(open) => !open && close()}>
         <DialogContent>

@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom'
 import { useApproveMutation } from '../model/useApproveMutation'
 import { useDeclineMutation } from '../model/useDeclineMutation'
 import { useModerationQueueQuery } from '../model/useModerationQueueQuery'
+import { readTotalCount, useListControls } from '@/shared/hooks/useListControls'
 import { moderatedProductId } from '@/shared/hooks/useModerateProductMutation'
 import type { ModerateProductVars } from '@/shared/hooks/useModerateProductMutation'
 import { formatDate } from '@/shared/lib/formatDate'
@@ -17,6 +18,7 @@ import { Badge } from '@/shared/ui/badge'
 import { Button } from '@/shared/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table'
 import { DeclineProductDialog } from '@/widgets/DeclineProductDialog'
+import { TablePagination } from '@/widgets/TablePagination'
 
 const statusVariant = {
   [ProductStatus.PENDING]: 'warning',
@@ -27,7 +29,11 @@ const statusVariant = {
 export function ProductModerationPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
-  const { data, isLoading } = useModerationQueueQuery()
+  // Списки грузились одной порцией до 500 записей без страниц: дальше
+  // запись было не найти. Теперь — постранично, с общим числом с сервера.
+  const { page, setPage, pageSize, skip, limit } = useListControls()
+  const { data, isLoading } = useModerationQueueQuery({ skip, limit })
+  const total = readTotalCount(data?.response.headers, data?.data.length ?? 0)
   const approve = useApproveMutation()
   const decline = useDeclineMutation()
   const [declineId, setDeclineId] = useState<number | null>(null)
@@ -147,6 +153,8 @@ export function ProductModerationPage() {
           </TableBody>
         </Table>
       </div>
+
+      <TablePagination page={page} pageSize={pageSize} total={total} onPageChange={setPage} />
 
       <DeclineProductDialog
         open={declineId !== null}

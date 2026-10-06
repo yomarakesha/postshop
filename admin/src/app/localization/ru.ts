@@ -251,6 +251,16 @@ export const ru = {
     selectedCount: 'Выбрано: {{count}}',
   },
   warehouses: {
+    history: 'История',
+    historyTitle: 'История: {{product}}',
+    operation: 'Операция',
+    op: {
+      income: 'Приход',
+      sold: 'Продажа',
+      return_from_customer: 'Возврат от покупателя',
+      return_to_shop: 'Возврат магазину',
+      write_off: 'Списание',
+    },
     writeOff: 'Списать',
     returnToShop: 'Вернуть магазину',
     writeOffTitle: 'Списать «{{product}}»?',
@@ -339,6 +349,12 @@ export const ru = {
       'Карта недоступна: картографический сервер не настроен (VITE_MAP_TILES_URL). Введите широту и долготу в поля выше.',
   },
   stores: {
+    activity: 'Заказы и возвраты',
+    activityTab: {
+      orders: 'Заказы',
+      returns: 'Возвраты',
+    },
+    partTotal: 'Сумма магазина',
     searchPlaceholder: 'Поиск магазинов...',
     logo: 'Логотип',
     warehouseType: 'Тип склада',
@@ -423,6 +439,7 @@ export const ru = {
   orders: {
     searchPlaceholder: 'Поиск по номеру заказа или телефону покупателя...',
     filter: {
+      unpaid: 'Не оплачены',
       all: 'Все',
       fbo: 'Ждут склада Postshop',
     },
@@ -460,6 +477,13 @@ export const ru = {
     comment: 'Комментарий',
     updatedAt: 'Дата обновления',
     payment: {
+      title: 'Оплата',
+      paid: 'Оплачен',
+      unpaid: 'Не оплачен',
+      paidAt: 'Оплачен {{date}}',
+      mark: 'Отметить оплату',
+      unmark: 'Снять отметку',
+      requiredToComplete: 'Завершить можно только оплаченный заказ',
       cash: 'Наличные',
       card: 'Банковская карта',
       cashAndCard: 'Наличные и карта',
@@ -546,6 +570,7 @@ export const ru = {
   },
 
   returnRequests: {
+    amount: 'Сумма',
     buyer: 'Покупатель',
     order: 'Заказ',
     product: 'Товар',

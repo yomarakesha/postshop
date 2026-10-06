@@ -7,6 +7,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import { useOrderQuery } from '../model/useOrderQuery'
 import { useUpdateOrderStatusMutation } from '../model/useUpdateOrderStatusMutation'
+import { useUpdatePaymentMutation } from '../model/useUpdatePaymentMutation'
 import { useUpdateShopPartStatusMutation } from '../model/useUpdateShopPartStatusMutation'
 import { PERMISSION_KEYS } from '@/shared/constants/PermissionKeys'
 import { useHasPermission } from '@/shared/hooks/useHasPermission'
@@ -63,6 +64,7 @@ export function OrderDetailPage() {
   const { data: orderData, isLoading } = useOrderQuery(orderId)
   const updateStatus = useUpdateOrderStatusMutation(orderId)
   const updatePartStatus = useUpdateShopPartStatusMutation(orderId)
+  const updatePayment = useUpdatePaymentMutation(orderId)
   const { hasPermission } = useHasPermission()
   const [askReject, setAskReject] = useState(false)
   const [rejectComment, setRejectComment] = useState('')
@@ -240,11 +242,14 @@ export function OrderDetailPage() {
 
             {statusCode === OrderStatusCode.READY_TO_DELIVER && (
               <div className="flex flex-wrap gap-3">
+                {/* Завершить можно только оплаченный заказ — сервер иначе
+                    ответит 400. Оплату отмечают в блоке «Оплата» ниже. */}
                 <Button
                   variant="default"
                   onClick={() => handleStatusUpdate(OrderStatusCode.COMPLETED)}
                   isLoading={updateStatus.isPending}
-                  disabled={updateStatus.isPending}
+                  disabled={updateStatus.isPending || !order.paid_at}
+                  title={order.paid_at ? undefined : t('orders.payment.requiredToComplete')}
                 >
                   {orderActionLabel(t, OrderStatusCode.COMPLETED, deliveryMethod)}
                 </Button>
@@ -257,6 +262,39 @@ export function OrderDetailPage() {
                 </Button>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Оплата: отметку ставит оператор, когда деньги получены. Без неё
+            заказ не завершить. */}
+        {statusCode !== OrderStatusCode.REJECTED && (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border px-5 py-4">
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">
+                {t('orders.payment.title')}
+              </p>
+              <Badge variant={order.paid_at ? 'success' : 'warning'}>
+                {order.paid_at
+                  ? t('orders.payment.paidAt', { date: formatDate(order.paid_at) })
+                  : t('orders.payment.unpaid')}
+              </Badge>
+              {!order.paid_at && statusCode === OrderStatusCode.READY_TO_DELIVER && (
+                <p className="text-xs text-muted-foreground">
+                  {t('orders.payment.requiredToComplete')}
+                </p>
+              )}
+            </div>
+            {statusCode !== OrderStatusCode.COMPLETED &&
+              hasPermission(PERMISSION_KEYS.ORDERS.updateStatus) && (
+                <Button
+                  variant={order.paid_at ? 'outline' : 'default'}
+                  isLoading={updatePayment.isPending}
+                  disabled={updatePayment.isPending}
+                  onClick={() => updatePayment.mutate(!order.paid_at)}
+                >
+                  {order.paid_at ? t('orders.payment.unmark') : t('orders.payment.mark')}
+                </Button>
+              )}
           </div>
         )}
 

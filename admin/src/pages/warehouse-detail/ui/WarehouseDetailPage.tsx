@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useNavigate, useParams } from 'react-router-dom'
 
+import { ProductHistoryDialog } from './ProductHistoryDialog'
 import { useWarehouseBalancesQuery } from '../model/useWarehouseBalancesQuery'
 import { useWarehouseOutgoMutation } from '../model/useWarehouseOutgoMutation'
 import type { OutgoKind } from '../model/useWarehouseOutgoMutation'
@@ -50,6 +51,7 @@ export function WarehouseDetailPage() {
     kind: OutgoKind
   } | null>(null)
   const [outgoQuantity, setOutgoQuantity] = useState('')
+  const [historyRow, setHistoryRow] = useState<WarehouseProductBalance | null>(null)
   const openOutgo = (row: WarehouseProductBalance, kind: OutgoKind) => {
     setOutgoQuantity('')
     setOutgoTarget({ row, kind })
@@ -120,7 +122,7 @@ export function WarehouseDetailPage() {
                 <TableHead>{t('warehouses.productName')}</TableHead>
                 <TableHead>{t('warehouses.productPrice')}</TableHead>
                 <TableHead>{t('warehouses.productQuantity')}</TableHead>
-                {canOutgo && <TableHead className="w-0" />}
+                <TableHead className="w-0" />
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -152,27 +154,32 @@ export function WarehouseDetailPage() {
                       {row.balance}{' '}
                       {getTranslationName(row.measure_unit?.translations ?? [], i18n.language)}
                     </TableCell>
-                    {canOutgo && (
-                      <TableCell onClick={(e) => e.stopPropagation()}>
-                        <div className="flex justify-end gap-2">
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => openOutgo(row, 'return_to_shop')}
-                          >
-                            {t('warehouses.returnToShop')}
-                          </Button>
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className="text-destructive"
-                            onClick={() => openOutgo(row, 'write_off')}
-                          >
-                            {t('warehouses.writeOff')}
-                          </Button>
-                        </div>
-                      </TableCell>
-                    )}
+                    <TableCell onClick={(e) => e.stopPropagation()}>
+                      <div className="flex justify-end gap-2">
+                        <Button size="sm" variant="ghost" onClick={() => setHistoryRow(row)}>
+                          {t('warehouses.history')}
+                        </Button>
+                        {canOutgo && (
+                          <>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => openOutgo(row, 'return_to_shop')}
+                            >
+                              {t('warehouses.returnToShop')}
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              className="text-destructive"
+                              onClick={() => openOutgo(row, 'write_off')}
+                            >
+                              {t('warehouses.writeOff')}
+                            </Button>
+                          </>
+                        )}
+                      </div>
+                    </TableCell>
                   </TableRow>
                 ))}
 
@@ -187,6 +194,17 @@ export function WarehouseDetailPage() {
           </Table>
         </div>
       </div>
+
+      <ProductHistoryDialog
+        warehouseId={warehouseId}
+        productId={historyRow?.product_id ?? null}
+        productName={
+          historyRow
+            ? (getTranslationName(historyRow.product.translations, i18n.language) ?? '')
+            : ''
+        }
+        onClose={() => setHistoryRow(null)}
+      />
 
       <ConfirmDialog
         open={outgoTarget !== null}

@@ -21,7 +21,7 @@ import { ListToolbar } from '@/widgets/ListToolbar'
 import { TablePagination } from '@/widgets/TablePagination'
 
 /** Фильтр списка: статус заказа или «часть FBO ждёт склада Postshop». */
-type Filter = 'all' | 'fbo' | OrderStatusCode
+type Filter = 'all' | 'fbo' | 'unpaid' | OrderStatusCode
 
 const STATUS_FILTERS: OrderStatusCode[] = [
   OrderStatusCode.PENDING,
@@ -70,6 +70,8 @@ export function OrdersPage() {
     q: search.trim() || undefined,
     status_id: statusId,
     fbo_attention: filter === 'fbo' || undefined,
+    // Неоплаченные — среди живых заказов: у отклонённых оплаты и не ждут.
+    paid: filter === 'unpaid' ? false : undefined,
   })
   const orders = ordersData?.data ?? []
   const total = readTotalCount(ordersData?.response.headers, orders.length)
@@ -78,6 +80,7 @@ export function OrdersPage() {
     { key: 'all', label: t('orders.filter.all') },
     ...STATUS_FILTERS.map((code) => ({ key: code, label: orderStatusLabel(t, code) })),
     ...(fboEnabled ? [{ key: 'fbo' as const, label: t('orders.filter.fbo') }] : []),
+    { key: 'unpaid', label: t('orders.filter.unpaid') },
   ]
 
   return (
@@ -112,13 +115,14 @@ export function OrdersPage() {
               <TableHead>{t('orders.deliveryType')}</TableHead>
               <TableHead>{t('orders.items')}</TableHead>
               <TableHead className="text-right">{t('orders.grandTotal')}</TableHead>
+              <TableHead>{t('orders.payment.title')}</TableHead>
               <TableHead>{t('fields.createdAt')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {isLoading ? (
               <TableRow>
-                <TableCell colSpan={8} className="h-32 text-center">
+                <TableCell colSpan={9} className="h-32 text-center">
                   <Loader2 className="mx-auto size-5 animate-spin text-muted-foreground" />
                 </TableCell>
               </TableRow>
@@ -165,6 +169,13 @@ export function OrdersPage() {
                   <TableCell className="tabular-nums text-right font-medium">
                     {parseFloat(order.effective_total).toFixed(2)}
                   </TableCell>
+                  <TableCell>
+                    {order.order_status.code !== OrderStatusCode.REJECTED && (
+                      <Badge variant={order.paid_at ? 'success' : 'warning'}>
+                        {order.paid_at ? t('orders.payment.paid') : t('orders.payment.unpaid')}
+                      </Badge>
+                    )}
+                  </TableCell>
                   <TableCell className="tabular-nums text-muted-foreground">
                     {formatDate(order.created_at)}
                   </TableCell>
@@ -172,7 +183,7 @@ export function OrdersPage() {
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={8} className="h-32 text-center text-muted-foreground">
+                <TableCell colSpan={9} className="h-32 text-center text-muted-foreground">
                   {t('noResults')}
                 </TableCell>
               </TableRow>

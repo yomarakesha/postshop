@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { useReviewApproveMutation } from '../model/useReviewApproveMutation'
 import { useReviewQueueQuery } from '../model/useReviewQueueQuery'
 import { useReviewRejectMutation } from '../model/useReviewRejectMutation'
+import { readTotalCount, useListControls } from '@/shared/hooks/useListControls'
 import { formatDate } from '@/shared/lib/formatDate'
 import { cn } from '@/shared/lib/utils'
 import { ReviewStatus } from '@/shared/openapi/requests'
@@ -20,6 +21,7 @@ import {
 } from '@/shared/ui/dialog'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table'
 import { Textarea } from '@/shared/ui/textarea'
+import { TablePagination } from '@/widgets/TablePagination'
 
 const statusVariant = {
   [ReviewStatus.PENDING]: 'warning',
@@ -53,7 +55,11 @@ const Stars = ({ value }: { value: number }) => (
 export function ReviewModerationPage() {
   const { t } = useTranslation()
   const [tab, setTab] = useState<ReviewStatus>(ReviewStatus.PENDING)
-  const { data, isLoading } = useReviewQueueQuery(tab)
+  // Списки грузились одной порцией до 500 записей без страниц: дальше
+  // запись было не найти. Теперь — постранично, с общим числом с сервера.
+  const { page, setPage, pageSize, skip, limit } = useListControls()
+  const { data, isLoading } = useReviewQueueQuery(tab, { skip, limit })
+  const total = readTotalCount(data?.response.headers, data?.data.length ?? 0)
   const approve = useReviewApproveMutation()
   const reject = useReviewRejectMutation()
 
@@ -75,7 +81,10 @@ export function ReviewModerationPage() {
             key={status}
             size="sm"
             variant={tab === status ? 'default' : 'outline'}
-            onClick={() => setTab(status)}
+            onClick={() => {
+              setTab(status)
+              setPage(1)
+            }}
           >
             {t(`reviewStatus.${status}`)}
           </Button>
@@ -174,6 +183,8 @@ export function ReviewModerationPage() {
           </TableBody>
         </Table>
       </div>
+
+      <TablePagination page={page} pageSize={pageSize} total={total} onPageChange={setPage} />
 
       {/* Отдельный диалог, а не общий ConfirmDialog: тому нечем принять текст, а
           причина отказа обязательна и на сервере. */}

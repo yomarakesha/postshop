@@ -1,15 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { ADMIN_LIST_LIMIT } from '@/shared/constants/pagination'
 import { moderationQueueReviewsModerationGet } from '@/shared/openapi/requests'
 import type { ReviewStatus } from '@/shared/openapi/requests'
 
-export function useReviewQueueQuery(status: ReviewStatus) {
+export function useReviewQueueQuery(status: ReviewStatus, paging: { skip: number; limit: number }) {
   return useQuery({
-    queryKey: ['reviews', 'moderation', status],
+    queryKey: ['reviews', 'moderation', status, paging],
     queryFn: () =>
       moderationQueueReviewsModerationGet({
-        query: { limit: ADMIN_LIST_LIMIT, review_status: status },
+        query: { ...paging, review_status: status },
         throwOnError: true,
       }),
   })

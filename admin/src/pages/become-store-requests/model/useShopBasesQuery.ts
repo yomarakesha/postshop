@@ -1,12 +1,18 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { ADMIN_LIST_LIMIT } from '@/shared/constants/pagination'
+import type { RegistrationStatus } from '@/shared/openapi/requests'
 import { getShopBasesShopBasesGet } from '@/shared/openapi/requests'
 
-export function useShopBasesQuery() {
+export function useShopBasesQuery(
+  status: RegistrationStatus,
+  paging: { skip: number; limit: number },
+) {
   return useQuery({
-    queryKey: ['shop-bases'],
+    queryKey: ['shop-bases', status, paging],
     queryFn: () =>
-      getShopBasesShopBasesGet({ query: { limit: ADMIN_LIST_LIMIT }, throwOnError: true }),
+      getShopBasesShopBasesGet({
+        query: { ...paging, registration_status: status },
+        throwOnError: true,
+      }),
   })
 }

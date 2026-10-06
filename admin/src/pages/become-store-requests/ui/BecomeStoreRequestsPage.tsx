@@ -1,14 +1,16 @@
 import { Loader2 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { useShopBasesQuery } from '../model/useShopBasesQuery'
+import { readTotalCount, useListControls } from '@/shared/hooks/useListControls'
 import { useRowNavigation } from '@/shared/hooks/useRowNavigation'
 import { formatDate } from '@/shared/lib/formatDate'
 import { RegistrationStatus } from '@/shared/openapi/requests'
 import { Badge } from '@/shared/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/shared/ui/table'
+import { TablePagination } from '@/widgets/TablePagination'
 
 const FILTERABLE_STATUSES = [RegistrationStatus.PENDING, RegistrationStatus.REJECTED] as const
 
@@ -25,17 +27,26 @@ export function BecomeStoreRequestsPage() {
 
   const [status, setStatus] = useState<RegistrationStatus>(RegistrationStatus.PENDING)
 
-  const { data, isLoading } = useShopBasesQuery()
+  // Списки грузились одной порцией до 500 записей без страниц: дальше
+  // запись было не найти. Теперь — постранично, с общим числом с сервера.
+  const { page, setPage, pageSize, skip, limit } = useListControls()
+  const { data, isLoading } = useShopBasesQuery(status, { skip, limit })
+  const total = readTotalCount(data?.response.headers, data?.data.length ?? 0)
 
-  const filteredRequests = useMemo(
-    () => (data?.data ?? []).filter((shop) => shop.registration_status === status),
-    [data, status],
-  )
+  // Статус отбирается на сервере: раньше отбор шёл в браузере среди первых
+  // 500 заявок любого статуса.
+  const filteredRequests = data?.data ?? []
 
   return (
     <div className="space-y-6">
       <div className="flex items-end gap-3">
-        <Select value={status} onValueChange={(value) => setStatus(value as RegistrationStatus)}>
+        <Select
+          value={status}
+          onValueChange={(value) => {
+            setStatus(value as RegistrationStatus)
+            setPage(1)
+          }}
+        >
           <SelectTrigger className="w-56">
             <SelectValue />
           </SelectTrigger>
@@ -97,6 +108,8 @@ export function BecomeStoreRequestsPage() {
           </TableBody>
         </Table>
       </div>
+
+      <TablePagination page={page} pageSize={pageSize} total={total} onPageChange={setPage} />
     </div>
   )
 }

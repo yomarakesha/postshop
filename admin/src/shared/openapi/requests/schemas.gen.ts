@@ -2187,6 +2187,45 @@ export const FavoriteResponseSchema = {
     title: 'FavoriteResponse'
 } as const;
 
+export const FbsStockSummarySchema = {
+    properties: {
+        product_id: {
+            type: 'integer',
+            title: 'Product Id'
+        },
+        balance: {
+            type: 'string',
+            pattern: '^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$',
+            title: 'Balance'
+        },
+        on_shelf: {
+            type: 'string',
+            pattern: '^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$',
+            title: 'On Shelf'
+        },
+        reserved: {
+            type: 'string',
+            pattern: '^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$',
+            title: 'Reserved'
+        },
+        available: {
+            type: 'string',
+            pattern: '^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$',
+            title: 'Available'
+        }
+    },
+    type: 'object',
+    required: [
+        'product_id',
+        'balance',
+        'on_shelf',
+        'reserved',
+        'available'
+    ],
+    title: 'FbsStockSummary',
+    description: 'Остаток FBS в разрезе: журнал, полка, резерв, доступно.'
+} as const;
+
 export const FeaturesSchema = {
     properties: {
         fbo_enabled: {
@@ -2444,7 +2483,8 @@ export const NotificationKindSchema = {
         'product_out_of_stock',
         'order_shop_rejected',
         'product_blocked',
-        'return_completed'
+        'return_completed',
+        'order_approved_delivery'
     ],
     title: 'NotificationKind',
     description: 'О чём уведомление.\n\nХранится вид, а не готовый текст: витрина работает на четырёх языках, и\nтекст, записанный в базу, был бы всегда на одном из них — том, что был\nвыбран в момент события, а не тем, на котором человек читает.'
@@ -2793,6 +2833,21 @@ export const OrderItemResponseSchema = {
     title: 'OrderItemResponse'
 } as const;
 
+export const OrderPaymentUpdateSchema = {
+    properties: {
+        paid: {
+            type: 'boolean',
+            title: 'Paid'
+        }
+    },
+    type: 'object',
+    required: [
+        'paid'
+    ],
+    title: 'OrderPaymentUpdate',
+    description: 'Отметка оператора: деньги за заказ получены (или отметка снята).'
+} as const;
+
 export const OrderResponseSchema = {
     properties: {
         id: {
@@ -2867,6 +2922,30 @@ export const OrderResponseSchema = {
             ],
             title: 'Status Comment'
         },
+        paid_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Paid At'
+        },
+        completed_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Completed At'
+        },
         items: {
             items: {
                 $ref: '#/components/schemas/OrderItemResponse'
@@ -2931,6 +3010,20 @@ export const OrderResponseSchema = {
             description: 'Сумма к оплате: без частей отклонённых магазинов (частичное выполнение),\nплюс цена доставки, если назначена (NULL — не назначена или самовывоз).',
             readOnly: true
         },
+        return_until: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Return Until',
+            description: 'До какого момента можно подать заявку на возврат; None — заказ не завершён.',
+            readOnly: true
+        },
         has_rejected_shops: {
             type: 'boolean',
             title: 'Has Rejected Shops',
@@ -2961,6 +3054,7 @@ export const OrderResponseSchema = {
         'delivery_method',
         'total',
         'effective_total',
+        'return_until',
         'has_rejected_shops',
         'all_shops_rejected',
         'all_active_shops_ready'
@@ -4203,6 +4297,18 @@ export const ReturnResponseSchema = {
             pattern: '^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$',
             title: 'Quantity'
         },
+        amount: {
+            anyOf: [
+                {
+                    type: 'string',
+                    pattern: '^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Amount'
+        },
         reason: {
             type: 'string',
             title: 'Reason'
@@ -5239,6 +5345,35 @@ export const ShopOrderStatusUpdateSchema = {
     ],
     title: 'ShopOrderStatusUpdate',
     description: 'Смена локального статуса части заказа магазином.'
+} as const;
+
+export const ShopProductWarehouseHistorySchema = {
+    properties: {
+        product_id: {
+            type: 'integer',
+            title: 'Product Id'
+        },
+        balance: {
+            type: 'string',
+            pattern: '^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$',
+            title: 'Balance'
+        },
+        operations: {
+            items: {
+                $ref: '#/components/schemas/WarehouseOperationResponse'
+            },
+            type: 'array',
+            title: 'Operations'
+        }
+    },
+    type: 'object',
+    required: [
+        'product_id',
+        'balance',
+        'operations'
+    ],
+    title: 'ShopProductWarehouseHistory',
+    description: 'Движения товара магазина по всем складам платформы — для продавца FBO.'
 } as const;
 
 export const ShopStatusCountSchema = {
@@ -7270,6 +7405,30 @@ export const OrderResponseWritableSchema = {
                 }
             ],
             title: 'Status Comment'
+        },
+        paid_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Paid At'
+        },
+        completed_at: {
+            anyOf: [
+                {
+                    type: 'string',
+                    format: 'date-time'
+                },
+                {
+                    type: 'null'
+                }
+            ],
+            title: 'Completed At'
         },
         items: {
             items: {

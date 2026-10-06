@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { ADMIN_LIST_LIMIT } from '@/shared/constants/pagination'
 import { getAllShopsFullShopBasesFullGet, RegistrationStatus } from '@/shared/openapi/requests'
 
-export function useStoresQuery(search?: string) {
+export function useStoresQuery(
+  search: string | undefined,
+  paging: { skip: number; limit: number },
+) {
   return useQuery({
-    queryKey: ['stores', RegistrationStatus.APPROVED, search],
+    queryKey: ['stores', RegistrationStatus.APPROVED, search, paging],
     queryFn: () =>
       getAllShopsFullShopBasesFullGet({
         // Одобренные отбирались в браузере из первых 500 магазинов любого
@@ -14,7 +16,7 @@ export function useStoresQuery(search?: string) {
         query: {
           search: search || undefined,
           registration_status: RegistrationStatus.APPROVED,
-          limit: ADMIN_LIST_LIMIT,
+          ...paging,
         },
         throwOnError: true,
       }),
