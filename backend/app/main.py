@@ -21,6 +21,7 @@ from app.routers import (
     favorites, delivery_message, warehouses, stock_operations, features,
     warehouse_operations, stock_receipts, order_statuses, pickup_points, orders,
     search, statistics, contact_us, user_addresses, reviews, notifications,
+    withdrawals,
     returns,
 )
 
@@ -150,6 +151,8 @@ app.include_router(stock_operations.router,     prefix="/stock-operations",     
 app.include_router(warehouse_operations.router, prefix="/warehouse-operations", tags=["Warehouse Operations"],
                    dependencies=[Depends(require_fbo_enabled)])
 app.include_router(stock_receipts.router,       prefix="/stock-receipts",       tags=["Stock Receipts"],
+                   dependencies=[Depends(require_fbo_enabled)])
+app.include_router(withdrawals.router,          prefix="/withdrawals",          tags=["Withdrawals"],
                    dependencies=[Depends(require_fbo_enabled)])
 app.include_router(features.router,             prefix="/features",             tags=["Features"])
 app.include_router(order_statuses.router,       prefix="/order-statuses",       tags=["Order Statuses"])

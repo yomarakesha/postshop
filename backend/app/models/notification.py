@@ -59,6 +59,11 @@ class NotificationKind(str, enum.Enum):
     # объяснения; теперь покупатель видит её и может отменить заказ.
     order_approved_delivery = "order_approved_delivery"
 
+    # Заявка продавца на вывоз товара со склада Postshop выполнена / отклонена
+    # (продавцу); новая заявка (сотрудникам — через счётчик, не уведомлением).
+    withdrawal_completed = "withdrawal_completed"
+    withdrawal_rejected  = "withdrawal_rejected"
+
 
 class Notification(Base):
     """

@@ -281,6 +281,45 @@ async def _fbo_record_sold(db: AsyncSession, order_shop: OrderShop) -> None:
             db.add(_fbo_sold_operation(order_shop, item, fullest, remaining))
 
 
+async def fbo_take_plan(
+    db: AsyncSession, shop_id: int, product_id: int, quantity: Decimal
+) -> list[tuple[int, Decimal]]:
+    """С каких складов и сколько снять товар магазина — для вывоза продавцу.
+
+    Свободным считается остаток за вычетом резерва открытых заказов: товар,
+    который уже купили, отдать продавцу нельзя. Склады перебираются по
+    порядку, как при списании продажи. Строки блокируются. Не хватает —
+    HTTPException 400.
+    """
+    free = await fbo_available(db, shop_id, product_id, for_update=True)
+    if free < quantity:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Not enough free stock of product {product_id}: "
+                   f"free {max(free, Decimal('0'))}, requested {quantity}",
+        )
+    rows = (await db.execute(
+        select(WarehouseOperation.warehouse_id, func.sum(_fbo_signed_quantity()))
+        .where(
+            WarehouseOperation.shop_id == shop_id,
+            WarehouseOperation.product_id == product_id,
+        )
+        .group_by(WarehouseOperation.warehouse_id)
+        .order_by(WarehouseOperation.warehouse_id)
+        .with_for_update()
+    )).all()
+    plan: list[tuple[int, Decimal]] = []
+    remaining = Decimal(quantity)
+    for warehouse_id, balance in rows:
+        if remaining <= 0:
+            break
+        take = min(remaining, max(Decimal(balance), Decimal("0")))
+        if take > 0:
+            plan.append((warehouse_id, take))
+            remaining -= take
+    return plan
+
+
 def _fbo_sold_operation(
     order_shop: OrderShop, item: OrderItem, warehouse_id: int, quantity: Decimal
 ) -> WarehouseOperation:

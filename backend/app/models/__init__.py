@@ -32,6 +32,7 @@ from app.models.warehouse import Warehouse
 from app.models.stock_operation import StockOperation
 from app.models.warehouse_operation import WarehouseOperation
 from app.models.stock_receipt import StockReceipt, StockReceiptItem
+from app.models.withdrawal_request import WithdrawalItem, WithdrawalRequest
 from app.models.order_status import OrderStatus
 from app.models.order_status_translation import OrderStatusTranslation
 from app.models.pickup_point import PickupPoint
