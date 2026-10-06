@@ -675,7 +675,8 @@
       "subtitle": "Satuwa näçe haryt elýeterli. Açyk sargytlaryň eýeleýäni aýrylýar.",
       "edit": "Üýtgetmek",
       "fbsOnly": "Bu bölüm FBS dükanlary üçin: olar harydy özleri saklaýar. FBO dükanyň galyndylary «Ammar» bölüminde.",
-      "breakdown": "Tekjede: {{shelf}} · sargytlarda: {{reserved}} · elýeterli: {{available}}"
+      "breakdown": "Tekjede: {{shelf}} · sargytlarda: {{reserved}} · elýeterli: {{available}}",
+      "alreadyEquals": "Galyndy eýýäm şeýle — hiç zat ýazylmady"
     },
     "close": {
       "close": "Dükany ýapmak",

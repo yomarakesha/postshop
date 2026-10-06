@@ -265,6 +265,7 @@ export const tk = {
       set: 'Galyndyny görkeziň',
     },
     breakdown: 'Tekjede: {{shelf}} · sargytlarda: {{reserved}} · elýeterli: {{available}}',
+    alreadyEquals: 'Galyndy eýýäm şeýle — hiç zat ýazylmady',
     operationsHint: {
       income: 'Haryt ammara geldi we satuwa elýeterli',
       return_to_supplier: 'Haryt ammardan üpjün edijä gaýdýar',

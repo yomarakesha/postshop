@@ -133,6 +133,11 @@ const StockSheet = ({
     } catch (error) {
       // Причину отказа показываем как есть: «остаток не изменился», «нельзя
       // уйти в минус» — это осмысленные ответы, а не сбой.
+      // 409 при пересчёте — на полке ровно столько, сколько ввели.
+      if ((error as AxiosError)?.response?.status === 409 && mode === "set") {
+        Toast.show({ type: "info", text1: t("store.stock.alreadyEquals") });
+        return;
+      }
       Toast.show({
         type: "error",
         text1: t("error"),

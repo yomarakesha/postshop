@@ -111,7 +111,12 @@ export const StockModal = forwardRef<ModalRef, Props>(
     })
     const set = useSetStockStockOperationsSetPost(undefined, {
       onSuccess: () => done(t('stock.setSaved')),
-      onError: fail,
+      // 409 — на полке ровно столько, сколько ввели: писать нечего. Общий
+      // текст «Уже существует» здесь ничего не объяснял.
+      onError: (error) =>
+        (error as { status?: number } | undefined)?.status === 409
+          ? toast.info(t('stock.alreadyEquals'))
+          : fail(error),
     })
     const busy = move.isPending || set.isPending
 

@@ -675,7 +675,8 @@
       "subtitle": "Satışa ne kadar ürün hazır. Açık siparişlerin tuttuğu miktar düşülür.",
       "edit": "Değiştir",
       "fbsOnly": "Bu bölüm FBS mağazaları içindir: ürünlerini kendileri saklar. FBO mağazasının stoku «Depo» bölümündedir.",
-      "breakdown": "Rafta: {{shelf}} · siparişlerde: {{reserved}} · mevcut: {{available}}"
+      "breakdown": "Rafta: {{shelf}} · siparişlerde: {{reserved}} · mevcut: {{available}}",
+      "alreadyEquals": "Stok zaten bu kadar — hiçbir şey kaydedilmedi"
     },
     "close": {
       "close": "Mağazayı kapat",

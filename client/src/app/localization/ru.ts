@@ -270,6 +270,7 @@ export const ru = {
       set: 'Указать остаток',
     },
     breakdown: 'На полке: {{shelf}} · в заказах: {{reserved}} · доступно: {{available}}',
+    alreadyEquals: 'Остаток уже такой — ничего не записано',
     operationsHint: {
       income: 'Товар поступил на склад и доступен к продаже',
       return_to_supplier: 'Товар уходит со склада обратно поставщику',

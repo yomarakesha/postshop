@@ -675,7 +675,8 @@
       "subtitle": "How much is available for sale. What open orders already hold is subtracted.",
       "edit": "Change",
       "fbsOnly": "This section is for FBS shops: they store goods themselves. FBO shop stock is under “Warehouse”.",
-      "breakdown": "On shelf: {{shelf}} · in orders: {{reserved}} · available: {{available}}"
+      "breakdown": "On shelf: {{shelf}} · in orders: {{reserved}} · available: {{available}}",
+      "alreadyEquals": "Stock already matches — nothing recorded"
     },
     "close": {
       "close": "Close the store",

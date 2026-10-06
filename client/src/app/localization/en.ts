@@ -266,6 +266,7 @@ export const en = {
       set: 'Set the stock',
     },
     breakdown: 'On shelf: {{shelf}} · in orders: {{reserved}} · available: {{available}}',
+    alreadyEquals: 'Stock already matches — nothing recorded',
     operationsHint: {
       income: 'Goods arrived at the warehouse and are available for sale',
       return_to_supplier: 'Goods leave the warehouse back to the supplier',

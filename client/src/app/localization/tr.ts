@@ -264,6 +264,7 @@ export const tr = {
       set: 'Stoğu belirt',
     },
     breakdown: 'Rafta: {{shelf}} · siparişlerde: {{reserved}} · mevcut: {{available}}',
+    alreadyEquals: 'Stok zaten bu kadar — hiçbir şey kaydedilmedi',
     operationsHint: {
       income: 'Ürün depoya geldi ve satışa hazır',
       return_to_supplier: 'Ürün depodan tedarikçiye dönüyor',
