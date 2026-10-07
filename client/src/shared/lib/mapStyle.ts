@@ -17,7 +17,9 @@ export async function loadMapStyle(): Promise<maplibregl.StyleSpecification | nu
   if (!response.ok) return null
 
   const style = await response.json()
-  const base = MAP_TILES_BASE_URL.replace(/\/+$/, '')
+  // MapLibre грузит тайлы в web worker, где относительный адрес («/api»)
+  // не разрешается — карта остаётся пустой. Приводим к полному адресу.
+  const base = new URL(MAP_TILES_BASE_URL, window.location.origin).href.replace(/\/+$/, '')
 
   return {
     ...style,
