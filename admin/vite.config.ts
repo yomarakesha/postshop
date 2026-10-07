@@ -10,6 +10,16 @@ export default defineConfig(({ mode }) => ({
   // домене с витриной — по адресу /admin/ (VITE_BASE_PATH=/admin/ в .env);
   // локально — в корне.
   base: loadEnv(mode, process.cwd(), '').VITE_BASE_PATH || '/',
+  // Под каким именем сервера отвечает `vite preview` (на сервере админка
+  // работает через него). Vite отклоняет чужие имена (403 «Blocked
+  // request»), поэтому домен перечисляется в PREVIEW_ALLOWED_HOSTS через
+  // запятую. localhost разрешён всегда.
+  preview: {
+    allowedHosts: (loadEnv(mode, process.cwd(), '').PREVIEW_ALLOWED_HOSTS || '')
+      .split(',')
+      .map((host) => host.trim())
+      .filter(Boolean),
+  },
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
