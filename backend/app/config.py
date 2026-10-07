@@ -55,6 +55,11 @@ class Settings(BaseSettings):
     CLAMD_PORT: int = 3310
     ANTIVIRUS_TIMEOUT: int = 60
 
+    # Карта (app/routers/maps.py): turkmenistan-detail.mbtiles, fonts/ и sprite*.
+    # Путь относительный — от каталога запуска, как uploads. Файлы не в git:
+    # их собирают отдельно (planetiler) и кладут на сервер руками.
+    MAPS_DIR: str = "maps"
+
     class Config:
         env_file = _ENV_FILE
 

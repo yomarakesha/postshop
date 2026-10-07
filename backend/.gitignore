@@ -220,3 +220,6 @@ tests/.test-outsider-token
 __pycache__/
 .pytest_cache/
 .env
+
+# Map data (app/routers/maps.py): mbtiles, fonts and sprites are built separately
+maps/

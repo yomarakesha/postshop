@@ -23,6 +23,7 @@ from app.routers import (
     search, statistics, contact_us, user_addresses, reviews, notifications,
     withdrawals,
     returns,
+    maps,
 )
 
 
@@ -161,6 +162,9 @@ app.include_router(orders.router,               prefix="/orders",               
 app.include_router(search.router,               prefix="/search",               tags=["Search"])
 app.include_router(statistics.router,           prefix="/statistics",           tags=["Statistics"])
 app.include_router(contact_us.router,           prefix="/contact-us",           tags=["Contact Us"])
+# Тайлы, шрифты и иконки карты. Префикс /v1/maps — его ждёт стиль карты
+# витрины и админки (shared/lib/mapStyle.ts), как у прежнего сервера карт.
+app.include_router(maps.router,                 prefix="/v1/maps",              tags=["Maps"])
 
 # Документы магазинов — юридические сканы (паспорт, свидетельство). Папка
 # uploads раздаётся как статика ради картинок товаров, и вместе с ними в сеть

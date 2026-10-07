@@ -26,6 +26,8 @@ export async function loadMapStyle(): Promise<maplibregl.StyleSpecification | nu
       turkmenistan: {
         ...style.sources?.turkmenistan,
         tiles: [`${base}/v1/maps/tiles/{z}/{x}/{y}.pbf`],
+        // Лицензия данных OSM и схемы OpenMapTiles требует видимой подписи.
+        attribution: '© OpenMapTiles © OpenStreetMap contributors',
       },
     },
     sprite: `${base}/v1/maps/sprites/sprite`,
