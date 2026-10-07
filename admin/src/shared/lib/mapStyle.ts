@@ -13,7 +13,7 @@ export const MAP_TILES_BASE_URL: string | undefined = import.meta.env.VITE_MAP_T
 export async function loadMapStyle(): Promise<maplibregl.StyleSpecification | null> {
   if (!MAP_TILES_BASE_URL) return null
 
-  const response = await fetch('/map_styles.json')
+  const response = await fetch(`${import.meta.env.BASE_URL}map_styles.json`)
   if (!response.ok) return null
 
   const style = await response.json()

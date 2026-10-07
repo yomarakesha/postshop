@@ -2,10 +2,14 @@ import path from 'path'
 
 import tailwindcss from '@tailwindcss/vite'
 import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+  // Путь, под которым открывается админка. На сервере она живёт на одном
+  // домене с витриной — по адресу /admin/ (VITE_BASE_PATH=/admin/ в .env);
+  // локально — в корне.
+  base: loadEnv(mode, process.cwd(), '').VITE_BASE_PATH || '/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
@@ -22,4 +26,4 @@ export default defineConfig({
       },
     },
   },
-})
+}))

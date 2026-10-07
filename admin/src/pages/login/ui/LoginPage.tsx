@@ -33,7 +33,7 @@ export function LoginPage() {
       <div className="relative w-full max-w-md">
         {/* Logo */}
         <div className="mb-8 flex justify-center">
-          <img src="/logo.webp" alt="PostShop" className="h-8" />
+          <img src={`${import.meta.env.BASE_URL}logo.webp`} alt="PostShop" className="h-8" />
         </div>
 
         {/* Card */}

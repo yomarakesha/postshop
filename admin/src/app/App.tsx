@@ -63,7 +63,9 @@ import { RequireFbo } from '@/shared/lib/RequireFbo'
 
 export default function App() {
   return (
-    <BrowserRouter>
+    // Базовый путь сборки (/admin/ на сервере): без него ссылки и переходы
+    // вели бы в корень домена — на витрину.
+    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
       <Routes>
         <Route path="login" element={<LoginPage />} />
         <Route

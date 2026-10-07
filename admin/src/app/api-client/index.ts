@@ -63,7 +63,7 @@ export function setupApiClient() {
     if (!refreshed) {
       LocalStorage.delete('access_token')
       LocalStorage.delete('refresh_token')
-      window.location.href = '/login'
+      window.location.href = `${import.meta.env.BASE_URL}login`
       return toApiError(error, response.status)
     }
 
@@ -85,7 +85,7 @@ export function setupApiClient() {
     // Refresh succeeded but request still failed — give up
     LocalStorage.delete('access_token')
     LocalStorage.delete('refresh_token')
-    window.location.href = '/login'
+    window.location.href = `${import.meta.env.BASE_URL}login`
     return toApiError(error, retryResponse.status)
   })
 }

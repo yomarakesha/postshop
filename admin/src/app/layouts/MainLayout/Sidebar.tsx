@@ -153,7 +153,7 @@ export const Sidebar = ({ headerHeight, open, onClose }: Props) => {
             className="relative shrink-0"
           >
             <img
-              src="/logo.webp"
+              src={`${import.meta.env.BASE_URL}logo.webp`}
               alt="PostShop"
               width="100%"
               height="100%"
