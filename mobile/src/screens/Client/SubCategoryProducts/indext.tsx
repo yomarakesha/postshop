@@ -25,6 +25,7 @@ import { useTranslation } from "react-i18next";
 import { categoryApi } from "@/api/categoryApi";
 import useAppStore from "@/store/useAppStore";
 import EmptyState from "@/ui/EmptyState";
+import Button from "@/ui/Button";
 import RefreshControl from "@/ui/RefreshControl";
 import { pickTranslatedName } from "@/utils/pickTranslation";
 
@@ -132,6 +133,13 @@ const SubCategoriesProductScreen = () => {
     }
   }, [categoryId, subCategoryId, router]);
 
+  // Сбрасываем только фильтр: выбранная сортировка ничего не скрывает.
+  const handleResetFilter = () => {
+    useProductListStore.setState({
+      filter: { shops: null, brands: null, priceFrom: null, priceTo: null },
+    });
+  };
+
   const hasSortApplied = useMemo(() => sort !== null, [sort]);
 
   const openFilter = filterSheetOpen || hasFilterApplied;
@@ -190,20 +198,39 @@ const SubCategoriesProductScreen = () => {
         t={t}
         ListEmptyComponent={() => {
           if (isLoading) return <ActivityIndicator isFullScreen />;
+          if (search) {
+            return (
+              <EmptyState
+                image={emptySearchImage}
+                title={t("emptyState.search.title")}
+                description={t("emptyState.search.description")}
+              />
+            );
+          }
+          // С фильтром пустой список не значит пустой раздел: раньше здесь
+          // писалось «в этом разделе ничего не опубликовано», хотя товары
+          // были — их скрыл выбранный бренд или цена.
+          if (hasFilterApplied) {
+            return (
+              <EmptyState
+                image={emptySearchImage}
+                title={t("emptyState.filtered.title")}
+                description={t("emptyState.filtered.description")}
+              >
+                <Button
+                  variant="secondary"
+                  title={t("emptyState.filtered.reset")}
+                  onPress={handleResetFilter}
+                />
+              </EmptyState>
+            );
+          }
           // Без поиска экран пустой категории оставался белым листом.
           return (
             <EmptyState
               image={emptySearchImage}
-              title={
-                search
-                  ? t("emptyState.search.title")
-                  : t("emptyState.products.title")
-              }
-              description={
-                search
-                  ? t("emptyState.search.description")
-                  : t("emptyState.products.description")
-              }
+              title={t("emptyState.products.title")}
+              description={t("emptyState.products.description")}
             />
           );
         }}

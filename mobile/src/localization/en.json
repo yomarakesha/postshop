@@ -108,7 +108,7 @@
     },
     "search": {
       "title": "No results found",
-      "description": "Check that the name of the place you're looking for is spelled correctly, or enter a different one"
+      "description": "Check the spelling or try a different query"
     },
     "favorites": {
       "title": "You have no favorite items",
@@ -124,6 +124,11 @@
     },
     "cities": {
       "title": "No regions available"
+    },
+    "filtered": {
+      "title": "Nothing matches the filters",
+      "description": "Change the conditions or reset the filters",
+      "reset": "Reset filters"
     }
   },
   "product": {
@@ -395,7 +400,8 @@
     "categories": {
       "headerTitle": "Categories",
       "empty": "No categories yet",
-      "emptySubCategories": "This category has no subcategories yet"
+      "emptySubCategories": "This category has no subcategories yet",
+      "allProducts": "All products in this section"
     },
     "cart": {
       "headerTitle": "My cart",

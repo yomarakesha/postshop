@@ -25,6 +25,10 @@ const BrandsScreen = () => {
       skip: 0,
       limit: 10,
       name: debouncedSearch || undefined,
+      // Как на витрине: без заблокированных и без брендов, у которых нет
+      // товаров, — иначе список вёл на пустые страницы.
+      is_active: true,
+      has_products: true,
     });
 
   const onPressBrand = (id: number) => {

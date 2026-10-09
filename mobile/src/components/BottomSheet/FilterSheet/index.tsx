@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { StyleSheet } from "react-native-unistyles";
 import { UniTrueSheet } from "@/ui/BottomSheet";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
@@ -34,6 +34,11 @@ const FilterSheet = ({
 }: Props) => {
   const currentFilter = useProductListStore((s) => s.filter);
   const [filter, setFilter] = useState<ProductFilterType>(currentFilter);
+  // Фильтр могут сбросить и снаружи (кнопка на пустом списке): без этого
+  // шторка открывалась со старыми значениями и «Применить» возвращала их.
+  useEffect(() => {
+    setFilter(currentFilter);
+  }, [currentFilter]);
   const brandsRef = useRef<TrueSheet | null>(null);
   const shopBasesRef = useRef<TrueSheet | null>(null);
 
@@ -58,11 +63,15 @@ const FilterSheet = ({
     setFilter((prev) => ({ ...prev, shops }));
   };
 
+  // Пустое поле — «без границы», а не 0: иначе стёртая цена оставляла фильтр
+  // включённым, и экран показывал пустой список как отфильтрованный.
+  const toPrice = (price: string) => (price.trim() === "" ? null : Number(price));
+
   const onChangeMinPrice = (price: string) =>
-    setFilter((prev) => ({ ...prev, priceFrom: Number(price) }));
+    setFilter((prev) => ({ ...prev, priceFrom: toPrice(price) }));
 
   const onChangeMaxPrice = (price: string) =>
-    setFilter((prev) => ({ ...prev, priceTo: Number(price) }));
+    setFilter((prev) => ({ ...prev, priceTo: toPrice(price) }));
 
   const onSubmit = () => {
     useProductListStore.setState({ filter });

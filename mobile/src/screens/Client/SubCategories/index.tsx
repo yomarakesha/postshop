@@ -45,7 +45,19 @@ const SubCategoriesScreen = () => {
     return data?.children ? data.children.filter((item) => item.is_active) : [];
   }, [data]);
 
-  const onPressItem = (id: number) => {
+  // Раздел без подкатегорий сразу открывает свои товары. Раньше он показывал
+  // «нет подкатегорий», и до товаров, лежащих прямо в разделе, было не дойти.
+  const hasNoChildren = Boolean(data) && subCategories.length === 0;
+  useEffect(() => {
+    if (hasNoChildren) {
+      router.replace({
+        pathname: `/(client-tabs)/(categories)/[categoryId]/[subCategoryId]`,
+        params: { categoryId, subCategoryId: categoryId },
+      });
+    }
+  }, [hasNoChildren, categoryId, router]);
+
+  const onPressItem = (id: number | string) => {
     router.push({
       pathname: `/(client-tabs)/(categories)/[categoryId]/[subCategoryId]`,
       params: {
@@ -84,6 +96,27 @@ const SubCategoriesScreen = () => {
           <ActivityIndicator isFullScreen />
         ) : subCategories.length > 0 ? (
           <View style={styles.container}>
+            {/* Все товары раздела вместе с подкатегориями — как при нажатии на
+                раздел на витрине. Бэкенд сам добавляет товары подкатегорий. */}
+            <Pressable
+              style={styles.item(false)}
+              onPress={() => onPressItem(categoryId)}
+            >
+              <CategoryIcon path={data?.image_path} size={36} />
+              <Typography
+                variant="p3"
+                weight="semiBold"
+                numberOfLines={2}
+                style={styles.label}
+              >
+                {t("client.categories.allProducts")}
+              </Typography>
+              <RightChevronIcon
+                width={20}
+                height={20}
+                style={styles.chevron}
+              />
+            </Pressable>
             {subCategories.map((item, index) => (
               <Pressable
                 key={item.id}
@@ -104,6 +137,9 @@ const SubCategoriesScreen = () => {
               </Pressable>
             ))}
           </View>
+        ) : hasNoChildren ? (
+          // Пока идёт переход к товарам раздела.
+          <ActivityIndicator isFullScreen />
         ) : (
           <EmptyState title={t("client.categories.emptySubCategories")} />
         )}

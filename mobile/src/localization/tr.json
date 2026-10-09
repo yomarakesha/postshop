@@ -108,7 +108,7 @@
     },
     "search": {
       "title": "Sonuç bulunamadı",
-      "description": "Aradığınız yerin adını doğru yazdığınızdan emin olun veya başka bir isim girin"
+      "description": "Yazımı kontrol edin veya farklı bir arama deneyin"
     },
     "favorites": {
       "title": "Favori ürününüz yok",
@@ -124,6 +124,11 @@
     },
     "cities": {
       "title": "Bölge listesi boş"
+    },
+    "filtered": {
+      "title": "Filtrelere uyan sonuç yok",
+      "description": "Koşulları değiştirin veya filtreleri sıfırlayın",
+      "reset": "Filtreleri sıfırla"
     }
   },
   "product": {
@@ -395,7 +400,8 @@
     "categories": {
       "headerTitle": "Kategoriler",
       "empty": "Henüz kategori yok",
-      "emptySubCategories": "Bu kategoride henüz alt kategori yok"
+      "emptySubCategories": "Bu kategoride henüz alt kategori yok",
+      "allProducts": "Bu bölümdeki tüm ürünler"
     },
     "cart": {
       "headerTitle": "Sepetim",

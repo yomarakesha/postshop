@@ -65,6 +65,9 @@ const BrandsFilterSheet = ({
     skip: 0,
     limit: 20,
     name: debouncedSearch || undefined,
+    // Бренд без товаров в фильтре даёт только пустой список.
+    is_active: true,
+    has_products: true,
   });
 
   const data = useMemo(() => brandsQuery.data || [], [brandsQuery.data]);

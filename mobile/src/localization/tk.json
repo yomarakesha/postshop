@@ -108,7 +108,7 @@
     },
     "search": {
       "title": "Hiç zat tapylmady",
-      "description": "Gözleýän ýeriňiziň adynyň dogry ýazylandygyny barlaň ýa-da başga at giriziň"
+      "description": "Ýazylyşyny barlaň ýa-da başga sözleri synap görüň"
     },
     "favorites": {
       "title": "Saýlanan harytlaryňyz ýok",
@@ -124,6 +124,11 @@
     },
     "cities": {
       "title": "Sebitleriň sanawy boş"
+    },
+    "filtered": {
+      "title": "Süzgüçler boýunça hiç zat tapylmady",
+      "description": "Şertleri üýtgediň ýa-da süzgüçleri arassalaň",
+      "reset": "Süzgüçleri arassala"
     }
   },
   "product": {
@@ -395,7 +400,8 @@
     "categories": {
       "headerTitle": "Ähli bölümler",
       "empty": "Bölümler entek ýok",
-      "emptySubCategories": "Bu bölümde entek kiçi bölümler ýok"
+      "emptySubCategories": "Bu bölümde entek kiçi bölümler ýok",
+      "allProducts": "Bölümiň ähli harytlary"
     },
     "cart": {
       "headerTitle": "Sebedim",

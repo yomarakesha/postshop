@@ -19,6 +19,8 @@ declare namespace Brand {
       skip: number;
       limit: number;
       name?: string;
+      is_active?: boolean;
+      has_products?: boolean;
     };
   }
 }
