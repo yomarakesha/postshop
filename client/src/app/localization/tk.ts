@@ -917,6 +917,8 @@ export const tk = {
 
   categories: {
     empty: 'Häzirlikçe kategoriýa ýok',
+    productsEmpty: 'Bu bölümde entek haryt ýok',
+    seeParent: '«{{name}}» bölümindäki ähli harytlar',
   },
 
   profileEdit: {

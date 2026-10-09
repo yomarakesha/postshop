@@ -916,6 +916,8 @@ export const tr = {
 
   categories: {
     empty: 'Henüz kategori yok',
+    productsEmpty: 'Bu bölümde henüz ürün yok',
+    seeParent: '«{{name}}» bölümündeki tüm ürünler',
   },
 
   profileEdit: {

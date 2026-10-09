@@ -1,18 +1,20 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { PackageX } from 'lucide-react'
 import { useInfiniteQuery } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import { CategoryFilterSidebar } from './ui/CategoryFilterSidebar'
 import type { SortOption } from '../../widgets/Filters/SortFilter'
 import type { PriceRange } from '../../widgets/Filters/PriceRangeFilter'
 import type { ProductResponse } from '#/shared/openapi/requests'
 import { REFERENCE_LIST_LIMIT } from '#/shared/constants/pagination'
 import { Breadcrumbs } from '#/shared/ui/Breadcrumbs'
+import { EmptyState } from '#/shared/ui/EmptyState'
 import { ProductCard } from '#/widgets/ProductCard'
 import { ProductCardSkeleton } from '#/widgets/ProductCard/ui/ProductCardSkeleton'
 import { useOutOfStock } from '#/shared/hooks/useStockAvailability'
 import {
   useGetCategoryCategoriesCategoryIdGet,
-  useGetProductsProductsGet,
   useGetShopAdditionalsShopAdditionalsGet,
 } from '#/shared/openapi/queries'
 import { getDiscountInfo } from '#/shared/utils/discount'
@@ -25,9 +27,6 @@ interface CategoryIdPageProps {
 }
 
 const PAGE_SIZE = 24
-
-/** Сколько товаров показываем под списком, когда раздел кончился. */
-const SUGGESTIONS_SIZE = 6
 
 export const CategoryIdPage = ({ categoryId }: CategoryIdPageProps) => {
   const { t, i18n } = useTranslation()
@@ -102,13 +101,6 @@ export const CategoryIdPage = ({ categoryId }: CategoryIdPageProps) => {
     return () => observer.disconnect()
   }, [handleObserver])
 
-  // Когда раздел кончился, под списком показываем другие товары каталога:
-  // иначе внизу страницы остаётся пустота рядом с корзиной, которая длиннее
-  // короткого списка.
-  const { data: suggestions } = useGetProductsProductsGet({
-    query: { limit: SUGGESTIONS_SIZE * 2, sort: 'recently_added' },
-  })
-
   const { data: shopAdditionals } = useGetShopAdditionalsShopAdditionalsGet({
     query: { limit: REFERENCE_LIST_LIMIT },
   })
@@ -133,13 +125,7 @@ export const CategoryIdPage = ({ categoryId }: CategoryIdPageProps) => {
     { label: categoryName },
   ]
 
-  // Показываем только то, чего нет в самом разделе.
-  const shownIds = new Set((products ?? []).map((product) => product.id))
-  const recommended = (suggestions ?? [])
-    .filter((product) => !shownIds.has(product.id))
-    .slice(0, SUGGESTIONS_SIZE)
-  // Одним списком и лента раздела, и подборка под ней: карточки одни и те же.
-  const isOutOfStockProduct = useOutOfStock([...(products ?? []), ...recommended])
+  const isOutOfStockProduct = useOutOfStock(products ?? [])
 
   const renderCard = (product: ProductResponse, to: string) => {
     const { price, discountPercent, oldPrice } = getDiscountInfo(
@@ -197,16 +183,28 @@ export const CategoryIdPage = ({ categoryId }: CategoryIdPageProps) => {
               Array.from({ length: 3 }).map((_, i) => <ProductCardSkeleton key={`next-${i}`} />)}
           </div>
 
-          {/* Раздел кончился — показываем другие товары каталога. Иначе внизу
-              страницы список обрывается коротким рядом, а рядом с ним остаётся
-              пустая полоса под корзиной. */}
-          {!hasNextPage && recommended.length > 0 && (
-            <div className="flex flex-col gap-4">
-              <h2 className="p3 font-semibold">{t('product.youMayLike')}</h2>
-              <div className="grid grid-cols-3 gap-4">
-                {recommended.map((product) => renderCard(product, `/${product.id}`))}
-              </div>
-            </div>
+          {/* В разделе показываем только его товары. Раньше под коротким или
+              пустым списком шла подборка из других разделов, и в «Наушниках»
+              выходили тюнеры — это выглядело как сломанный фильтр. Из пустого
+              подраздела ведём в родительский: туда пользователь идёт сам. */}
+          {!isProductsLoading && products?.length === 0 && (
+            <EmptyState
+              icon={<PackageX size={40} strokeWidth={1.5} />}
+              title={t('categories.productsEmpty')}
+              action={
+                parent && (
+                  <Link
+                    to="/categories/$categoryId"
+                    params={{ categoryId: String(parent.id) }}
+                    className="p3 font-medium text-blue-main"
+                  >
+                    {t('categories.seeParent', {
+                      name: getTranslatedName(parent.translations, i18n.language),
+                    })}
+                  </Link>
+                )
+              }
+            />
           )}
         </div>
       </div>

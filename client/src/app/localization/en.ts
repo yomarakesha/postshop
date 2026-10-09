@@ -917,6 +917,8 @@ export const en = {
 
   categories: {
     empty: 'No categories yet',
+    productsEmpty: 'No products in this section yet',
+    seeParent: 'See everything in “{{name}}”',
   },
 
   profileEdit: {

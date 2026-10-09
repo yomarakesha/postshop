@@ -920,6 +920,8 @@ export const ru = {
 
   categories: {
     empty: 'Категорий пока нет',
+    productsEmpty: 'В этом разделе пока нет товаров',
+    seeParent: 'Смотреть всё в «{{name}}»',
   },
 
   profileEdit: {
