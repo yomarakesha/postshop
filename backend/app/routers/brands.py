@@ -7,6 +7,8 @@ from sqlalchemy import select
 from app.database import get_db
 from app.core.pagination import limit_param, paginate, skip_param
 from app.models.brand import Brand
+from app.models.product import Product
+from app.core.visibility import visible_to_customer
 from app.schemas.brand import BrandCreate, BrandUpdate, BrandResponse
 from app.core.dependencies import require_permissions
 from app.core.permissions import Perm
@@ -53,6 +55,10 @@ async def get_brands(
         default=None,
         description="Фильтр по признаку активности; без него возвращаются и заблокированные",
     ),
+    has_products: bool = Query(
+        default=False,
+        description="Только бренды, у которых есть товары, видимые покупателю",
+    ),
     db: AsyncSession = Depends(get_db),
 ):
     query = select(Brand)
@@ -62,6 +68,14 @@ async def get_brands(
     # не влияла: заблокированный бренд оставался в каталоге.
     if is_active is not None:
         query = query.where(Brand.is_active == is_active)
+    # Каталог брендов на витрине вёл в пустые страницы: бренд заводится в
+    # справочнике раньше, чем у него появляются товары.
+    if has_products:
+        visible = await visible_to_customer(
+            select(Product.brand_id).where(Product.brand_id.isnot(None)), db
+        )
+        query = query.where(Brand.id.in_(visible))
+    query = query.order_by(Brand.name)
     result = await db.execute(await paginate(db, response, query, skip=skip, limit=limit))
     return result.scalars().all()
 

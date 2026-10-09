@@ -61,10 +61,28 @@ def set_pagination_headers(response: Response, *, total: int, skip: int, limit: 
     response.headers["X-Has-More"] = "true" if skip + limit < total else "false"
 
 
+def _with_stable_order(query: Select) -> Select:
+    """Дописать в конец сортировки первичный ключ.
+
+    Без ORDER BY (а у большинства справочников его не было) или с сортировкой
+    по неуникальному полю (цена, «со скидкой») MySQL вправе отдавать строки
+    в любом порядке, и от запроса к запросу он разный. Срез OFFSET/LIMIT по
+    такому порядку при прокрутке повторял одни записи и терял другие.
+    Ключ в конце делает порядок однозначным, не меняя заданной сортировки.
+
+    Запросы с GROUP BY не трогаем: там первичный ключ не входит в группировку.
+    """
+    if query._group_by_clauses:  # noqa: SLF001
+        return query
+    entity = query.column_descriptions[0].get("entity") if query.column_descriptions else None
+    pk = getattr(entity, "id", None) if entity is not None else None
+    return query.order_by(pk) if pk is not None else query
+
+
 async def paginate(
     db: AsyncSession, response: Response, query: Select, *, skip: int, limit: int
 ) -> Select:
     """Посчитать общее число строк, выставить заголовки и вернуть запрос со срезом."""
     total = await count_rows(db, query)
     set_pagination_headers(response, total=total, skip=skip, limit=limit)
-    return query.offset(skip).limit(limit)
+    return _with_stable_order(query).offset(skip).limit(limit)

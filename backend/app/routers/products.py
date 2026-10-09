@@ -6,7 +6,7 @@ import uuid
 from typing import List, Literal, Optional
 from fastapi import APIRouter, Depends, HTTPException, Query, status, UploadFile, File, Form, Response
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import case, select, asc, desc, exists, func, update
+from sqlalchemy import case, select, asc, desc, exists, func, or_, update
 from sqlalchemy.orm import selectinload
 from decimal import Decimal
 
@@ -30,7 +30,7 @@ from app.models.notification import NotificationKind
 from app.services.notifications import notify, notify_shop_owner
 from app.core.ownership import STAFF_SHOPS, is_staff
 from app.services.stock import product_has_stock_history
-from app.core.visibility import visible_to_customer, shop_public_conditions
+from app.core.visibility import visible_category_ids, visible_to_customer, shop_public_conditions
 from app.core.images import remove_files, check_content_type, process_upload
 from app.services.barcode import normalize_vendor_barcode, platform_barcode
 
@@ -94,6 +94,20 @@ def _product_query():
         selectinload(Product.currency).selectinload(Currency.translations),
         selectinload(Product.measure_unit).selectinload(MeasureUnit.translations),
     )
+
+
+async def _ensure_category_usable(category_id: int, db: AsyncSession) -> None:
+    """Товар можно положить только в категорию, которую видит покупатель.
+
+    Раньше проверялось лишь существование: товар в выключенной категории (или
+    в подкатегории выключенного раздела) сохранялся, проходил модерацию и
+    молча не появлялся на витрине — продавец не понимал, почему.
+    """
+    exists_row = (await db.execute(select(Category.id).where(Category.id == category_id))).scalar_one_or_none()
+    if exists_row is None:
+        raise HTTPException(status_code=404, detail="Category not found")
+    if category_id not in await visible_category_ids(db):
+        raise HTTPException(status_code=400, detail="Category is disabled")
 
 
 async def _expand_category_ids(category_ids: List[int], db: AsyncSession) -> List[int]:
@@ -268,9 +282,7 @@ async def create_product(
     _validate_pricing(price, discount_type, discount)
     vendor_code = normalize_vendor_barcode(vendor_barcode)
 
-    cat_res = await db.execute(select(Category).where(Category.id == category_id))
-    if not cat_res.scalar_one_or_none():
-        raise HTTPException(status_code=404, detail="Category not found")
+    await _ensure_category_usable(category_id, db)
 
     await _ensure_can_manage_shop(shop_base_id, current_user, db)
     await _ensure_vendor_barcode_free(db, shop_base_id, vendor_code)
@@ -560,10 +572,11 @@ async def update_product(
     # модерацию не отправляют — см. конец метода.
     content_changed = False
 
+    # Проверяем только смену категории: товар, уже лежащий в выключенной
+    # категории, должен оставаться редактируемым по остальным полям.
+    if category_id is not None and category_id != product.category_id:
+        await _ensure_category_usable(category_id, db)
     if category_id is not None:
-        cat_res = await db.execute(select(Category).where(Category.id == category_id))
-        if not cat_res.scalar_one_or_none():
-            raise HTTPException(status_code=404, detail="Category not found")
         content_changed |= product.category_id != category_id
         product.category_id = category_id
 
@@ -851,10 +864,20 @@ async def get_similar_products(
     if product.hashtag:
         score = score + case((Product.hashtag == product.hashtag, 1), else_=0)
 
+    # Похожим считается только товар той же категории, соседней подкатегории
+    # или того же бренда. Раньше порога не было: при нехватке настоящих
+    # соседей список добивался чем угодно с тем же магазином или ценой, и
+    # к ноутбуку подмешивались детские книги.
+    related = [Product.category_id == product.category_id]
+    if parent_id is not None:
+        related.append(Product.category_id.in_(sibling_subq))
+    if product.brand_id is not None:
+        related.append(Product.brand_id == product.brand_id)
+
     query = (
         (await visible_to_customer(_product_query(), db))
-        .where(Product.id != product_id)
-        .order_by(desc(score), desc(Product.created_at))
+        .where(Product.id != product_id, or_(*related))
+        .order_by(desc(score), desc(Product.created_at), desc(Product.id))
         .limit(8)
     )
     if city_id is not None:
