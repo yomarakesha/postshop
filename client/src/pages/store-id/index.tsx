@@ -1,11 +1,13 @@
 import { useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { PackageX } from 'lucide-react'
 import { StoreInfoModal } from '../../widgets/StoreCard/ui/StoreInfoModal'
 import { FilterSidebar } from './ui/FilterSidebar'
 import type { SortOption } from '../../widgets/Filters/SortFilter'
 import type { PriceRange } from '../../widgets/Filters/PriceRangeFilter'
 import type { ModalRef } from '#/shared/ui/Modal'
 import { Breadcrumbs } from '#/shared/ui/Breadcrumbs'
+import { EmptyState } from '#/shared/ui/EmptyState'
 import { ProductCard } from '#/widgets/ProductCard'
 import {
   useGetProductsProductsGet,
@@ -48,6 +50,8 @@ export const StoreIdPage = ({ storeId }: StoreIdPageProps) => {
   })
 
   const isOutOfStockProduct = useOutOfStock(products)
+  const hasFilters =
+    selectedBrands.length > 0 || Boolean(priceRange.priceFrom) || Boolean(priceRange.priceTo)
 
   const storeName = shopAdditional?.name ?? ''
   const storeLogo = getImageUrl(shopAdditional?.logo_path)
@@ -143,6 +147,15 @@ export const StoreIdPage = ({ storeId }: StoreIdPageProps) => {
               )
             })}
           </div>
+          {/* Пустую выдачу раньше ничем не объясняли: оставалась пустая сетка.
+              С фильтром пишем про фильтр — товары есть, их скрыл он. */}
+          {!isProductsLoading && products?.length === 0 && (
+            <EmptyState
+              icon={<PackageX size={40} strokeWidth={1.5} />}
+              title={t(hasFilters ? 'categories.filteredEmpty' : 'categories.storeEmpty')}
+              hint={hasFilters ? t('categories.filteredEmptyHint') : undefined}
+            />
+          )}
         </div>
       </div>
     </div>

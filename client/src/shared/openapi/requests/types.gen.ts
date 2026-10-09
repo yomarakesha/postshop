@@ -5120,6 +5120,12 @@ export type GetBrandsBrandsGetData = {
          * Фильтр по признаку активности; без него возвращаются и заблокированные
          */
         is_active?: boolean | null;
+        /**
+         * Has Products
+         *
+         * Только бренды, у которых есть товары, видимые покупателю
+         */
+        has_products?: boolean;
     };
     url: '/brands/';
 };

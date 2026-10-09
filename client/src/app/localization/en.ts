@@ -919,6 +919,10 @@ export const en = {
     empty: 'No categories yet',
     productsEmpty: 'No products in this section yet',
     seeParent: 'See everything in “{{name}}”',
+    brandEmpty: 'This brand has no products yet',
+    storeEmpty: 'This store has no products yet',
+    filteredEmpty: 'Nothing matches the filters',
+    filteredEmptyHint: 'Change the conditions or reset the filters',
   },
 
   profileEdit: {

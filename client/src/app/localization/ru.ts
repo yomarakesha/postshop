@@ -922,6 +922,10 @@ export const ru = {
     empty: 'Категорий пока нет',
     productsEmpty: 'В этом разделе пока нет товаров',
     seeParent: 'Смотреть всё в «{{name}}»',
+    brandEmpty: 'У бренда пока нет товаров',
+    storeEmpty: 'В магазине пока нет товаров',
+    filteredEmpty: 'Ничего не найдено по фильтрам',
+    filteredEmptyHint: 'Измените условия или сбросьте фильтры',
   },
 
   profileEdit: {

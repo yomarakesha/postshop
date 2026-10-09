@@ -41,6 +41,8 @@ export const BrandFilter = ({ value, onChange, categoryId }: BrandFilterProps) =
           // Раньше неактивные отсеивались уже после ответа, из-за чего
           // постраничная загрузка считала страницы по полной выдаче.
           is_active: true,
+          // Бренд без товаров в фильтре даёт только пустой список.
+          has_products: true,
         },
       }).then((res) => res.data ?? []),
     initialPageParam: 0,

@@ -919,6 +919,10 @@ export const tk = {
     empty: 'Häzirlikçe kategoriýa ýok',
     productsEmpty: 'Bu bölümde entek haryt ýok',
     seeParent: '«{{name}}» bölümindäki ähli harytlar',
+    brandEmpty: 'Bu brendiň entek harydy ýok',
+    storeEmpty: 'Bu dükanda entek haryt ýok',
+    filteredEmpty: 'Süzgüçler boýunça hiç zat tapylmady',
+    filteredEmptyHint: 'Şertleri üýtgediň ýa-da süzgüçleri arassalaň',
   },
 
   profileEdit: {

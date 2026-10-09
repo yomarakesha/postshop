@@ -126,6 +126,12 @@ export const CategoryIdPage = ({ categoryId }: CategoryIdPageProps) => {
   ]
 
   const isOutOfStockProduct = useOutOfStock(products ?? [])
+  // Пустой список с фильтром — не пустой раздел: товары есть, их скрыл фильтр.
+  const hasFilters =
+    selectedBrands.length > 0 ||
+    selectedStores.length > 0 ||
+    Boolean(priceRange.priceFrom) ||
+    Boolean(priceRange.priceTo)
 
   const renderCard = (product: ProductResponse, to: string) => {
     const { price, discountPercent, oldPrice } = getDiscountInfo(
@@ -187,7 +193,14 @@ export const CategoryIdPage = ({ categoryId }: CategoryIdPageProps) => {
               пустым списком шла подборка из других разделов, и в «Наушниках»
               выходили тюнеры — это выглядело как сломанный фильтр. Из пустого
               подраздела ведём в родительский: туда пользователь идёт сам. */}
-          {!isProductsLoading && products?.length === 0 && (
+          {!isProductsLoading && products?.length === 0 && hasFilters && (
+            <EmptyState
+              icon={<PackageX size={40} strokeWidth={1.5} />}
+              title={t('categories.filteredEmpty')}
+              hint={t('categories.filteredEmptyHint')}
+            />
+          )}
+          {!isProductsLoading && products?.length === 0 && !hasFilters && (
             <EmptyState
               icon={<PackageX size={40} strokeWidth={1.5} />}
               title={t('categories.productsEmpty')}

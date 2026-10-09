@@ -20,7 +20,8 @@ export const BrandsPage = () => {
       getBrandsBrandsGet({
         // Без is_active в каталоге оставались заблокированные бренды:
         // блокировка в админке ни на что не влияла (тот же класс, что C-27).
-        query: { skip: pageParam, limit: PAGE_SIZE, is_active: true },
+        // has_products — бренды без товаров вели на пустую страницу.
+        query: { skip: pageParam, limit: PAGE_SIZE, is_active: true, has_products: true },
       }).then((res) => res.data ?? []),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) =>

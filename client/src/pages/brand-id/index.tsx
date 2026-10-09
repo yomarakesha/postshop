@@ -1,10 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useInfiniteQuery } from '@tanstack/react-query'
+import { PackageX } from 'lucide-react'
 import { FilterSidebar } from './ui/FilterSidebar'
 import type { SortOption } from './ui/FilterSidebar/SortFilter'
 import type { PriceRange } from './ui/FilterSidebar/PriceRangeFilter'
 import { Breadcrumbs } from '#/shared/ui/Breadcrumbs'
+import { EmptyState } from '#/shared/ui/EmptyState'
 import { ProductCard } from '#/widgets/ProductCard'
 import { useGetBrandBrandsBrandIdGet } from '#/shared/openapi/queries'
 import { UseGetProductsProductsGetKeyFn } from '#/shared/openapi/queries/common'
@@ -64,6 +66,8 @@ export const BrandIdPage = ({ brandId }: BrandIdPageProps) => {
   })
 
   const products = data?.pages.flat()
+  const hasFilters =
+    selectedStores.length > 0 || Boolean(priceRange.priceFrom) || Boolean(priceRange.priceTo)
   const isOutOfStockProduct = useOutOfStock(products)
   const brandName = brand?.name ?? ''
   const brandImage = getImageUrl(brand?.image_path)
@@ -122,7 +126,9 @@ export const BrandIdPage = ({ brandId }: BrandIdPageProps) => {
                   images={product.images ?? []}
                   price={price}
                   oldPrice={oldPrice}
-                  store={brandName}
+                  /* Здесь стоял бренд, хотя в карточке это строка магазина:
+                     на остальных страницах она ведёт в магазин-продавца. */
+                  store={product.shop_name ?? ''}
                   discount={discountPercent}
                   name={getTranslatedName(product.translations, i18n.language)}
                   outOfStock={isOutOfStockProduct(product)}
@@ -130,11 +136,20 @@ export const BrandIdPage = ({ brandId }: BrandIdPageProps) => {
                   rating={product.rating_avg}
                   ratingCount={product.rating_count}
                   to={`/brands/${brandId}/${product.id}`}
-                  storeTo={`/brands/${brandId}`}
+                  storeTo={`/stores/${product.shop_base_id}`}
                 />
               )
             })}
           </div>
+          {/* Пустую выдачу раньше ничем не объясняли: оставалась пустая сетка.
+              С фильтром пишем про фильтр — товары есть, их скрыл он. */}
+          {!isLoading && products?.length === 0 && (
+            <EmptyState
+              icon={<PackageX size={40} strokeWidth={1.5} />}
+              title={t(hasFilters ? 'categories.filteredEmpty' : 'categories.brandEmpty')}
+              hint={hasFilters ? t('categories.filteredEmptyHint') : undefined}
+            />
+          )}
           {isFetchingNextPage &&
             Array.from({ length: 3 }).map((_, i) => <ProductCardSkeleton key={i} />)}
           {hasNextPage && <div ref={loaderRef} className="h-10" />}

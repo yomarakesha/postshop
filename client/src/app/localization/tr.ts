@@ -918,6 +918,10 @@ export const tr = {
     empty: 'Henüz kategori yok',
     productsEmpty: 'Bu bölümde henüz ürün yok',
     seeParent: '«{{name}}» bölümündeki tüm ürünler',
+    brandEmpty: 'Bu markanın henüz ürünü yok',
+    storeEmpty: 'Bu mağazada henüz ürün yok',
+    filteredEmpty: 'Filtrelere uyan sonuç yok',
+    filteredEmptyHint: 'Koşulları değiştirin veya filtreleri sıfırlayın',
   },
 
   profileEdit: {
