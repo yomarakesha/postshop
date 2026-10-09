@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from '@tanstack/react-router'
 import { ChevronDown, ChevronUp, X } from 'lucide-react'
@@ -164,6 +164,46 @@ const CategoryList = ({
   )
 }
 
+/**
+ * Затухание у краёв прокручиваемого списка.
+ *
+ * Панель категорий высотой с экран, а полоса прокрутки скрыта: последняя
+ * карточка обрезалась ровным краем, и выглядело так, будто список не
+ * догрузился. Затухание снизу показывает, что дальше есть ещё, сверху — что
+ * список уже прокручен. У края, до которого докрутили, затухания нет.
+ */
+const FADE = '48px'
+
+// `contentKey` — смена содержимого (скелетон → список): новых детей надо
+// подписать на наблюдение заново.
+const useScrollFade = <T extends HTMLElement>(contentKey: unknown) => {
+  const ref = useRef<T>(null)
+  const [edges, setEdges] = useState({ top: false, bottom: false })
+
+  const update = useCallback(() => {
+    const el = ref.current
+    if (!el) return
+    const top = el.scrollTop > 1
+    const bottom = el.scrollTop + el.clientHeight < el.scrollHeight - 1
+    setEdges((prev) => (prev.top === top && prev.bottom === bottom ? prev : { top, bottom }))
+  }, [])
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    update()
+    // Высота меняется при раскрытии разделов и при изменении окна.
+    const observer = new ResizeObserver(update)
+    observer.observe(el)
+    for (const child of Array.from(el.children)) observer.observe(child)
+    return () => observer.disconnect()
+  }, [update, contentKey])
+
+  const mask = `linear-gradient(to bottom, ${edges.top ? 'transparent' : 'black'}, black ${FADE}, black calc(100% - ${FADE}), ${edges.bottom ? 'transparent' : 'black'})`
+
+  return { ref, onScroll: update, style: { maskImage: mask, WebkitMaskImage: mask } }
+}
+
 export const CategoriesSidebar = () => {
   const { i18n, t } = useTranslation()
   // only_parents: эндпоинт отдаёт плоский список всех категорий вместе с
@@ -176,6 +216,7 @@ export const CategoriesSidebar = () => {
   const [isOpen, setIsOpen] = useState(false)
 
   const parentCategories = (categories ?? []).filter((c) => !c.parent_id)
+  const desktopFade = useScrollFade<HTMLElement>(isLoading)
 
   const skeletons = (
     <div className="flex flex-col gap-1">
@@ -189,6 +230,9 @@ export const CategoriesSidebar = () => {
     <>
       {/* Desktop sidebar */}
       <aside
+        ref={desktopFade.ref}
+        onScroll={desktopFade.onScroll}
+        style={desktopFade.style}
         className={`
           hidden sidebar:block
           w-full max-w-62.5 max-h-[calc(100vh-var(--page-content-top-padding)-24px)]
