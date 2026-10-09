@@ -430,6 +430,10 @@ export type BrandResponse = {
      * Updated At
      */
     updated_at: string | null;
+    /**
+     * Products Count
+     */
+    products_count?: number | null;
 };
 
 /**
@@ -5126,6 +5130,12 @@ export type GetBrandsBrandsGetData = {
          * Только бренды, у которых есть товары, видимые покупателю
          */
         has_products?: boolean;
+        /**
+         * With Products First
+         *
+         * Сначала бренды с товарами, затем без; внутри групп — по имени
+         */
+        with_products_first?: boolean;
     };
     url: '/brands/';
 };

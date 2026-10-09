@@ -12,6 +12,8 @@ declare namespace Brand {
     is_active: boolean;
     created_at: string;
     updated_at: string;
+    /** Только в списке: сколько товаров бренда видит покупатель. */
+    products_count?: number | null;
   };
 
   namespace API {
@@ -21,6 +23,7 @@ declare namespace Brand {
       name?: string;
       is_active?: boolean;
       has_products?: boolean;
+      with_products_first?: boolean;
     };
   }
 }

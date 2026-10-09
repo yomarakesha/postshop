@@ -344,7 +344,8 @@
       "searchPlaceholder": "Mağazada ara"
     },
     "brands": {
-      "headerTitle": "Markalar"
+      "headerTitle": "Markalar",
+      "soon": "Yakında"
     },
     "favorites": {
       "headerTitle": "Favoriler",

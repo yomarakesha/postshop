@@ -3,7 +3,7 @@ import uuid
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, status, UploadFile, File, Query, Response
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import desc, func, select
 from app.database import get_db
 from app.core.pagination import limit_param, paginate, skip_param
 from app.models.brand import Brand
@@ -59,25 +59,43 @@ async def get_brands(
         default=False,
         description="Только бренды, у которых есть товары, видимые покупателю",
     ),
+    with_products_first: bool = Query(
+        default=False,
+        description="Сначала бренды с товарами, затем без; внутри групп — по имени",
+    ),
     db: AsyncSession = Depends(get_db),
 ):
-    query = select(Brand)
+    # Число видимых покупателю товаров у каждого бренда. Витрина показывает
+    # бренды без товаров приглушёнными, а не скрывает их: каталог брендов
+    # заводится раньше, чем у брендов появляются товары.
+    visible = await visible_to_customer(
+        select(Product.brand_id, func.count(Product.id).label("n"))
+        .where(Product.brand_id.isnot(None))
+        .group_by(Product.brand_id),
+        db,
+    )
+    counts = visible.subquery()
+    products_count = func.coalesce(counts.c.n, 0)
+
+    query = select(Brand, products_count).outerjoin(counts, counts.c.brand_id == Brand.id)
     if name:
         query = query.where(Brand.name.ilike(f"%{name}%"))
     # Без этого фильтра блокировка бренда (PATCH /brands/{id}/block) ни на что
     # не влияла: заблокированный бренд оставался в каталоге.
     if is_active is not None:
         query = query.where(Brand.is_active == is_active)
-    # Каталог брендов на витрине вёл в пустые страницы: бренд заводится в
-    # справочнике раньше, чем у него появляются товары.
     if has_products:
-        visible = await visible_to_customer(
-            select(Product.brand_id).where(Product.brand_id.isnot(None)), db
-        )
-        query = query.where(Brand.id.in_(visible))
+        query = query.where(products_count > 0)
+    if with_products_first:
+        query = query.order_by(desc(products_count > 0))
     query = query.order_by(Brand.name)
-    result = await db.execute(await paginate(db, response, query, skip=skip, limit=limit))
-    return result.scalars().all()
+
+    rows = (await db.execute(await paginate(db, response, query, skip=skip, limit=limit))).all()
+    brands = []
+    for brand, count in rows:
+        brand.products_count = int(count)
+        brands.append(brand)
+    return brands
 
 
 @router.get("/{brand_id}", response_model=BrandResponse)

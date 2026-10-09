@@ -344,7 +344,8 @@
       "searchPlaceholder": "Поиск в магазине"
     },
     "brands": {
-      "headerTitle": "Бренды"
+      "headerTitle": "Бренды",
+      "soon": "Скоро"
     },
     "favorites": {
       "headerTitle": "Избранное",

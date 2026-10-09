@@ -22,6 +22,9 @@ class BrandResponse(BaseModel):
     is_active: bool
     created_at: datetime
     updated_at: datetime | None
+    # Заполняется только в списке GET /brands/: сколько товаров бренда видит
+    # покупатель. В остальных ответах — None.
+    products_count: int | None = None
 
     class Config:
         from_attributes = True

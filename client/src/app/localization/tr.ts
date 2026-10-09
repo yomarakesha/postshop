@@ -922,6 +922,9 @@ export const tr = {
     storeEmpty: 'Bu mağazada henüz ürün yok',
     filteredEmpty: 'Filtrelere uyan sonuç yok',
     filteredEmptyHint: 'Koşulları değiştirin veya filtreleri sıfırlayın',
+    productsCount_one: '{{count}} ürün',
+    productsCount_other: '{{count}} ürün',
+    soon: 'Yakında',
   },
 
   profileEdit: {

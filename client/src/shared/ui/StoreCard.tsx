@@ -10,9 +10,17 @@ interface Props {
    * витрины, по которой магазин не опознать.
    */
   showName?: boolean
+  /** Строка под карточкой: число товаров или «Скоро». */
+  caption?: string
+  /**
+   * Приглушить карточку — у бренда пока нет товаров. Его не прячем: каталог
+   * брендов показывает, что есть на площадке, а страница бренда честно
+   * скажет, что товаров пока нет.
+   */
+  muted?: boolean
 }
 
-export const StoreCard = ({ name, image, to, showName = true }: Props) => {
+export const StoreCard = ({ name, image, to, showName = true, caption, muted = false }: Props) => {
   // Без картинки карточка без подписи была бы пустым белым квадратом,
   // поэтому в этом случае название показываем всегда.
   const withName = showName || !image
@@ -25,10 +33,19 @@ export const StoreCard = ({ name, image, to, showName = true }: Props) => {
           выходили разного размера. Теперь квадрат задан самой картинке, а
           подписи отведено постоянное место под две строки. */}
       <div className="aspect-square w-full">
-        <img src={image} alt={withName ? '' : name} className="size-full object-contain" />
+        <img
+          src={image}
+          alt={withName ? '' : name}
+          className={`size-full object-contain ${muted ? 'opacity-40 grayscale' : ''}`}
+        />
       </div>
       {withName && (
         <span className="t1 caption-2-lines line-clamp-2 text-center font-medium">{name}</span>
+      )}
+      {caption && (
+        <span className={`t2 text-center ${muted ? 'text-passive1' : 'text-passive2'}`}>
+          {caption}
+        </span>
       )}
     </Link>
   )

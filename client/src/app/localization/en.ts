@@ -923,6 +923,9 @@ export const en = {
     storeEmpty: 'This store has no products yet',
     filteredEmpty: 'Nothing matches the filters',
     filteredEmptyHint: 'Change the conditions or reset the filters',
+    productsCount_one: '{{count}} product',
+    productsCount_other: '{{count}} products',
+    soon: 'Coming soon',
   },
 
   profileEdit: {

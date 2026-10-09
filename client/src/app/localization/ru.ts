@@ -926,6 +926,11 @@ export const ru = {
     storeEmpty: 'В магазине пока нет товаров',
     filteredEmpty: 'Ничего не найдено по фильтрам',
     filteredEmptyHint: 'Измените условия или сбросьте фильтры',
+    productsCount_one: '{{count}} товар',
+    productsCount_few: '{{count}} товара',
+    productsCount_many: '{{count}} товаров',
+    productsCount_other: '{{count}} товара',
+    soon: 'Скоро',
   },
 
   profileEdit: {

@@ -20,8 +20,10 @@ export const BrandsPage = () => {
       getBrandsBrandsGet({
         // Без is_active в каталоге оставались заблокированные бренды:
         // блокировка в админке ни на что не влияла (тот же класс, что C-27).
-        // has_products — бренды без товаров вели на пустую страницу.
-        query: { skip: pageParam, limit: PAGE_SIZE, is_active: true, has_products: true },
+        // Бренды без товаров не скрываем, а показываем приглушёнными после
+        // брендов с товарами — порядок задаёт сервер, иначе постраничная
+        // загрузка перемешала бы группы.
+        query: { skip: pageParam, limit: PAGE_SIZE, is_active: true, with_products_first: true },
       }).then((res) => res.data ?? []),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) =>
@@ -70,6 +72,12 @@ export const BrandsPage = () => {
                 image={getImageUrl(brand.image_path)}
                 to={`/brands/${brand.id}`}
                 showName={false}
+                muted={brand.products_count === 0}
+                caption={
+                  brand.products_count
+                    ? t('categories.productsCount', { count: brand.products_count })
+                    : t('categories.soon')
+                }
               />
             ))}
           </div>

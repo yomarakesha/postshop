@@ -923,6 +923,9 @@ export const tk = {
     storeEmpty: 'Bu dükanda entek haryt ýok',
     filteredEmpty: 'Süzgüçler boýunça hiç zat tapylmady',
     filteredEmptyHint: 'Şertleri üýtgediň ýa-da süzgüçleri arassalaň',
+    productsCount_one: '{{count}} haryt',
+    productsCount_other: '{{count}} haryt',
+    soon: 'Ýakynda',
   },
 
   profileEdit: {

@@ -25,10 +25,10 @@ const BrandsScreen = () => {
       skip: 0,
       limit: 10,
       name: debouncedSearch || undefined,
-      // Как на витрине: без заблокированных и без брендов, у которых нет
-      // товаров, — иначе список вёл на пустые страницы.
+      // Как на витрине: без заблокированных; бренды без товаров идут после
+      // брендов с товарами и показываются бледными с подписью «Скоро».
       is_active: true,
-      has_products: true,
+      with_products_first: true,
     });
 
   const onPressBrand = (id: number) => {
@@ -44,10 +44,13 @@ const BrandsScreen = () => {
         <LogoTile
           onPress={() => onPressBrand(item.id)}
           image={getImageUrl(item.image_path)}
+          muted={item.products_count === 0}
+          caption={item.products_count === 0 ? t("client.brands.soon") : undefined}
         />
       );
     },
-    [data],
+    // t — иначе подпись «Скоро» оставалась на прежнем языке.
+    [data, t],
   );
 
   const keyExtractor = useCallback((item: Brand.Item) => {

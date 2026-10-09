@@ -344,7 +344,8 @@
       "searchPlaceholder": "Search in store"
     },
     "brands": {
-      "headerTitle": "Brands"
+      "headerTitle": "Brands",
+      "soon": "Coming soon"
     },
     "favorites": {
       "headerTitle": "Favorites",

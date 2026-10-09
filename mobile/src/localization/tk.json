@@ -344,7 +344,8 @@
       "searchPlaceholder": "Dükanda gözleg"
     },
     "brands": {
-      "headerTitle": "Brendler"
+      "headerTitle": "Brendler",
+      "soon": "Ýakynda"
     },
     "favorites": {
       "headerTitle": "Halanlarym",
