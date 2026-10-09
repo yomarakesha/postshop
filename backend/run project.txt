@@ -10,6 +10,7 @@ alembic upgrade head                    # строит всю схему + си�
 python scripts/seed_permissions.py      # права ACL
 python scripts/seed_order_statuses.py   # статусы (идемпотентно, на всякий случай)
 python scripts/create_superuser.py      # создать админа
+python scripts/seed_demo.py             # демо-данные для разработки (не для прода)
 uvicorn app.main:app --reload
 
 

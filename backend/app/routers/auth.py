@@ -40,6 +40,60 @@ from app.schemas.auth import (
 router = APIRouter()
 
 
+# Набор прав, который получает каждый зарегистрировавшийся по SMS.
+# Он широкий не по ошибке: у платформы нет отдельной роли продавца —
+# любой пользователь может открыть магазин, поэтому права продавца
+# выдаются сразу. Проверку «своё или чужое» они не заменяют: она
+# живёт в app/core/ownership.py и стоит на каждом из этих методов.
+# Ниже расписано, зачем нужно каждое право. Тот же набор выдаёт
+# демо-продавцу scripts/seed_demo.py.
+NEW_USER_PERMISSIONS = [
+    # Свой магазин: открыть, заполнить, закрыть и открыть обратно.
+    Perm.SHOP_BASES_READ, Perm.SHOP_BASES_CREATE, Perm.SHOP_BASES_UPDATE,
+    Perm.SHOP_BASES_BLOCK,
+    # Профиль магазина: название, логотип, адреса, телефоны.
+    # shop_additionals:read закрывает только выдачу по id — список и
+    # выдача по магазину публичны. Оставлено ради совместимости с уже
+    # работающими клиентами, защитой считать его нельзя.
+    Perm.SHOP_ADDITIONALS_READ, Perm.SHOP_ADDITIONALS_CREATE,
+    Perm.SHOP_ADDITIONALS_UPDATE,
+    # Свои товары: создать, править, снять с продажи и вернуть.
+    Perm.PRODUCTS_READ, Perm.PRODUCTS_CREATE, Perm.PRODUCTS_UPDATE,
+    Perm.PRODUCTS_BLOCK,
+    # Свой профиль пользователя. Правка чужого запрещена в users.py.
+    Perm.USERS_UPDATE,
+    # Покупки: корзина, избранное, оформление, свои заказы.
+    Perm.CART_READ, Perm.CART_MANAGE,
+    Perm.FAVORITES_READ, Perm.FAVORITES_MANAGE,
+    # Свои адреса доставки: раньше адрес набирался заново при каждом
+    # оформлении, сохранить его было нельзя.
+    Perm.ADDRESSES_READ, Perm.ADDRESSES_MANAGE,
+    # Отзыв о купленном товаре. Проверку «куплено и получено» право не
+    # заменяет: она стоит в reviews.py.
+    Perm.REVIEWS_CREATE,
+    # Заявка на возврат купленного. Решение по ней принимает платформа.
+    Perm.RETURNS_CREATE,
+    Perm.ORDERS_CREATE, Perm.ORDERS_READ_OWN,
+    # pickup_points:read — как и shop_additionals:read, закрывает только
+    # выдачу по id при публичном списке.
+    Perm.PICKUP_POINTS_READ,
+    # Заказы своего магазина: список, карточка, статистика и смена
+    # статуса своей части. orders:read даёт общий список, но он
+    # фильтруется по владельцу — сотрудника отличает отдельная проверка.
+    Perm.ORDERS_READ, Perm.ORDERS_UPDATE_SHOP_STATUS,
+    # Склад своего магазина: движения и приходы. Подтверждение прихода
+    # (stock_receipts:confirm) сюда не входит — это работа платформы.
+    Perm.STOCK_OPERATIONS_CREATE, Perm.STOCK_OPERATIONS_READ,
+    Perm.STOCK_RECEIPTS_CREATE, Perm.STOCK_RECEIPTS_READ,
+    # Список складов платформы: без него приход не создать — в нём надо
+    # указать склад. Это адреса складов оператора, а не чужие данные,
+    # и продавцу они нужны, чтобы знать, куда везти товар.
+    Perm.WAREHOUSES_READ,
+    # categories:read из набора убрано: право мёртвое, ни один метод
+    # его не требует, все чтения категорий публичны.
+]
+
+
 @router.post("/login", response_model=TokenResponse)
 async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.username == payload.username))
@@ -161,58 +215,7 @@ async def verify_otp(payload: OTPVerifyRequest, db: AsyncSession = Depends(get_d
         db.add(user)
         await db.flush()
 
-        # Набор прав, который получает каждый зарегистрировавшийся по SMS.
-        # Он широкий не по ошибке: у платформы нет отдельной роли продавца —
-        # любой пользователь может открыть магазин, поэтому права продавца
-        # выдаются сразу. Проверку «своё или чужое» они не заменяют: она
-        # живёт в app/core/ownership.py и стоит на каждом из этих методов.
-        # Ниже расписано, зачем нужно каждое право.
-        new_user_perms = [
-            # Свой магазин: открыть, заполнить, закрыть и открыть обратно.
-            Perm.SHOP_BASES_READ, Perm.SHOP_BASES_CREATE, Perm.SHOP_BASES_UPDATE,
-            Perm.SHOP_BASES_BLOCK,
-            # Профиль магазина: название, логотип, адреса, телефоны.
-            # shop_additionals:read закрывает только выдачу по id — список и
-            # выдача по магазину публичны. Оставлено ради совместимости с уже
-            # работающими клиентами, защитой считать его нельзя.
-            Perm.SHOP_ADDITIONALS_READ, Perm.SHOP_ADDITIONALS_CREATE,
-            Perm.SHOP_ADDITIONALS_UPDATE,
-            # Свои товары: создать, править, снять с продажи и вернуть.
-            Perm.PRODUCTS_READ, Perm.PRODUCTS_CREATE, Perm.PRODUCTS_UPDATE,
-            Perm.PRODUCTS_BLOCK,
-            # Свой профиль пользователя. Правка чужого запрещена в users.py.
-            Perm.USERS_UPDATE,
-            # Покупки: корзина, избранное, оформление, свои заказы.
-            Perm.CART_READ, Perm.CART_MANAGE,
-            Perm.FAVORITES_READ, Perm.FAVORITES_MANAGE,
-            # Свои адреса доставки: раньше адрес набирался заново при каждом
-            # оформлении, сохранить его было нельзя.
-            Perm.ADDRESSES_READ, Perm.ADDRESSES_MANAGE,
-            # Отзыв о купленном товаре. Проверку «куплено и получено» право не
-            # заменяет: она стоит в reviews.py.
-            Perm.REVIEWS_CREATE,
-            # Заявка на возврат купленного. Решение по ней принимает платформа.
-            Perm.RETURNS_CREATE,
-            Perm.ORDERS_CREATE, Perm.ORDERS_READ_OWN,
-            # pickup_points:read — как и shop_additionals:read, закрывает только
-            # выдачу по id при публичном списке.
-            Perm.PICKUP_POINTS_READ,
-            # Заказы своего магазина: список, карточка, статистика и смена
-            # статуса своей части. orders:read даёт общий список, но он
-            # фильтруется по владельцу — сотрудника отличает отдельная проверка.
-            Perm.ORDERS_READ, Perm.ORDERS_UPDATE_SHOP_STATUS,
-            # Склад своего магазина: движения и приходы. Подтверждение прихода
-            # (stock_receipts:confirm) сюда не входит — это работа платформы.
-            Perm.STOCK_OPERATIONS_CREATE, Perm.STOCK_OPERATIONS_READ,
-            Perm.STOCK_RECEIPTS_CREATE, Perm.STOCK_RECEIPTS_READ,
-            # Список складов платформы: без него приход не создать — в нём надо
-            # указать склад. Это адреса складов оператора, а не чужие данные,
-            # и продавцу они нужны, чтобы знать, куда везти товар.
-            Perm.WAREHOUSES_READ,
-            # categories:read из набора убрано: право мёртвое, ни один метод
-            # его не требует, все чтения категорий публичны.
-        ]
-        perm_result = await db.execute(select(Permission).where(Permission.code.in_(new_user_perms)))
+        perm_result = await db.execute(select(Permission).where(Permission.code.in_(NEW_USER_PERMISSIONS)))
         permissions = perm_result.scalars().all()
         for perm in permissions:
             db.add(UserPermission(user_id=user.id, permission_id=perm.id))
