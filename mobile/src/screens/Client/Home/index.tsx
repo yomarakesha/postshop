@@ -8,7 +8,7 @@ import ProductCard from "@/ui/ProductCard";
 import Typography from "@/ui/Typography";
 import { TrueSheet } from "@lodev09/react-native-true-sheet";
 import { useRouter } from "expo-router";
-import React, { useMemo, useRef } from "react";
+import React, { useMemo, useRef, useState } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { StyleSheet } from "react-native-unistyles";
 import BannerCarousel from "./_components/BannerCarousel";
@@ -64,6 +64,7 @@ const HomeScreen = () => {
     only_active: true,
   });
   const citiesQuery = cityApi.useGetAll();
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   const banners = useMemo(() => {
     return bannersQuery.data || [];
@@ -117,11 +118,18 @@ const HomeScreen = () => {
     router.push("/search");
   };
 
-  const handleRefresh = () => {
-    bannersQuery.refetch();
-    collectionsQuery.refetch();
-    citiesQuery.refetch();
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
     api.client.invalidateQueries({ queryKey: ["get-me"] });
+    try {
+      await Promise.all([
+        bannersQuery.refetch(),
+        collectionsQuery.refetch(),
+        citiesQuery.refetch(),
+      ]);
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   const handlePressShop = () => {
@@ -196,11 +204,10 @@ const HomeScreen = () => {
         disableIntervalMomentum
         refreshControl={
           <RefreshControl
-            refreshing={
-              bannersQuery.isFetching ||
-              collectionsQuery.isFetching ||
-              isFetching
-            }
+            // Только жест пользователя, а не любой запрос: фоновое обновление
+            // данных, пока главная скрыта за другой вкладкой, включало и
+            // выключало индикатор за кадром, и на iOS он оставался висеть.
+            refreshing={isRefreshing}
             onRefresh={handleRefresh}
           />
         }
