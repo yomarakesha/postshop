@@ -1,4 +1,4 @@
-import { useBottomTabBarHeight as useRNBottomTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useBottomTabBarHeight as useRNBottomTabBarHeight } from "expo-router/js-tabs";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const useBottomTabBarHeight = () => {

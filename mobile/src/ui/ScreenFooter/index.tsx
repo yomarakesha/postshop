@@ -4,7 +4,7 @@ import { KeyboardStickyView } from "react-native-keyboard-controller";
 import useBottomTabBarHeight from "@/hooks/useBottomTabBarHeight";
 import { LayoutChangeEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useBottomTabBarHeight as useNavigationTabBarHeight } from "@react-navigation/bottom-tabs";
+import { useBottomTabBarHeight as useNavigationTabBarHeight } from "expo-router/js-tabs";
 
 interface ScreenFooterProps {
   children: ReactNode;
