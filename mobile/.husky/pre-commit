@@ -1,0 +1,7 @@
+# Репозиторий общий для backend, admin, client и mobile, а проверки — только
+# для mobile: без мобильных файлов в коммите хук ничего не делает.
+if git diff --cached --quiet -- mobile; then
+  exit 0
+fi
+
+cd mobile && npx lint-staged
