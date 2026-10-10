@@ -11,6 +11,7 @@
       "icon": "./assets/images/ios-icon.png",
       "bundleIdentifier": "com.askeladd04.postshop",
       "infoPlist": {
+        "UIDesignRequiresCompatibility": true,
         "NSAppTransportSecurity": {
           "NSAllowsArbitraryLoads": true
         }
