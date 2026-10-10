@@ -4,6 +4,7 @@ import SelectCityScreen from "@/screens/SelectCity";
 import SelectLanguageScreen from "@/screens/SelectLanguage";
 import useAppStore from "@/store/useAppStore";
 import { useUserStore } from "@/store/useUserStore";
+import TabBarButton from "@/utils/TabBarButton";
 import TabBarIcon from "@/utils/TabBarIcon";
 import BasketIcon from "@assets/icons/basket.svg";
 import CategoryIcon from "@assets/icons/category.svg";
@@ -48,6 +49,7 @@ const TabsLayout = () => {
       initialRouteName="(home)"
       screenOptions={{
         headerShown: false,
+        tabBarButton: TabBarButton,
         tabBarStyle: {
           backgroundColor: theme.colors.white,
           elevation: 0,

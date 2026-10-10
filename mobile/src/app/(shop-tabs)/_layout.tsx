@@ -2,6 +2,7 @@ import { shopAdditionalApi } from "@/api/shopAdditionalApi";
 import CreateShopAdditionalScreen from "@/screens/Shop/CreateShopAdditional";
 import useAppStore from "@/store/useAppStore";
 import useShopStore from "@/store/useShopStore";
+import TabBarButton from "@/utils/TabBarButton";
 import TabBarIcon from "@/utils/TabBarIcon";
 import { Redirect, Tabs } from "expo-router";
 import { orderApi } from "@/api/orderApi";
@@ -103,6 +104,7 @@ const ShopTabs = () => {
         initialRouteName="(home)"
         screenOptions={{
           headerShown: false,
+          tabBarButton: TabBarButton,
           tabBarStyle: {
             backgroundColor: theme.colors.white,
             elevation: 0,
