@@ -1,20 +1,20 @@
-import React, { useCallback, useState } from "react";
-import { FlatList, ListRenderItem, Pressable } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import { useRouter } from "expo-router";
-import { useTranslation } from "react-i18next";
-import Header from "@/components/Header";
-import ActivityIndicator from "@/ui/ActivityIndicator";
-import EmptyState from "@/ui/EmptyState";
-import RefreshControl from "@/ui/RefreshControl";
-import Typography from "@/ui/Typography";
-import useAppStore from "@/store/useAppStore";
-import { notificationApi } from "@/api/notificationApi";
-import { notificationTarget } from "@/utils/notificationTarget";
-import NotificationRow from "./_components/NotificationRow";
+import React, { useCallback, useState } from 'react'
+import { FlatList, ListRenderItem, Pressable } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import { useRouter } from 'expo-router'
+import { useTranslation } from 'react-i18next'
+import Header from '@/components/Header'
+import ActivityIndicator from '@/ui/ActivityIndicator'
+import EmptyState from '@/ui/EmptyState'
+import RefreshControl from '@/ui/RefreshControl'
+import Typography from '@/ui/Typography'
+import useAppStore from '@/store/useAppStore'
+import { notificationApi } from '@/api/notificationApi'
+import { notificationTarget } from '@/utils/notificationTarget'
+import NotificationRow from './_components/NotificationRow'
 
 /** По столько добавляется за одно нажатие «Показать ещё». */
-const PAGE_SIZE = 20;
+const PAGE_SIZE = 20
 
 /**
  * Список уведомлений.
@@ -26,34 +26,34 @@ const PAGE_SIZE = 20;
  * пронумерованные страницы теряли бы уже просмотренное место.
  */
 const NotificationsScreen = () => {
-  const router = useRouter();
-  const { t } = useTranslation();
-  const language = useAppStore((s) => s.lang) ?? "ru";
+  const router = useRouter()
+  const { t } = useTranslation()
+  const language = useAppStore((s) => s.lang) ?? 'ru'
 
-  const [limit, setLimit] = useState(PAGE_SIZE);
+  const [limit, setLimit] = useState(PAGE_SIZE)
 
   const { data, isPending, isFetching, refetch } = notificationApi.useGetAll({
     skip: 0,
     limit,
-  });
-  const markRead = notificationApi.useMarkRead();
-  const markAllRead = notificationApi.useMarkAllRead();
-  const remove = notificationApi.useDelete();
+  })
+  const markRead = notificationApi.useMarkRead()
+  const markAllRead = notificationApi.useMarkAllRead()
+  const remove = notificationApi.useDelete()
 
-  const items = data ?? [];
+  const items = data ?? []
   // Пришло ровно столько, сколько просили, — значит, скорее всего, есть ещё.
   // Общее число приходит заголовком, но клиент читает только тело ответа.
-  const mayHaveMore = items.length >= limit;
-  const hasUnread = items.some((item) => !item.is_read);
+  const mayHaveMore = items.length >= limit
+  const hasUnread = items.some((item) => !item.is_read)
 
   const onPress = useCallback(
     (item: Notification.Item) => {
-      if (!item.is_read) markRead.mutate(item.id);
-      const target = notificationTarget(item.kind, item.entity_id);
-      if (target) router.push(target);
+      if (!item.is_read) markRead.mutate(item.id)
+      const target = notificationTarget(item.kind, item.entity_id)
+      if (target) router.push(target)
     },
     [markRead, router],
-  );
+  )
 
   const renderItem: ListRenderItem<Notification.Item> = useCallback(
     ({ item }) => (
@@ -67,18 +67,15 @@ const NotificationsScreen = () => {
       />
     ),
     [onPress, remove, language, t],
-  );
+  )
 
-  const keyExtractor = useCallback(
-    (item: Notification.Item) => String(item.id),
-    [],
-  );
+  const keyExtractor = useCallback((item: Notification.Item) => String(item.id), [])
 
   return (
     <>
       <Header
         withGoBack
-        title={t("notifications.title")}
+        title={t('notifications.title')}
         headerRight={
           hasUnread ? (
             <Pressable
@@ -87,7 +84,7 @@ const NotificationsScreen = () => {
               hitSlop={10}
             >
               <Typography variant="t1" weight="semiBold" color="main">
-                {t("notifications.markAll")}
+                {t('notifications.markAll')}
               </Typography>
             </Pressable>
           ) : undefined
@@ -101,17 +98,14 @@ const NotificationsScreen = () => {
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
         refreshControl={
-          <RefreshControl
-            refreshing={isFetching && !isPending}
-            onRefresh={refetch}
-          />
+          <RefreshControl refreshing={isFetching && !isPending} onRefresh={refetch} />
         }
         ListEmptyComponent={
           // Пустой список и список, который ещё не пришёл, — разные вещи.
           isPending ? (
             <ActivityIndicator isFullScreen />
           ) : (
-            <EmptyState title={t("notifications.empty")} />
+            <EmptyState title={t('notifications.empty')} />
           )
         }
         ListFooterComponent={
@@ -121,17 +115,17 @@ const NotificationsScreen = () => {
               onPress={() => setLimit((value) => value + PAGE_SIZE)}
             >
               <Typography variant="t1" weight="semiBold" color="main">
-                {t("notifications.loadMore")}
+                {t('notifications.loadMore')}
               </Typography>
             </Pressable>
           ) : null
         }
       />
     </>
-  );
-};
+  )
+}
 
-export default NotificationsScreen;
+export default NotificationsScreen
 
 const styles = StyleSheet.create((theme) => ({
   list: {
@@ -140,7 +134,7 @@ const styles = StyleSheet.create((theme) => ({
     flexGrow: 1,
   },
   loadMore: {
-    alignSelf: "center",
+    alignSelf: 'center',
     paddingVertical: theme.spacing(4),
   },
-}));
+}))

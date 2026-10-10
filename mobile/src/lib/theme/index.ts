@@ -1,9 +1,9 @@
-import storage from "@/store/storage";
-import appStore from "@/store/useAppStore";
-import { Appearance } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import { darkThemeColors } from "./dark";
-import { lightThemeColors } from "./light";
+import storage from '@/store/storage'
+import appStore from '@/store/useAppStore'
+import { Appearance } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import { darkThemeColors } from './dark'
+import { lightThemeColors } from './light'
 
 /**
  * Скругления. На витрине это одна переменная --radius-base: 12px, и приложение
@@ -18,7 +18,7 @@ const RADIUS = {
   small: 8,
   /** Круглые кнопки и аватары. */
   full: 999,
-} as const;
+} as const
 
 const shadows = {
   soft: {
@@ -33,7 +33,7 @@ const shadows = {
     shadowRadius: 4,
     elevation: 10,
   },
-};
+}
 
 const lightTheme = {
   colors: lightThemeColors,
@@ -49,7 +49,7 @@ const lightTheme = {
   },
   spacing: (v: number) => v * 4,
   radius: RADIUS,
-};
+}
 
 const darkTheme = {
   colors: darkThemeColors,
@@ -66,21 +66,21 @@ const darkTheme = {
   },
   spacing: (v: number) => v * 4,
   radius: RADIUS,
-};
+}
 
 const appThemes = {
   light: lightTheme,
   dark: darkTheme,
-};
+}
 
 const breakpoints = {
   xs: 0,
-};
+}
 
-type AppBreakpoints = typeof breakpoints;
-type AppThemes = typeof appThemes;
+type AppBreakpoints = typeof breakpoints
+type AppThemes = typeof appThemes
 
-declare module "react-native-unistyles" {
+declare module 'react-native-unistyles' {
   export interface UnistylesThemes extends AppThemes {}
   export interface UnistylesBreakpoints extends AppBreakpoints {}
 }
@@ -88,29 +88,27 @@ declare module "react-native-unistyles" {
 StyleSheet.configure({
   settings: {
     initialTheme: () => {
-      const store = storage.mmkv.getString("app-store");
-      const theme: AppTheme | null = store
-        ? JSON.parse(store).state.theme
-        : null;
-      const colorScheme = Appearance.getColorScheme() || "light";
+      const store = storage.mmkv.getString('app-store')
+      const theme: AppTheme | null = store ? JSON.parse(store).state.theme : null
+      const colorScheme = Appearance.getColorScheme() || 'light'
 
-      if (theme === "system") {
-        if (colorScheme === "unspecified") {
-          appStore.setState({ theme: "light" });
-          return "light";
+      if (theme === 'system') {
+        if (colorScheme === 'unspecified') {
+          appStore.setState({ theme: 'light' })
+          return 'light'
         }
-        appStore.setState({ theme: colorScheme as AppTheme });
-        return colorScheme;
+        appStore.setState({ theme: colorScheme as AppTheme })
+        return colorScheme
       }
 
       if (!theme) {
-        appStore.setState({ theme: "light" });
-        return "light";
+        appStore.setState({ theme: 'light' })
+        return 'light'
       }
 
-      return theme;
+      return theme
     },
   },
   breakpoints,
   themes: appThemes,
-});
+})

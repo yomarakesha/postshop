@@ -1,73 +1,73 @@
-import { useRouter } from "expo-router";
-import React, { useState } from "react";
-import { Pressable, View } from "react-native";
-import MaskInput from "react-native-mask-input";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { Controller, SubmitHandler, useForm } from "react-hook-form";
-import ArrowLeft from "@assets/icons/arrow-left.svg";
-import ActivityIndicator from "@/ui/ActivityIndicator";
-import Button from "@/ui/Button";
-import ScreenFooter from "@/ui/ScreenFooter";
-import Typography from "@/ui/Typography";
-import { authApi } from "@/api/authApi";
-import ErrorAlert from "@/utils/errorAlert";
-import { useTranslation } from "react-i18next";
-import useLayoutHeight from "@/hooks/useLayoutHeight";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import { useRouter } from 'expo-router'
+import React, { useState } from 'react'
+import { Pressable, View } from 'react-native'
+import MaskInput from 'react-native-mask-input'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { StyleSheet, useUnistyles } from 'react-native-unistyles'
+import { Controller, SubmitHandler, useForm } from 'react-hook-form'
+import ArrowLeft from '@assets/icons/arrow-left.svg'
+import ActivityIndicator from '@/ui/ActivityIndicator'
+import Button from '@/ui/Button'
+import ScreenFooter from '@/ui/ScreenFooter'
+import Typography from '@/ui/Typography'
+import { authApi } from '@/api/authApi'
+import ErrorAlert from '@/utils/errorAlert'
+import { useTranslation } from 'react-i18next'
+import useLayoutHeight from '@/hooks/useLayoutHeight'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 
 type FormValues = {
-  phoneNumber: string;
-};
+  phoneNumber: string
+}
 
 const AuthScreen = () => {
-  const router = useRouter();
-  const insets = useSafeAreaInsets();
-  const { theme } = useUnistyles();
-  const [tooManyRequestsError, setTooManyRequestsError] = useState(false);
-  const authMutation = authApi.useLogin();
-  const { height: footerHeight, onLayout: onFooterLayout } = useLayoutHeight();
-  const { t } = useTranslation();
+  const router = useRouter()
+  const insets = useSafeAreaInsets()
+  const { theme } = useUnistyles()
+  const [tooManyRequestsError, setTooManyRequestsError] = useState(false)
+  const authMutation = authApi.useLogin()
+  const { height: footerHeight, onLayout: onFooterLayout } = useLayoutHeight()
+  const { t } = useTranslation()
 
   const {
     control,
     formState: { isValid },
     handleSubmit,
   } = useForm<FormValues>({
-    mode: "all",
+    mode: 'all',
     defaultValues: {
-      phoneNumber: "",
+      phoneNumber: '',
     },
-  });
+  })
 
   const onSubmit: SubmitHandler<FormValues> = async (data) => {
-    const phoneNumber = `+993${data.phoneNumber}`;
+    const phoneNumber = `+993${data.phoneNumber}`
     try {
       await authMutation.mutateAsync({
         phone_number: phoneNumber,
-      });
+      })
       router.push({
-        pathname: "/(auth)/verify",
+        pathname: '/(auth)/verify',
         params: {
           phoneNumber,
         },
-      });
+      })
     } catch (e: any) {
       if (!!e.response && e.response.status == 429) {
-        setTooManyRequestsError(true);
+        setTooManyRequestsError(true)
       } else {
-        ErrorAlert(t, e);
+        ErrorAlert(t, e)
       }
     }
-  };
+  }
 
   const onGoBack = () => {
     if (router.canGoBack()) {
-      router.back();
+      router.back()
     } else {
-      router.replace("/");
+      router.replace('/')
     }
-  };
+  }
 
   return (
     <>
@@ -81,7 +81,7 @@ const AuthScreen = () => {
       >
         <View style={styles.content}>
           <Typography variant="p2" weight="bold" color="secondary" isCentered>
-            {t("auth.login.headline")}
+            {t('auth.login.headline')}
           </Typography>
 
           <View style={styles.inputWrapper}>
@@ -102,23 +102,11 @@ const AuthScreen = () => {
                 }}
                 render={({ field: { onChange, value } }) => (
                   <MaskInput
-                    mask={[
-                      /\d/,
-                      /\d/,
-                      " ",
-                      /\d/,
-                      /\d/,
-                      " ",
-                      /\d/,
-                      /\d/,
-                      " ",
-                      /\d/,
-                      /\d/,
-                    ]}
+                    mask={[/\d/, /\d/, ' ', /\d/, /\d/, ' ', /\d/, /\d/, ' ', /\d/, /\d/]}
                     value={value}
                     onChangeText={(_, unmasked) => {
-                      setTooManyRequestsError(false);
-                      onChange(unmasked);
+                      setTooManyRequestsError(false)
+                      onChange(unmasked)
                     }}
                     style={styles.input}
                     keyboardType="number-pad"
@@ -134,7 +122,7 @@ const AuthScreen = () => {
             </View>
             {tooManyRequestsError ? (
               <Typography variant="p3" color="error" weight="bold" isCentered>
-                {t("auth.login.tryAgain")}
+                {t('auth.login.tryAgain')}
               </Typography>
             ) : null}
           </View>
@@ -146,14 +134,14 @@ const AuthScreen = () => {
                 style={styles.goBackButton}
                 onPress={onGoBack}
                 accessibilityRole="button"
-                accessibilityLabel={t("common.back")}
+                accessibilityLabel={t('common.back')}
               >
                 <ArrowLeft style={styles.arrowLeft} />
               </Pressable>
               <Button
                 variant="primary"
                 disabled={!isValid || authMutation.isPending}
-                title={t("common.next")}
+                title={t('common.next')}
                 onPress={handleSubmit(onSubmit)}
               >
                 {authMutation.isPending ? (
@@ -161,40 +149,35 @@ const AuthScreen = () => {
                 ) : undefined}
               </Button>
             </View>
-            <Typography
-              variant="t1"
-              color="tertiary"
-              weight="medium"
-              isCentered
-            >
-              {t("common.authAgreement.prefix")}
+            <Typography variant="t1" color="tertiary" weight="medium" isCentered>
+              {t('common.authAgreement.prefix')}
               <Typography
                 variant="t1"
                 color="main"
                 weight="medium"
-                onPress={() => router.push("/(legal)/terms-of-use")}
+                onPress={() => router.push('/(legal)/terms-of-use')}
               >
-                {t("common.authAgreement.terms")}
+                {t('common.authAgreement.terms')}
               </Typography>
-              {t("common.authAgreement.and")}
+              {t('common.authAgreement.and')}
               <Typography
                 variant="t1"
                 color="main"
                 weight="medium"
-                onPress={() => router.push("/(legal)/privacy-policy")}
+                onPress={() => router.push('/(legal)/privacy-policy')}
               >
-                {t("common.authAgreement.privacy")}
+                {t('common.authAgreement.privacy')}
               </Typography>
-              {t("common.authAgreement.suffix")}
+              {t('common.authAgreement.suffix')}
             </Typography>
           </View>
         </ScreenFooter>
       </KeyboardAwareScrollView>
     </>
-  );
-};
+  )
+}
 
-export default AuthScreen;
+export default AuthScreen
 
 const styles = StyleSheet.create((theme) => ({
   container: (hh: number) => ({
@@ -216,7 +199,7 @@ const styles = StyleSheet.create((theme) => ({
   input: {
     flex: 1,
     fontSize: 17,
-    fontFamily: "GoogleSans-Medium",
+    fontFamily: 'GoogleSans-Medium',
     color: theme.colors.text,
     padding: 0,
     includeFontPadding: false,
@@ -225,8 +208,8 @@ const styles = StyleSheet.create((theme) => ({
   // читалось как обычная надпись, и куда нажимать, понять было нельзя.
   // Оформлено как остальные поля приложения: белая подложка, рамка, скругление.
   inputContainer: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: theme.spacing(2),
     backgroundColor: theme.colors.white,
     borderWidth: 1,
@@ -242,18 +225,18 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.blueMain,
   },
   buttonsContainer: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: theme.spacing(4),
   },
   goBackButton: {
     width: 48,
     height: 48,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: theme.spacing(3),
     backgroundColor: theme.colors.blue2,
   },
   footer: {
     gap: theme.spacing(4),
   },
-}));
+}))

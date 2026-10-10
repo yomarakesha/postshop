@@ -1,11 +1,11 @@
-import React, { useCallback } from "react";
-import Typography from "@/ui/Typography";
-import { FlatList, ListRenderItem, Pressable } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import React, { useCallback } from 'react'
+import Typography from '@/ui/Typography'
+import { FlatList, ListRenderItem, Pressable } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 
 type Props = {
-  data: string[];
-};
+  data: string[]
+}
 
 const RecommendationsHorizontalList = ({ data }: Props) => {
   const renderItem: ListRenderItem<string> = ({ item }) => {
@@ -15,12 +15,12 @@ const RecommendationsHorizontalList = ({ data }: Props) => {
           {item}
         </Typography>
       </Pressable>
-    );
-  };
+    )
+  }
 
   const keyExtractor = useCallback((item: string) => {
-    return item;
-  }, []);
+    return item
+  }, [])
 
   return (
     <FlatList
@@ -33,10 +33,10 @@ const RecommendationsHorizontalList = ({ data }: Props) => {
       nestedScrollEnabled
       contentContainerStyle={styles.list}
     />
-  );
-};
+  )
+}
 
-export default RecommendationsHorizontalList;
+export default RecommendationsHorizontalList
 
 const styles = StyleSheet.create((theme) => ({
   button: {
@@ -44,13 +44,13 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing(4),
     borderRadius: theme.spacing(3),
     backgroundColor: theme.colors.gray2,
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: theme.spacing(2),
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
   },
   list: {
     gap: theme.spacing(2),
     paddingHorizontal: theme.spacing(3),
   },
-}));
+}))

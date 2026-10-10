@@ -1,16 +1,16 @@
-import { create } from "zustand";
+import { create } from 'zustand'
 
 export type ProductFilterType = {
-  shops: { name: string; id: number }[] | null;
-  brands: { name: string; id: number }[] | null;
-  priceFrom: number | null;
-  priceTo: number | null;
-};
+  shops: { name: string; id: number }[] | null
+  brands: { name: string; id: number }[] | null
+  priceFrom: number | null
+  priceTo: number | null
+}
 type ProductListState = {
-  filter: ProductFilterType;
-  sort: Product.Sort | null;
-  reset: () => void;
-};
+  filter: ProductFilterType
+  sort: Product.Sort | null
+  reset: () => void
+}
 
 export const useProductListStore = create<ProductListState>((set) => ({
   filter: {
@@ -30,4 +30,4 @@ export const useProductListStore = create<ProductListState>((set) => ({
       },
       sort: null,
     }),
-}));
+}))

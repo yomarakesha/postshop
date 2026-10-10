@@ -1,5 +1,5 @@
-import type { BottomTabBarButtonProps } from "expo-router/js-tabs";
-import { Pressable } from "react-native";
+import type { BottomTabBarButtonProps } from 'expo-router/js-tabs'
+import { Pressable } from 'react-native'
 
 /**
  * Кнопка вкладки без эффекта нажатия.
@@ -9,7 +9,7 @@ import { Pressable } from "react-native";
  * рисует; всё остальное (нажатие, подписи для чтецов) приходит в props.
  */
 const TabBarButton = ({ href, ref, ...props }: BottomTabBarButtonProps) => {
-  return <Pressable {...props} android_ripple={null} />;
-};
+  return <Pressable {...props} android_ripple={null} />
+}
 
-export default TabBarButton;
+export default TabBarButton

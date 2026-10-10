@@ -1,9 +1,9 @@
-import OrdersScreen from "@/screens/Client/Orders";
-import React from "react";
-import { View } from "react-native";
+import OrdersScreen from '@/screens/Client/Orders'
+import React from 'react'
+import { View } from 'react-native'
 
 const OrdersRoute = () => {
-  return <OrdersScreen />;
-};
+  return <OrdersScreen />
+}
 
-export default OrdersRoute;
+export default OrdersRoute

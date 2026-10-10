@@ -1,41 +1,41 @@
-import React from "react";
-import { Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import Typography from "@/ui/Typography";
-import { TFunction } from "i18next";
-import { orderStatus } from "@/utils/orderStatus";
-import { CurrencySource, formatMoney } from "@/utils/formatMoney";
+import React from 'react'
+import { Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import Typography from '@/ui/Typography'
+import { TFunction } from 'i18next'
+import { orderStatus } from '@/utils/orderStatus'
+import { CurrencySource, formatMoney } from '@/utils/formatMoney'
 
-type TypographyColor = React.ComponentProps<typeof Typography>["color"];
+type TypographyColor = React.ComponentProps<typeof Typography>['color']
 
 type Props = {
   /** Укрупнённый статус — от него только цвет рамки и иконка. */
-  status: Order.UIStatus;
+  status: Order.UIStatus
   /**
    * Ключ подписи статуса. Подпись точнее цвета: «Ждёт в пункте выдачи» и
    * «Передан в доставку» — оба «в работе», но покупателю нужно разное.
    */
-  labelKey: string;
-  id: number;
-  date: string;
-  price: number;
-  onPress: (id: number) => void;
-  t: TFunction;
-  partiallyRejected?: boolean;
+  labelKey: string
+  id: number
+  date: string
+  price: number
+  onPress: (id: number) => void
+  t: TFunction
+  partiallyRejected?: boolean
   /** Валюта из товаров заказа; при отсутствии formatMoney подставит TMT. */
-  currency?: CurrencySource;
-};
+  currency?: CurrencySource
+}
 
 // Цвет подписи статуса — статическая карта на варианты Typography.
 // Раньше здесь лежал useMemo с зависимостью [status], который читал палитру
 // через UnistylesRuntime.getTheme(): при переключении темы значения не
 // пересчитывались, и карточка оставалась в цветах светлой палитры.
 const statusTextColor: Record<Order.UIStatus, TypographyColor> = {
-  pending: "warning",
-  in_progress: "main",
-  cancelled: "error",
-  done: "success",
-};
+  pending: 'warning',
+  in_progress: 'main',
+  cancelled: 'error',
+  done: 'success',
+}
 
 const Card = ({
   status,
@@ -48,19 +48,16 @@ const Card = ({
   partiallyRejected,
   currency,
 }: Props) => {
-  const StatusIcon = orderStatus.client.getIcon(status);
+  const StatusIcon = orderStatus.client.getIcon(status)
 
   return (
     <Pressable
-      style={({ pressed }) => [
-        styles.container(status),
-        pressed && styles.containerPressed,
-      ]}
+      style={({ pressed }) => [styles.container(status), pressed && styles.containerPressed]}
       onPress={() => onPress(id)}
     >
       <View style={styles.row}>
         <Typography weight="medium" numberOfLines={1} style={styles.flexible}>
-          {t("order")} #{id}
+          {t('order')} #{id}
         </Typography>
         <Typography weight="semiBold" numberOfLines={1} style={styles.fixed}>
           {formatMoney(price, currency)}
@@ -94,21 +91,16 @@ const Card = ({
       {partiallyRejected ? (
         <View style={styles.noticeRow}>
           <View style={styles.noticeMarker} />
-          <Typography
-            variant="t1"
-            color="error"
-            weight="medium"
-            style={styles.flexible}
-          >
-            {t("client.orders.partiallyRejected")}
+          <Typography variant="t1" color="error" weight="medium" style={styles.flexible}>
+            {t('client.orders.partiallyRejected')}
           </Typography>
         </View>
       ) : null}
     </Pressable>
-  );
-};
+  )
+}
 
-export default Card;
+export default Card
 
 const styles = StyleSheet.create((theme) => {
   const statusBorderColor: Record<Order.UIStatus, string> = {
@@ -116,7 +108,7 @@ const styles = StyleSheet.create((theme) => {
     in_progress: theme.colors.blueMain,
     cancelled: theme.colors.failure,
     done: theme.colors.success,
-  };
+  }
 
   return {
     container: (status: Order.UIStatus) => ({
@@ -131,14 +123,14 @@ const styles = StyleSheet.create((theme) => {
       backgroundColor: theme.colors.gray2,
     },
     row: {
-      justifyContent: "space-between",
-      flexDirection: "row",
-      alignItems: "center",
+      justifyContent: 'space-between',
+      flexDirection: 'row',
+      alignItems: 'center',
       gap: theme.spacing(3),
     },
     statusGroup: {
-      flexDirection: "row",
-      alignItems: "center",
+      flexDirection: 'row',
+      alignItems: 'center',
       gap: theme.spacing(1),
       flexShrink: 1,
     },
@@ -151,16 +143,16 @@ const styles = StyleSheet.create((theme) => {
       flexShrink: 0,
     },
     noticeRow: {
-      flexDirection: "row",
-      alignItems: "flex-start",
+      flexDirection: 'row',
+      alignItems: 'flex-start',
       gap: theme.spacing(2),
       marginTop: theme.spacing(1),
     },
     noticeMarker: {
       width: theme.spacing(1),
-      alignSelf: "stretch",
+      alignSelf: 'stretch',
       borderRadius: theme.spacing(1),
       backgroundColor: theme.colors.failure,
     },
-  };
-});
+  }
+})

@@ -1,26 +1,26 @@
-import SelectableSheet from "@/components/BottomSheet/SelectableSheet";
-import Header from "@/components/Header";
-import { langs } from "@/constants/langs";
-import i18n from "@/localization";
-import useAppStore from "@/store/useAppStore";
-import Typography from "@/ui/Typography";
-import React from "react";
-import { useTranslation } from "react-i18next";
-import { ScrollView, TouchableOpacity, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import RightChevronIcon from "@assets/icons/right-chevron.svg";
-import HeaderBottom from "./_components/HeaderBottom";
-import useProfileLinks from "./_hooks/useProfileLinks";
+import SelectableSheet from '@/components/BottomSheet/SelectableSheet'
+import Header from '@/components/Header'
+import { langs } from '@/constants/langs'
+import i18n from '@/localization'
+import useAppStore from '@/store/useAppStore'
+import Typography from '@/ui/Typography'
+import React from 'react'
+import { useTranslation } from 'react-i18next'
+import { ScrollView, TouchableOpacity, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import RightChevronIcon from '@assets/icons/right-chevron.svg'
+import HeaderBottom from './_components/HeaderBottom'
+import useProfileLinks from './_hooks/useProfileLinks'
 
 const ProfileScreen = () => {
-  const { t } = useTranslation();
-  const currentLanguage = useAppStore((s) => s.lang);
-  const { links, langSheetRef } = useProfileLinks(t, currentLanguage!);
+  const { t } = useTranslation()
+  const currentLanguage = useAppStore((s) => s.lang)
+  const { links, langSheetRef } = useProfileLinks(t, currentLanguage!)
 
   const handleSelectLanguage = (lang: AppLang) => {
-    useAppStore.setState({ lang });
-    i18n.changeLanguage(lang);
-  };
+    useAppStore.setState({ lang })
+    i18n.changeLanguage(lang)
+  }
 
   return (
     <>
@@ -28,10 +28,7 @@ const ProfileScreen = () => {
           плюс зазор под ней добавляли шапке высоты вдвое больше, чем сам
           блок с именем. Он переехал в ту же строку. */}
       <Header headerBottom={<HeaderBottom t={t} />} />
-      <ScrollView
-        style={styles.flex1}
-        contentContainerStyle={styles.contentContainer}
-      >
+      <ScrollView style={styles.flex1} contentContainerStyle={styles.contentContainer}>
         {links.map(
           (section, i) =>
             section.isVisible && (
@@ -50,20 +47,14 @@ const ProfileScreen = () => {
                       accessibilityState={{ disabled: !!link.isComingSoon }}
                     >
                       <View style={styles.linkContent}>
-                        <link.icon
-                          style={styles.icon(link.isDanger, link.isComingSoon)}
-                        />
+                        <link.icon style={styles.icon(link.isDanger, link.isComingSoon)} />
                         <Typography
                           variant="p3"
                           weight="medium"
                           numberOfLines={1}
                           style={styles.linkTitle}
                           color={
-                            link.isDanger
-                              ? "error"
-                              : link.isComingSoon
-                                ? "tertiary"
-                                : undefined
+                            link.isDanger ? 'error' : link.isComingSoon ? 'tertiary' : undefined
                           }
                         >
                           {link.title}
@@ -83,21 +74,13 @@ const ProfileScreen = () => {
                         )}
                         {link.isComingSoon && (
                           <View style={styles.soonBadge}>
-                            <Typography
-                              variant="t2"
-                              weight="medium"
-                              color="secondary"
-                            >
-                              {t("common.comingSoon")}
+                            <Typography variant="t2" weight="medium" color="secondary">
+                              {t('common.comingSoon')}
                             </Typography>
                           </View>
                         )}
                         {link.hasChevron && (
-                          <RightChevronIcon
-                            width={20}
-                            height={20}
-                            style={styles.chevron}
-                          />
+                          <RightChevronIcon width={20} height={20} style={styles.chevron} />
                         )}
                       </View>
                     </TouchableOpacity>
@@ -110,16 +93,16 @@ const ProfileScreen = () => {
 
       <SelectableSheet
         ref={langSheetRef}
-        title={t("sheets.chooseLanguage.title")}
+        title={t('sheets.chooseLanguage.title')}
         data={langs}
         selectedKey={currentLanguage}
         onSelect={handleSelectLanguage}
       />
     </>
-  );
-};
+  )
+}
 
-export default ProfileScreen;
+export default ProfileScreen
 
 const styles = StyleSheet.create((theme) => ({
   flex1: {
@@ -141,11 +124,11 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing(3),
     paddingVertical: theme.spacing(4),
     borderRadius: theme.spacing(3),
-    flexDirection: "row",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     // Без этого правая часть строки растягивалась по высоте и текст значения
     // («Русский») вставал не по центру относительно иконки слева.
-    alignItems: "center",
+    alignItems: 'center',
     gap: theme.spacing(3),
     ...theme.shadows.soft,
   },
@@ -153,17 +136,17 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1),
   },
   linkContent: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: theme.spacing(2),
-    alignItems: "center",
+    alignItems: 'center',
     flexShrink: 1,
   },
   linkTitle: {
     flexShrink: 1,
   },
   linkTrailing: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: theme.spacing(2),
     flexShrink: 0,
   },
@@ -183,4 +166,4 @@ const styles = StyleSheet.create((theme) => ({
         ? theme.colors.passive1
         : theme.colors.passive2,
   }),
-}));
+}))

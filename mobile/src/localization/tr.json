@@ -604,10 +604,7 @@
           },
           "fbo": {
             "title": "Ürünler Postshop deposunda saklanır",
-            "steps": [
-              "Ürün gönderimi — «Depo»",
-              "Siparişleri ve iadeleri Postshop deposu yürütür"
-            ]
+            "steps": ["Ürün gönderimi — «Depo»", "Siparişleri ve iadeleri Postshop deposu yürütür"]
           }
         }
       }

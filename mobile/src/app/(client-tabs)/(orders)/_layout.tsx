@@ -1,9 +1,9 @@
-import React from "react";
-import { Stack } from "expo-router";
-import useScreenOptions from "@/hooks/useScreenOptions";
+import React from 'react'
+import { Stack } from 'expo-router'
+import useScreenOptions from '@/hooks/useScreenOptions'
 
 const OrdersStack = () => {
-  const screenOption = useScreenOptions();
+  const screenOption = useScreenOptions()
   return (
     <Stack screenOptions={screenOption}>
       <Stack.Screen name="index" />
@@ -12,7 +12,7 @@ const OrdersStack = () => {
           ничему: такого файла на этом уровне нет. */}
       <Stack.Screen name="order/[id]" />
     </Stack>
-  );
-};
+  )
+}
 
-export default OrdersStack;
+export default OrdersStack

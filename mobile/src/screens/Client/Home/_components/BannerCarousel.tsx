@@ -1,15 +1,15 @@
-import useAppStore from "@/store/useAppStore";
-import { getImageUrl } from "@/utils/getImageUrl";
-import { Image } from "expo-image";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import useAppStore from '@/store/useAppStore'
+import { getImageUrl } from '@/utils/getImageUrl'
+import { Image } from 'expo-image'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   FlatList,
   ListRenderItem,
   NativeScrollEvent,
   NativeSyntheticEvent,
   View,
-} from "react-native";
-import { StyleSheet, UnistylesRuntime } from "react-native-unistyles";
+} from 'react-native'
+import { StyleSheet, UnistylesRuntime } from 'react-native-unistyles'
 
 /**
  * Карусель баннеров главной.
@@ -25,62 +25,56 @@ import { StyleSheet, UnistylesRuntime } from "react-native-unistyles";
  * баннера другой формы, лучше поля по краям, чем срезанный текст на картинке.
  */
 
-const AUTOPLAY_DELAY = 4000;
+const AUTOPLAY_DELAY = 4000
 
 interface Props {
-  data: Banner.Item[];
-  isLoading: boolean;
+  data: Banner.Item[]
+  isLoading: boolean
 }
 
 const BannerCarousel = ({ data, isLoading }: Props) => {
   // Ширина берётся из того же источника, что и стили ниже, иначе после
   // поворота экрана шаг прокрутки разъезжается с шириной страницы.
-  const pageWidth = UnistylesRuntime.screen.width;
-  const currentLanguage = useAppStore((s) => s.lang) || "tk";
-  const listRef = useRef<FlatList<Banner.Item>>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const [activeIndex, setActiveIndex] = useState(0);
+  const pageWidth = UnistylesRuntime.screen.width
+  const currentLanguage = useAppStore((s) => s.lang) || 'tk'
+  const listRef = useRef<FlatList<Banner.Item>>(null)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const [activeIndex, setActiveIndex] = useState(0)
 
-  const banners = useMemo(
-    () => [...data].sort((a, b) => a.priority - b.priority),
-    [data],
-  );
-  const isLooped = banners.length > 1;
+  const banners = useMemo(() => [...data].sort((a, b) => a.priority - b.priority), [data])
+  const isLooped = banners.length > 1
 
   // Клоны по краям дают бесшовный переход с последнего баннера на первый.
   const loopData = useMemo(() => {
-    if (!isLooped) return banners;
-    return [banners[banners.length - 1], ...banners, banners[0]];
-  }, [banners, isLooped]);
+    if (!isLooped) return banners
+    return [banners[banners.length - 1], ...banners, banners[0]]
+  }, [banners, isLooped])
 
-  const pageIndex = useRef(0);
+  const pageIndex = useRef(0)
 
-  const keyExtractor = useCallback(
-    (item: Banner.Item, index: number) => `${item.id}-${index}`,
-    [],
-  );
+  const keyExtractor = useCallback((item: Banner.Item, index: number) => `${item.id}-${index}`, [])
 
   const stopTimer = useCallback(() => {
     if (timerRef.current) {
-      clearInterval(timerRef.current);
-      timerRef.current = null;
+      clearInterval(timerRef.current)
+      timerRef.current = null
     }
-  }, []);
+  }, [])
 
   const startTimer = useCallback(() => {
-    if (!isLooped) return;
+    if (!isLooped) return
 
-    stopTimer();
+    stopTimer()
 
     timerRef.current = setInterval(() => {
-      pageIndex.current += 1;
+      pageIndex.current += 1
 
       listRef.current?.scrollToOffset({
         offset: pageIndex.current * pageWidth,
         animated: true,
-      });
-    }, AUTOPLAY_DELAY);
-  }, [isLooped, pageWidth, stopTimer]);
+      })
+    }, AUTOPLAY_DELAY)
+  }, [isLooped, pageWidth, stopTimer])
 
   // Стартовая позиция ставится эффектом, а не пропом contentOffset: список
   // монтируется ещё пустым, contentOffset применяется один раз при монтаже, и
@@ -88,60 +82,59 @@ const BannerCarousel = ({ data, isLoading }: Props) => {
   // открывалась «с конца».
   useEffect(() => {
     if (!isLooped) {
-      pageIndex.current = 0;
-      setActiveIndex(0);
-      return;
+      pageIndex.current = 0
+      setActiveIndex(0)
+      return
     }
 
-    pageIndex.current = 1;
-    setActiveIndex(0);
-    listRef.current?.scrollToOffset({ offset: pageWidth, animated: false });
-  }, [isLooped, banners.length, pageWidth]);
+    pageIndex.current = 1
+    setActiveIndex(0)
+    listRef.current?.scrollToOffset({ offset: pageWidth, animated: false })
+  }, [isLooped, banners.length, pageWidth])
 
   useEffect(() => {
-    startTimer();
+    startTimer()
 
-    return stopTimer;
-  }, [startTimer, stopTimer]);
+    return stopTimer
+  }, [startTimer, stopTimer])
 
   const onMomentumScrollEnd = useCallback(
     (e: NativeSyntheticEvent<NativeScrollEvent>) => {
-      let index = Math.round(e.nativeEvent.contentOffset.x / pageWidth);
+      let index = Math.round(e.nativeEvent.contentOffset.x / pageWidth)
 
       if (isLooped) {
         if (index === 0) {
-          index = banners.length;
+          index = banners.length
 
           listRef.current?.scrollToOffset({
             offset: index * pageWidth,
             animated: false,
-          });
+          })
         } else if (index === loopData.length - 1) {
-          index = 1;
+          index = 1
 
           listRef.current?.scrollToOffset({
             offset: pageWidth,
             animated: false,
-          });
+          })
         }
       }
 
-      pageIndex.current = index;
-      setActiveIndex(isLooped ? index - 1 : index);
+      pageIndex.current = index
+      setActiveIndex(isLooped ? index - 1 : index)
 
-      startTimer();
+      startTimer()
     },
     [banners.length, isLooped, loopData.length, pageWidth, startTimer],
-  );
+  )
 
   const renderItem: ListRenderItem<Banner.Item> = useCallback(
     ({ item }) => {
       // Если картинки на текущем языке нет, витрина берёт любую доступную —
       // раньше приложение в этом случае показывало пустую серую плашку.
       const image =
-        item.images.find(
-          (i) => i.language === currentLanguage && i.image_path,
-        ) || item.images.find((i) => i.image_path);
+        item.images.find((i) => i.language === currentLanguage && i.image_path) ||
+        item.images.find((i) => i.image_path)
 
       return (
         <View style={styles.page}>
@@ -156,10 +149,10 @@ const BannerCarousel = ({ data, isLoading }: Props) => {
             <View style={[styles.image, styles.placeholder]} />
           )}
         </View>
-      );
+      )
     },
     [currentLanguage],
-  );
+  )
 
   // Пока баннеры грузятся, место под них занимает плашка того же размера —
   // иначе контент под каруселью прыгает вверх.
@@ -168,10 +161,10 @@ const BannerCarousel = ({ data, isLoading }: Props) => {
       <View style={styles.page}>
         <View style={[styles.image, styles.placeholder]} />
       </View>
-    );
+    )
   }
 
-  if (banners.length === 0) return null;
+  if (banners.length === 0) return null
 
   return (
     <View style={styles.container}>
@@ -205,18 +198,15 @@ const BannerCarousel = ({ data, isLoading }: Props) => {
       {isLooped && (
         <View style={styles.dots}>
           {banners.map((banner, index) => (
-            <View
-              key={banner.id}
-              style={[styles.dot, index === activeIndex && styles.dotActive]}
-            />
+            <View key={banner.id} style={[styles.dot, index === activeIndex && styles.dotActive]} />
           ))}
         </View>
       )}
     </View>
-  );
-};
+  )
+}
 
-export default BannerCarousel;
+export default BannerCarousel
 
 const styles = StyleSheet.create((theme, unistyles) => ({
   container: {
@@ -229,7 +219,7 @@ const styles = StyleSheet.create((theme, unistyles) => ({
     paddingHorizontal: theme.spacing(2),
   },
   image: {
-    width: "100%",
+    width: '100%',
     aspectRatio: 2,
     borderRadius: theme.radius.base,
     backgroundColor: theme.colors.gray2,
@@ -238,9 +228,9 @@ const styles = StyleSheet.create((theme, unistyles) => ({
     backgroundColor: theme.colors.gray3,
   },
   dots: {
-    flexDirection: "row",
-    alignSelf: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignSelf: 'center',
+    alignItems: 'center',
     gap: theme.spacing(1),
   },
   dot: {
@@ -253,4 +243,4 @@ const styles = StyleSheet.create((theme, unistyles) => ({
     width: theme.spacing(4),
     backgroundColor: theme.colors.blueMain,
   },
-}));
+}))

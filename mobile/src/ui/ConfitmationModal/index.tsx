@@ -1,17 +1,14 @@
-import React, { useEffect, useState } from "react";
-import CustomTextInput from "@/ui/CustomTextInput";
-import Typography from "@/ui/Typography";
-import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import {
-  ConfirmationModalState,
-  useConfirmationModal,
-} from "@/store/useConfirmationModal";
-import Button, { ButtonVariant } from "@/ui/Button";
-import { UniTrueSheet } from "@/ui/BottomSheet";
-import { TrueSheet } from "@lodev09/react-native-true-sheet";
-import { useTranslation } from "react-i18next";
-import LottieView from "lottie-react-native";
+import React, { useEffect, useState } from 'react'
+import CustomTextInput from '@/ui/CustomTextInput'
+import Typography from '@/ui/Typography'
+import { View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import { ConfirmationModalState, useConfirmationModal } from '@/store/useConfirmationModal'
+import Button, { ButtonVariant } from '@/ui/Button'
+import { UniTrueSheet } from '@/ui/BottomSheet'
+import { TrueSheet } from '@lodev09/react-native-true-sheet'
+import { useTranslation } from 'react-i18next'
+import LottieView from 'lottie-react-native'
 
 const ConfirmationModal = () => {
   const {
@@ -26,80 +23,75 @@ const ConfirmationModal = () => {
     okTitle,
     animation,
     inputPlaceholder,
-  } = useConfirmationModal();
-  const [inputText, setInputText] = useState("");
-  const trueSheetRef = React.useRef<TrueSheet | null>(null);
-  const isPresentedRef = React.useRef(false);
-  const { t } = useTranslation();
+  } = useConfirmationModal()
+  const [inputText, setInputText] = useState('')
+  const trueSheetRef = React.useRef<TrueSheet | null>(null)
+  const isPresentedRef = React.useRef(false)
+  const { t } = useTranslation()
 
   const clearData = () => {
     useConfirmationModal.setState({
       isOpen: false,
-      title: "",
-      description: "",
-      onConfirm: () => { },
-      type: "danger",
+      title: '',
+      description: '',
+      onConfirm: () => {},
+      type: 'danger',
       Icon: null,
       animation: false,
-      confirmTitle: "",
-      cancelTitle: "",
-      okTitle: "",
+      confirmTitle: '',
+      cancelTitle: '',
+      okTitle: '',
       inputPlaceholder: undefined,
-    });
-    setInputText("");
-  };
+    })
+    setInputText('')
+  }
 
   // любое действие просто закрывает лист
   const handleConfirm = () => {
-    onConfirm?.(inputText.trim() || undefined);
-    trueSheetRef.current?.dismiss();
+    onConfirm?.(inputText.trim() || undefined)
+    trueSheetRef.current?.dismiss()
     clearData()
-  };
+  }
 
   const handleCancel = () => {
-    trueSheetRef.current?.dismiss();
+    trueSheetRef.current?.dismiss()
     clearData()
-  };
+  }
 
   const handleOk = () => {
-    trueSheetRef.current?.dismiss();
+    trueSheetRef.current?.dismiss()
     clearData()
-  };
+  }
 
   // единственная точка очистки — после реального закрытия
   const handleDidDismiss = () => {
-    clearData();
-  };
+    clearData()
+  }
 
-  const buttonVariants: Record<ConfirmationModalState["type"], ButtonVariant> =
-  {
-    danger: "error",
-    warning: "warning",
-    success: "success",
-    info: "primary",
-  };
+  const buttonVariants: Record<ConfirmationModalState['type'], ButtonVariant> = {
+    danger: 'error',
+    warning: 'warning',
+    success: 'success',
+    info: 'primary',
+  }
 
   useEffect(() => {
     if (isOpen) {
-      isPresentedRef.current = true;
-      trueSheetRef.current?.present();
+      isPresentedRef.current = true
+      trueSheetRef.current?.present()
     } else if (isPresentedRef.current) {
-      isPresentedRef.current = false;
-      trueSheetRef.current?.dismiss();
+      isPresentedRef.current = false
+      trueSheetRef.current?.dismiss()
     }
-  }, [isOpen]);
+  }, [isOpen])
 
   return (
-    <UniTrueSheet
-      ref={trueSheetRef}
-      onDidDismiss={handleDidDismiss}
-      detents={["auto"]}
-    >
+    <UniTrueSheet ref={trueSheetRef} onDidDismiss={handleDidDismiss} detents={['auto']}>
       <View style={styles.container}>
         <View style={styles.iconContainer(type, animation)}>
           {animation ? (
             <LottieView
-              source={require("@assets/animations/success.json")}
+              source={require('@assets/animations/success.json')}
               autoPlay
               loop={false}
               style={{
@@ -132,64 +124,57 @@ const ConfirmationModal = () => {
             <>
               <Button
                 onPress={handleCancel}
-                title={cancelTitle ?? t("common.no")}
+                title={cancelTitle ?? t('common.no')}
                 variant="secondary"
               />
               <Button
                 onPress={handleConfirm}
-                title={confirmTitle ?? t("common.yes")}
-                variant={type === "info" ? "primary" : buttonVariants[type]}
+                title={confirmTitle ?? t('common.yes')}
+                variant={type === 'info' ? 'primary' : buttonVariants[type]}
               />
             </>
           ) : (
-            <Button
-              variant="primary"
-              onPress={handleOk}
-              title={okTitle ?? "OK"}
-            />
+            <Button variant="primary" onPress={handleOk} title={okTitle ?? 'OK'} />
           )}
         </View>
       </View>
     </UniTrueSheet>
-  );
-};
+  )
+}
 
-export default ConfirmationModal;
+export default ConfirmationModal
 
 const styles = StyleSheet.create((theme, rt) => {
-  const backgorundColor: Record<ConfirmationModalState["type"], string> = {
+  const backgorundColor: Record<ConfirmationModalState['type'], string> = {
     danger: theme.colors.failure,
     warning: theme.colors.warning,
     success: theme.colors.success,
     info: theme.colors.blueMain,
-  };
+  }
 
   return {
     container: {
       gap: theme.spacing(4),
-      justifyContent: "center",
-      alignItems: "center",
+      justifyContent: 'center',
+      alignItems: 'center',
       paddingHorizontal: theme.spacing(4),
       paddingTop: theme.spacing(4),
     },
-    iconContainer: (
-      type: ConfirmationModalState["type"],
-      animation: boolean,
-    ) => ({
+    iconContainer: (type: ConfirmationModalState['type'], animation: boolean) => ({
       width: animation ? 84 : 56,
       height: animation ? 84 : 56,
       borderRadius: 56,
-      alignItems: "center",
-      justifyContent: "center",
-      backgroundColor: animation ? "transparent" : backgorundColor[type] + "1a", // opacity 10%
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: animation ? 'transparent' : backgorundColor[type] + '1a', // opacity 10%
     }),
     footer: {
-      flexDirection: "row",
+      flexDirection: 'row',
       gap: theme.spacing(2),
       paddingBottom: theme.spacing(2),
     },
-    icon: (type: ConfirmationModalState["type"]) => ({
+    icon: (type: ConfirmationModalState['type']) => ({
       color: backgorundColor[type],
     }),
-  };
-});
+  }
+})

@@ -1,4 +1,4 @@
-import type { Href } from "expo-router";
+import type { Href } from 'expo-router'
 
 /**
  * Куда ведёт уведомление — или `null`, если вести некуда.
@@ -22,56 +22,50 @@ export const notificationTarget = (
 ): Href | null => {
   switch (kind) {
     // Покупателю.
-    case "order_status":
-    case "order_shop_rejected":
-    case "order_approved_delivery":
+    case 'order_status':
+    case 'order_shop_rejected':
+    case 'order_approved_delivery':
       return entityId
-        ? { pathname: "/(client-tabs)/(orders)/order/[id]", params: { id: String(entityId) } }
-        : "/(client-tabs)/(orders)";
+        ? { pathname: '/(client-tabs)/(orders)/order/[id]', params: { id: String(entityId) } }
+        : '/(client-tabs)/(orders)'
 
-    case "product_approved":
-    case "product_declined":
-      return entityId
-        ? { pathname: "/products/[id]", params: { id: String(entityId) } }
-        : null;
+    case 'product_approved':
+    case 'product_declined':
+      return entityId ? { pathname: '/products/[id]', params: { id: String(entityId) } } : null
 
-    case "shop_approved":
-      return entityId
-        ? { pathname: "/shops/[id]", params: { id: String(entityId) } }
-        : null;
+    case 'shop_approved':
+      return entityId ? { pathname: '/shops/[id]', params: { id: String(entityId) } } : null
 
     // Отклонённый или закрытый магазин не открывается — вести туда некуда.
-    case "shop_rejected":
-    case "shop_blocked":
-      return null;
+    case 'shop_rejected':
+    case 'shop_blocked':
+      return null
 
     // Возвраты и отзывы: экранов для них в приложении пока нет, ссылка в
     // пустоту хуже её отсутствия.
-    case "return_approved":
-    case "return_rejected":
-    case "return_received":
-    case "return_completed":
-    case "review_approved":
-    case "review_rejected":
-    case "review_received":
-      return null;
+    case 'return_approved':
+    case 'return_rejected':
+    case 'return_received':
+    case 'return_completed':
+    case 'review_approved':
+    case 'review_rejected':
+    case 'review_received':
+      return null
 
     // Виды продавца — см. пояснение выше.
-    case "order_created":
-    case "order_cancelled":
-    case "receipt_confirmed":
-    case "product_out_of_stock":
-    case "product_blocked":
-    case "withdrawal_completed":
-    case "withdrawal_rejected":
-      return null;
+    case 'order_created':
+    case 'order_cancelled':
+    case 'receipt_confirmed':
+    case 'product_out_of_stock':
+    case 'product_blocked':
+    case 'withdrawal_completed':
+    case 'withdrawal_rejected':
+      return null
 
     default:
-      return null;
+      return null
   }
-};
+}
 
 /** Виды, где `comment` — код статуса заказа, а не текст человека. */
-export const STATUS_COMMENT_KINDS = new Set<Notification.Kind>([
-  "order_status",
-]);
+export const STATUS_COMMENT_KINDS = new Set<Notification.Kind>(['order_status'])

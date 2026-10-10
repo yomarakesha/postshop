@@ -1,54 +1,51 @@
-import Header from "@/components/Header";
-import Typography from "@/ui/Typography";
-import ShopMainIcon from "@assets/icons/shop-main.svg";
-import ShopNeutralIcon from "@assets/icons/shop-neutral.svg";
-import React, { useEffect, useImperativeHandle, useState } from "react";
-import { Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import { StepsProps } from "..";
+import Header from '@/components/Header'
+import Typography from '@/ui/Typography'
+import ShopMainIcon from '@assets/icons/shop-main.svg'
+import ShopNeutralIcon from '@assets/icons/shop-neutral.svg'
+import React, { useEffect, useImperativeHandle, useState } from 'react'
+import { Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import { StepsProps } from '..'
 
 const WarehouseType = ({ setIsValid, ref, t }: StepsProps) => {
-  const [selectedType, setSelectedType] = useState<
-    ShopAdditional.WarehouseType | undefined
-  >(undefined);
+  const [selectedType, setSelectedType] = useState<ShopAdditional.WarehouseType | undefined>(
+    undefined,
+  )
 
   useEffect(() => {
-    setIsValid(!!selectedType);
-  }, [selectedType]);
+    setIsValid(!!selectedType)
+  }, [selectedType])
 
   useImperativeHandle(ref, () => ({
     getData: () => ({
       warehouse_type: selectedType,
     }),
     isValid: !!selectedType,
-  }));
+  }))
 
   const typeData: {
-    key: ShopAdditional.WarehouseType;
-    title: string;
-    description: string;
+    key: ShopAdditional.WarehouseType
+    title: string
+    description: string
   }[] = [
     {
-      key: "fbs",
-      title: t("store.shopAdditional.warehouseType.fbs.title"),
-      description: t("store.shopAdditional.warehouseType.fbs.description"),
+      key: 'fbs',
+      title: t('store.shopAdditional.warehouseType.fbs.title'),
+      description: t('store.shopAdditional.warehouseType.fbs.description'),
     },
     {
-      key: "fbo",
-      title: t("store.shopAdditional.warehouseType.fbo.title"),
-      description: t("store.shopAdditional.warehouseType.fbo.description"),
+      key: 'fbo',
+      title: t('store.shopAdditional.warehouseType.fbo.title'),
+      description: t('store.shopAdditional.warehouseType.fbo.description'),
     },
-  ];
+  ]
 
   const handleSelectType = (type: ShopAdditional.WarehouseType) => {
-    setSelectedType(type);
-  };
+    setSelectedType(type)
+  }
   return (
     <>
-      <Header
-        title={t("store.shopAdditional.warehouseType.headerTitle")}
-        backgroundColor="white"
-      />
+      <Header title={t('store.shopAdditional.warehouseType.headerTitle')} backgroundColor="white" />
       <View style={styles.wrapper}>
         <View style={styles.container}>
           {typeData.map((item, index) => (
@@ -59,17 +56,9 @@ const WarehouseType = ({ setIsValid, ref, t }: StepsProps) => {
             >
               <View style={styles.badge(item.key === selectedType)}>
                 {item.key === selectedType ? (
-                  <ShopNeutralIcon
-                    width={32}
-                    height={32}
-                    style={styles.shopSolid}
-                  />
+                  <ShopNeutralIcon width={32} height={32} style={styles.shopSolid} />
                 ) : (
-                  <ShopMainIcon
-                    width={32}
-                    height={32}
-                    style={styles.shopOutline}
-                  />
+                  <ShopMainIcon width={32} height={32} style={styles.shopOutline} />
                 )}
               </View>
               <View style={styles.cardTextContainer}>
@@ -85,10 +74,10 @@ const WarehouseType = ({ setIsValid, ref, t }: StepsProps) => {
         </View>
       </View>
     </>
-  );
-};
+  )
+}
 
-export default WarehouseType;
+export default WarehouseType
 
 const styles = StyleSheet.create((theme) => ({
   wrapper: {
@@ -105,8 +94,8 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing(4),
     gap: theme.spacing(2),
     borderRadius: theme.spacing(3),
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
     borderColor: isActive ? theme.colors.blueMain : theme.colors.stroke,
   }),
@@ -117,9 +106,9 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: isActive ? theme.colors.blue2 : theme.colors.gray2,
     width: 56,
     height: 56,
-    borderRadius: "100%",
-    justifyContent: "center",
-    alignItems: "center",
+    borderRadius: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
   }),
   shopOutline: {
     color: theme.colors.passive2,
@@ -127,4 +116,4 @@ const styles = StyleSheet.create((theme) => ({
   shopSolid: {
     color: theme.colors.blueMain,
   },
-}));
+}))

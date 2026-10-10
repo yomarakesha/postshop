@@ -1,7 +1,7 @@
-import DeliveryDetailScreen from "@/screens/Client/DeliveryDetail";
+import DeliveryDetailScreen from '@/screens/Client/DeliveryDetail'
 
 const DeliveryDetailRoute = () => {
-  return <DeliveryDetailScreen />;
-};
+  return <DeliveryDetailScreen />
+}
 
-export default DeliveryDetailRoute;
+export default DeliveryDetailRoute

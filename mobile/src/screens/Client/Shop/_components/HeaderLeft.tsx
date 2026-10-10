@@ -1,26 +1,22 @@
-import React from "react";
-import Typography from "@/ui/Typography";
-import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import { Image } from "expo-image";
-import { isColorDark } from "@/utils/processColor";
+import React from 'react'
+import Typography from '@/ui/Typography'
+import { View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import { Image } from 'expo-image'
+import { isColorDark } from '@/utils/processColor'
 
 type Props = {
-  logo: string;
-  name: string;
+  logo: string
+  name: string
   /** Фон шапки — цвет магазина. По нему выбирается цвет названия. */
-  backgroundColor: string;
-};
+  backgroundColor: string
+}
 
 const HeaderLeft = ({ logo, name, backgroundColor }: Props) => {
   return (
     <View style={styles.container}>
       <View style={styles.logoContainer}>
-        <Image
-          source={{ uri: logo }}
-          style={styles.logo}
-          contentFit="contain"
-        />
+        <Image source={{ uri: logo }} style={styles.logo} contentFit="contain" />
       </View>
       <View style={styles.infoContainer}>
         {/* Название было наглухо белым. У магазина без своего цвета шапка
@@ -28,20 +24,20 @@ const HeaderLeft = ({ logo, name, backgroundColor }: Props) => {
         <Typography
           variant="p1"
           weight="semiBold"
-          color={isColorDark(backgroundColor) ? "white" : undefined}
+          color={isColorDark(backgroundColor) ? 'white' : undefined}
         >
           {name}
         </Typography>
       </View>
     </View>
-  );
-};
+  )
+}
 
-export default HeaderLeft;
+export default HeaderLeft
 
 const styles = StyleSheet.create((theme) => ({
   container: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: theme.spacing(4),
     flex: 1,
   },
@@ -52,11 +48,11 @@ const styles = StyleSheet.create((theme) => ({
     backgroundColor: theme.colors.white,
   },
   logo: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
   },
   infoContainer: {
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-}));
+}))

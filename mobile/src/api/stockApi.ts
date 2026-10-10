@@ -1,16 +1,11 @@
-import {
-  useMutation,
-  useQuery,
-  useQueryClient,
-  UseQueryOptions,
-} from "@tanstack/react-query";
-import { AxiosError } from "axios";
-import api from ".";
+import { useMutation, useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
+import { AxiosError } from 'axios'
+import api from '.'
 
 type AvailabilityOptions = Omit<
   UseQueryOptions<Stock.Availability[], AxiosError<ApiErrorResponse>>,
-  "queryKey" | "queryFn"
->;
+  'queryKey' | 'queryFn'
+>
 
 /**
  * Доступный остаток сразу по нескольким товарам.
@@ -25,32 +20,32 @@ type AvailabilityOptions = Omit<
  */
 const useAvailability = (productIds: number[], options?: AvailabilityOptions) => {
   const query = useQuery<Stock.Availability[], AxiosError<ApiErrorResponse>>({
-    queryKey: ["stock-availability", productIds],
+    queryKey: ['stock-availability', productIds],
     queryFn: async () => {
       const res = await api.req({
-        method: "GET",
-        url: "/stock-operations/availability",
+        method: 'GET',
+        url: '/stock-operations/availability',
         params: { product_ids: productIds },
-      });
+      })
 
-      return res.data;
+      return res.data
     },
     enabled: productIds.length > 0,
     ...options,
-  });
+  })
 
-  return query;
-};
+  return query
+}
 
 /** После любого движения остаток на экранах нужно перечитать. */
 const useInvalidateAvailability = () => {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   return () => {
-    queryClient.invalidateQueries({ queryKey: ["stock-availability"] });
-    queryClient.invalidateQueries({ queryKey: ["stock-summary"] });
-    queryClient.invalidateQueries({ queryKey: ["stock-history"] });
-  };
-};
+    queryClient.invalidateQueries({ queryKey: ['stock-availability'] })
+    queryClient.invalidateQueries({ queryKey: ['stock-summary'] })
+    queryClient.invalidateQueries({ queryKey: ['stock-history'] })
+  }
+}
 
 /**
  * Остаток в разрезе для пересчёта: полка, резерв, доступно. Пересчёт
@@ -59,72 +54,68 @@ const useInvalidateAvailability = () => {
  */
 const useSummary = (productId: number | undefined, enabled: boolean) =>
   useQuery<Stock.Summary, AxiosError<ApiErrorResponse>>({
-    queryKey: ["stock-summary", productId],
+    queryKey: ['stock-summary', productId],
     queryFn: async () => {
       const res = await api.req({
-        method: "GET",
+        method: 'GET',
         url: `/stock-operations/${productId}/summary`,
-      });
-      return res.data;
+      })
+      return res.data
     },
     enabled: enabled && !!productId,
-  });
+  })
 
 /** Приход или возврат поставщику: продавец называет, сколько штук. */
 const useCreateOperation = () => {
-  const invalidate = useInvalidateAvailability();
+  const invalidate = useInvalidateAvailability()
   return useMutation<unknown, AxiosError<ApiErrorResponse>, Stock.API.OperationBody>({
-    mutationKey: ["stock-operation"],
+    mutationKey: ['stock-operation'],
     mutationFn: async (body) => {
-      const res = await api.req({ method: "POST", url: "/stock-operations/", data: body });
-      return res.data;
+      const res = await api.req({ method: 'POST', url: '/stock-operations/', data: body })
+      return res.data
     },
     onSuccess: invalidate,
-  });
-};
+  })
+}
 
 /**
  * Пересчёт: продавец называет, сколько товара на полке сейчас, а разницу
  * записывает сервер. Если остаток не изменился, сервер отвечает 409.
  */
 const useSetStock = () => {
-  const invalidate = useInvalidateAvailability();
+  const invalidate = useInvalidateAvailability()
   return useMutation<unknown, AxiosError<ApiErrorResponse>, Stock.API.Body>({
-    mutationKey: ["stock-set"],
+    mutationKey: ['stock-set'],
     mutationFn: async (body) => {
-      const res = await api.req({ method: "POST", url: "/stock-operations/set", data: body });
-      return res.data;
+      const res = await api.req({ method: 'POST', url: '/stock-operations/set', data: body })
+      return res.data
     },
     onSuccess: invalidate,
-  });
-};
+  })
+}
 
 /**
  * История движений товара: у FBS — журнал магазина, у FBO — склады Postshop
  * (там же списания брака и возврат товара продавцу). Продавец видел только
  * итоговое число и не мог понять, откуда оно взялось.
  */
-const useHistory = (
-  shopId: number | undefined,
-  productId: number | undefined,
-  isFbo: boolean,
-) =>
+const useHistory = (shopId: number | undefined, productId: number | undefined, isFbo: boolean) =>
   useQuery<Stock.Operation[], AxiosError<ApiErrorResponse>>({
-    queryKey: ["stock-history", shopId, productId, isFbo],
+    queryKey: ['stock-history', shopId, productId, isFbo],
     queryFn: async () => {
       const res = await api.req({
-        method: "GET",
+        method: 'GET',
         url: isFbo
           ? `/warehouse-operations/shop/${shopId}/product/${productId}`
           : `/stock-operations/${productId}`,
-      });
-      const operations: Stock.Operation[] = res.data.operations ?? [];
+      })
+      const operations: Stock.Operation[] = res.data.operations ?? []
       // Журнал магазина приходит по возрастанию, склад — по убыванию;
       // показываем новые сверху.
-      return isFbo ? operations : [...operations].reverse();
+      return isFbo ? operations : [...operations].reverse()
     },
     enabled: !!shopId && !!productId,
-  });
+  })
 
 export const stockApi = {
   useAvailability,
@@ -132,4 +123,4 @@ export const stockApi = {
   useHistory,
   useCreateOperation,
   useSetStock,
-};
+}

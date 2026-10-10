@@ -1,84 +1,78 @@
-import { MAX_PAGE_SIZE } from "@/constants/pagination";
-import React, { useMemo } from "react";
-import { View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import noOrderImage from "@assets/images/no-order.png";
-import Header from "@/components/Header";
-import Typography from "@/ui/Typography";
-import { useTranslation } from "react-i18next";
-import { orderApi } from "@/api/orderApi";
-import { formatApiDateTimeNumeric, getAshgabatParts } from "@/utils/formatDate";
-import { ScrollView } from "react-native-gesture-handler";
-import Card from "./_components/Card";
-import RefreshControl from "@/ui/RefreshControl";
-import { useRouter } from "expo-router";
-import { Image } from "expo-image";
-import ActivityIndicator from "@/ui/ActivityIndicator";
-import useAppStore from "@/store/useAppStore";
-import InernetError from "@/ui/InternetError";
-import { orderStatus } from "@/utils/orderStatus";
+import { MAX_PAGE_SIZE } from '@/constants/pagination'
+import React, { useMemo } from 'react'
+import { View } from 'react-native'
+import { StyleSheet, useUnistyles } from 'react-native-unistyles'
+import noOrderImage from '@assets/images/no-order.png'
+import Header from '@/components/Header'
+import Typography from '@/ui/Typography'
+import { useTranslation } from 'react-i18next'
+import { orderApi } from '@/api/orderApi'
+import { formatApiDateTimeNumeric, getAshgabatParts } from '@/utils/formatDate'
+import { ScrollView } from 'react-native-gesture-handler'
+import Card from './_components/Card'
+import RefreshControl from '@/ui/RefreshControl'
+import { useRouter } from 'expo-router'
+import { Image } from 'expo-image'
+import ActivityIndicator from '@/ui/ActivityIndicator'
+import useAppStore from '@/store/useAppStore'
+import InernetError from '@/ui/InternetError'
+import { orderStatus } from '@/utils/orderStatus'
 
 type OrderMonthGroup = {
-  monthKey: number;
-  year: number;
-  items: Order.Item[];
-};
+  monthKey: number
+  year: number
+  items: Order.Item[]
+}
 
 const groupByMonth = (orders: Order.Item[]): OrderMonthGroup[] => {
-  const map = new Map<string, OrderMonthGroup>();
+  const map = new Map<string, OrderMonthGroup>()
   for (const order of orders) {
     // Месяц — по Ашхабаду: заказ 1-го числа в 02:00 по-местному в UTC ещё
     // прошлый месяц, и раньше он попадал не в ту группу.
-    const parts = getAshgabatParts(order.created_at);
-    const monthKey = parts?.month ?? 0;
-    const year = parts?.year ?? 0;
-    const key = `${year}-${monthKey}`;
+    const parts = getAshgabatParts(order.created_at)
+    const monthKey = parts?.month ?? 0
+    const year = parts?.year ?? 0
+    const key = `${year}-${monthKey}`
     if (!map.has(key)) {
-      map.set(key, { monthKey, year, items: [] });
+      map.set(key, { monthKey, year, items: [] })
     }
-    map.get(key)!.items.push(order);
+    map.get(key)!.items.push(order)
   }
-  return Array.from(map.values());
-};
+  return Array.from(map.values())
+}
 
 const OrdersScreen = () => {
-  const { t } = useTranslation();
-  const router = useRouter();
+  const { t } = useTranslation()
+  const router = useRouter()
   // Цвет шапки берём из темы, а не литералом "white": иначе при тёмной теме
   // шапка осталась бы белой поверх тёмного экрана.
-  const { theme } = useUnistyles();
-  const hasInternetConnection = useAppStore((s) => s.hasInternetConnection);
-  const isServerAvailable = useAppStore((s) => s.isServerAvailable);
+  const { theme } = useUnistyles()
+  const hasInternetConnection = useAppStore((s) => s.hasInternetConnection)
+  const isServerAvailable = useAppStore((s) => s.isServerAvailable)
   const ordersQuery = orderApi.useGetAllMy({
     limit: MAX_PAGE_SIZE,
     skip: 0,
-    sort: "newest",
-  });
+    sort: 'newest',
+  })
 
   const orders = useMemo(() => {
-    return ordersQuery.data ?? [];
-  }, [ordersQuery.data]);
+    return ordersQuery.data ?? []
+  }, [ordersQuery.data])
 
-  const groupedByMonth = groupByMonth(orders);
+  const groupedByMonth = groupByMonth(orders)
 
   const onRefresh = () => {
-    ordersQuery.refetch();
-  };
+    ordersQuery.refetch()
+  }
 
   const handleClickOrder = (id: number) => {
-    router.push(`/(client-tabs)/(orders)/order/${id}`);
-  };
+    router.push(`/(client-tabs)/(orders)/order/${id}`)
+  }
 
   // Сеть есть, но запрос упал (5xx, таймаут) — раньше экран молча показывал
   // «Заказов нет», и отличить пустой список от ошибки было невозможно.
   if (!hasInternetConnection || !isServerAvailable || ordersQuery.isError) {
-    return (
-      <InernetError
-        t={t}
-        onRetry={onRefresh}
-        isLoading={ordersQuery.isFetching}
-      />
-    );
+    return <InernetError t={t} onRetry={onRefresh} isLoading={ordersQuery.isFetching} />
   }
 
   return (
@@ -88,20 +82,14 @@ const OrdersScreen = () => {
         style={styles.scroll}
         contentContainerStyle={styles.contentContainer}
         refreshControl={
-          <RefreshControl
-            refreshing={ordersQuery.isRefetching}
-            onRefresh={onRefresh}
-          />
+          <RefreshControl refreshing={ordersQuery.isRefetching} onRefresh={onRefresh} />
         }
       >
         {ordersQuery.isLoading ? (
           <ActivityIndicator isFullScreen />
         ) : groupedByMonth.length > 0 ? (
           groupedByMonth.map((item) => (
-            <View
-              key={`${item.year}-${item.monthKey}`}
-              style={styles.container}
-            >
+            <View key={`${item.year}-${item.monthKey}`} style={styles.container}>
               <Typography color="secondary" weight="semiBold">
                 {t(`months.${item.monthKey}`)} {item.year}
               </Typography>
@@ -113,23 +101,18 @@ const OrdersScreen = () => {
                   date={formatApiDateTimeNumeric(el.created_at)}
                   status={
                     el.all_shops_rejected
-                      ? "cancelled"
+                      ? 'cancelled'
                       : orderStatus.client.map[el.order_status.code]
                   }
                   // Все магазины отказались — для покупателя заказ отклонён,
                   // даже если общий статус ещё не сменился.
                   labelKey={orderStatus.buyer.getLabelKey(
-                    el.all_shops_rejected ? "rejected" : el.order_status.code,
+                    el.all_shops_rejected ? 'rejected' : el.order_status.code,
                     el.delivery_method,
                   )}
-                  partiallyRejected={
-                    el.has_rejected_shops && !el.all_shops_rejected
-                  }
+                  partiallyRejected={el.has_rejected_shops && !el.all_shops_rejected}
                   price={Number(el.effective_total)}
-                  currency={
-                    el.items.find((item) => item.product.currency)?.product
-                      .currency
-                  }
+                  currency={el.items.find((item) => item.product.currency)?.product.currency}
                   t={t}
                 />
               ))}
@@ -137,35 +120,21 @@ const OrdersScreen = () => {
           ))
         ) : (
           <View style={styles.center}>
-            <Image
-              source={noOrderImage}
-              style={styles.image}
-              contentFit="contain"
-            />
-            <Typography
-              variant="p1"
-              weight="semiBold"
-              isCentered
-              style={styles.emptyTitle}
-            >
-              {t("emptyState.orders.title")}
+            <Image source={noOrderImage} style={styles.image} contentFit="contain" />
+            <Typography variant="p1" weight="semiBold" isCentered style={styles.emptyTitle}>
+              {t('emptyState.orders.title')}
             </Typography>
-            <Typography
-              variant="t1"
-              weight="medium"
-              color="secondary"
-              isCentered
-            >
-              {t("emptyState.orders.description")}
+            <Typography variant="t1" weight="medium" color="secondary" isCentered>
+              {t('emptyState.orders.description')}
             </Typography>
           </View>
         )}
       </ScrollView>
     </>
-  );
-};
+  )
+}
 
-export default OrdersScreen;
+export default OrdersScreen
 
 const styles = StyleSheet.create((theme) => ({
   scroll: {
@@ -183,8 +152,8 @@ const styles = StyleSheet.create((theme) => ({
   },
   center: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     // Отступы вместо inline marginTop 24/8 у самих подписей: описание больше
     // не упирается в края экрана на узких телефонах.
     paddingHorizontal: theme.spacing(6),
@@ -196,4 +165,4 @@ const styles = StyleSheet.create((theme) => ({
   container: {
     gap: theme.spacing(3),
   },
-}));
+}))

@@ -1,16 +1,16 @@
-import { FC } from "react";
-import { SvgProps } from "react-native-svg";
-import { useUnistyles } from "react-native-unistyles";
+import { FC } from 'react'
+import { SvgProps } from 'react-native-svg'
+import { useUnistyles } from 'react-native-unistyles'
 
-type IconProps = FC<SvgProps & { style?: { color: string } }>;
+type IconProps = FC<SvgProps & { style?: { color: string } }>
 
 type Props = {
-  focused: boolean;
-  color: string;
-  size?: number;
-};
+  focused: boolean
+  color: string
+  size?: number
+}
 
-const DEFAULT_ICON_SIZE = 20;
+const DEFAULT_ICON_SIZE = 20
 
 /**
  * Фабрика иконок для таб-бара.
@@ -23,7 +23,7 @@ const DEFAULT_ICON_SIZE = 20;
  */
 const TabBarIcon = (Icon: IconProps) => {
   const TabBarIconComponent = ({ focused, size }: Props) => {
-    const { theme } = useUnistyles();
+    const { theme } = useUnistyles()
 
     return (
       <Icon
@@ -31,14 +31,12 @@ const TabBarIcon = (Icon: IconProps) => {
         width={size ?? DEFAULT_ICON_SIZE}
         height={size ?? DEFAULT_ICON_SIZE}
       />
-    );
-  };
+    )
+  }
 
-  TabBarIconComponent.displayName = `TabBarIcon(${
-    Icon.displayName || Icon.name || "Icon"
-  })`;
+  TabBarIconComponent.displayName = `TabBarIcon(${Icon.displayName || Icon.name || 'Icon'})`
 
-  return TabBarIconComponent;
-};
+  return TabBarIconComponent
+}
 
-export default TabBarIcon;
+export default TabBarIcon

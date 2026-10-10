@@ -1,16 +1,16 @@
-import useFavorite from "@/hooks/useFavorite";
-import useAppStore from "@/store/useAppStore";
-import ActivityIndicator from "@/ui/ActivityIndicator";
-import EmptyState from "@/ui/EmptyState";
-import React, { useCallback } from "react";
-import { FlatList, FlatListProps, ListRenderItem } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import ProductCard from "../../ui/ProductCard";
-import emptySearchImage from "@assets/images/empty-search.png";
-import { TFunction } from "i18next";
+import useFavorite from '@/hooks/useFavorite'
+import useAppStore from '@/store/useAppStore'
+import ActivityIndicator from '@/ui/ActivityIndicator'
+import EmptyState from '@/ui/EmptyState'
+import React, { useCallback } from 'react'
+import { FlatList, FlatListProps, ListRenderItem } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import ProductCard from '../../ui/ProductCard'
+import emptySearchImage from '@assets/images/empty-search.png'
+import { TFunction } from 'i18next'
 
-type Props = Omit<FlatListProps<Product.Item>, "renderItem"> & {
-  withoutBrand?: boolean;
+type Props = Omit<FlatListProps<Product.Item>, 'renderItem'> & {
+  withoutBrand?: boolean
   /**
    * Данные ещё грузятся.
    *
@@ -19,16 +19,16 @@ type Props = Omit<FlatListProps<Product.Item>, "renderItem"> & {
    * «Товаров пока нет» с картинкой, и только потом появлялись товары.
    * Особенно заметно при переходе «Смотреть все» с главной.
    */
-  isLoading?: boolean;
-  isFetchingNextPage?: boolean;
-  onPress: (id: number) => void;
-  withoutFavorite?: boolean;
+  isLoading?: boolean
+  isFetchingNextPage?: boolean
+  onPress: (id: number) => void
+  withoutFavorite?: boolean
   /** Низ карточки для каждого товара — см. ProductCard.footer. */
-  renderItemFooter?: (item: Product.Item) => React.ReactNode;
+  renderItemFooter?: (item: Product.Item) => React.ReactNode
   /** Подпись значка неактивного товара — см. ProductCard.unavailableLabel. */
-  unavailableLabel?: string;
-  t: TFunction;
-};
+  unavailableLabel?: string
+  t: TFunction
+}
 
 const ProductsVerticalList = ({
   data,
@@ -43,11 +43,11 @@ const ProductsVerticalList = ({
   t,
   ...props
 }: Props) => {
-  const currentLanguage = useAppStore((s) => s.lang);
+  const currentLanguage = useAppStore((s) => s.lang)
   const { data: favoritesData, toggleFavorite } = useFavorite({
     enabled: !withoutFavorite,
     t,
-  });
+  })
 
   const renderItem: ListRenderItem<Product.Item> = useCallback(
     ({ item }) => {
@@ -64,7 +64,7 @@ const ProductsVerticalList = ({
           unavailableLabel={unavailableLabel}
           t={t}
         />
-      );
+      )
     },
     [
       renderItemFooter,
@@ -77,9 +77,9 @@ const ProductsVerticalList = ({
       withoutFavorite,
       t,
     ],
-  );
+  )
 
-  const keyExtractor = useCallback((item: Product.Item) => String(item.id), []);
+  const keyExtractor = useCallback((item: Product.Item) => String(item.id), [])
 
   // Раньше при пустом списке экран оставался просто белым: пустое состояние
   // было только у поиска. Свой ListEmptyComponent у экрана перекрывает этот
@@ -91,12 +91,12 @@ const ProductsVerticalList = ({
       ) : (
         <EmptyState
           image={emptySearchImage}
-          title={t("emptyState.products.title")}
-          description={t("emptyState.products.description")}
+          title={t('emptyState.products.title')}
+          description={t('emptyState.products.description')}
         />
       ),
     [isLoading, t],
-  );
+  )
 
   return (
     <FlatList
@@ -112,16 +112,14 @@ const ProductsVerticalList = ({
       onEndReachedThreshold={0.8}
       ListEmptyComponent={renderEmpty}
       ListFooterComponent={
-        isFetchingNextPage ? (
-          <ActivityIndicator style={styles.footerLoader} />
-        ) : null
+        isFetchingNextPage ? <ActivityIndicator style={styles.footerLoader} /> : null
       }
       {...props}
     />
-  );
-};
+  )
+}
 
-export default ProductsVerticalList;
+export default ProductsVerticalList
 
 const styles = StyleSheet.create((theme) => ({
   // Был magic-отступ marginTop: -9, из-за которого верх сетки заезжал
@@ -142,9 +140,9 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(2),
     // Карточки ряда тянутся до высоты самой высокой: у одной есть строка
     // бренда, у другой нет — нижние края переставали совпадать.
-    alignItems: "stretch",
+    alignItems: 'stretch',
   },
   footerLoader: {
     paddingVertical: theme.spacing(4),
   },
-}));
+}))

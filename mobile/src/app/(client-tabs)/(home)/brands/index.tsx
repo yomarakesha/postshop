@@ -1,8 +1,8 @@
-import BrandsScreen from "@/screens/Client/Brands";
-import React from "react";
+import BrandsScreen from '@/screens/Client/Brands'
+import React from 'react'
 
 const BrandsRoute = () => {
-  return <BrandsScreen />;
-};
+  return <BrandsScreen />
+}
 
-export default BrandsRoute;
+export default BrandsRoute

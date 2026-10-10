@@ -1,10 +1,10 @@
-import { useQuery } from "@tanstack/react-query";
-import api from "@/api";
+import { useQuery } from '@tanstack/react-query'
+import api from '@/api'
 
 type Features = {
   /** Склад платформы (FBO): приёмки и остатки на складах Postshop. */
-  fbo_enabled: boolean;
-};
+  fbo_enabled: boolean
+}
 
 /**
  * Что включено на этом сервере.
@@ -19,20 +19,20 @@ type Features = {
  */
 const useFeatures = () => {
   const query = useQuery<Features>({
-    queryKey: ["features"],
+    queryKey: ['features'],
     queryFn: async () => {
-      const res = await api.req({ method: "GET", url: "/features/" });
-      return res.data;
+      const res = await api.req({ method: 'GET', url: '/features/' })
+      return res.data
     },
     // Настройка сервера за сеанс не меняется — перезапрашивать незачем.
     staleTime: Infinity,
     retry: 1,
-  });
+  })
 
   return {
     isLoading: query.isPending,
     fboEnabled: query.data?.fbo_enabled ?? false,
-  };
-};
+  }
+}
 
-export default useFeatures;
+export default useFeatures

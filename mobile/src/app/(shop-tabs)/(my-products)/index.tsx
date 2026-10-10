@@ -1,9 +1,8 @@
-import MyProductsScreen from "@/screens/Shop/MyProducts";
-import React from "react";
+import MyProductsScreen from '@/screens/Shop/MyProducts'
+import React from 'react'
 
 const MyProductsRoute = () => {
-  return <MyProductsScreen />;
-};
+  return <MyProductsScreen />
+}
 
-export default MyProductsRoute;
-
+export default MyProductsRoute

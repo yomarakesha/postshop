@@ -1,35 +1,30 @@
-import { UniTrueSheet } from "@/ui/BottomSheet";
-import { TrueSheet } from "@lodev09/react-native-true-sheet";
-import React from "react";
-import { StyleSheet } from "react-native-unistyles";
-import HeaderSheet from "./HeaderSheet";
-import { Pressable, ScrollView, View } from "react-native";
-import Typography from "@/ui/Typography";
-import { getImageUrl } from "@/utils/getImageUrl";
-import { Image } from "expo-image";
-import { TFunction } from "i18next";
-import ShopIcon from "@assets/icons/shop-main.svg";
+import { UniTrueSheet } from '@/ui/BottomSheet'
+import { TrueSheet } from '@lodev09/react-native-true-sheet'
+import React from 'react'
+import { StyleSheet } from 'react-native-unistyles'
+import HeaderSheet from './HeaderSheet'
+import { Pressable, ScrollView, View } from 'react-native'
+import Typography from '@/ui/Typography'
+import { getImageUrl } from '@/utils/getImageUrl'
+import { Image } from 'expo-image'
+import { TFunction } from 'i18next'
+import ShopIcon from '@assets/icons/shop-main.svg'
 
 type Props = {
-  data: User.Shop[];
-  ref: React.RefObject<TrueSheet | null>;
-  onSelect: (shopBaseId: number) => void;
-  t: TFunction;
-};
+  data: User.Shop[]
+  ref: React.RefObject<TrueSheet | null>
+  onSelect: (shopBaseId: number) => void
+  t: TFunction
+}
 
 const UserShopsSheet = ({ ref, data, onSelect, t }: Props) => {
   const onClose = () => {
-    ref.current?.dismiss();
-  };
+    ref.current?.dismiss()
+  }
 
   return (
-    <UniTrueSheet
-      ref={ref}
-      scrollable
-      detents={[0.5, 1]}
-      style={styles.wrapper}
-    >
-      <HeaderSheet title={t("sheets.selectMyShop.title")} onClose={onClose} />
+    <UniTrueSheet ref={ref} scrollable detents={[0.5, 1]} style={styles.wrapper}>
+      <HeaderSheet title={t('sheets.selectMyShop.title')} onClose={onClose} />
       <ScrollView contentContainerStyle={styles.contentContainer}>
         {data.map((item, index) => (
           <Pressable
@@ -49,12 +44,10 @@ const UserShopsSheet = ({ ref, data, onSelect, t }: Props) => {
               )}
             </View>
             <View style={styles.nameRow}>
-              <Typography weight="medium">
-                {item.name || t("noRegistration")}
-              </Typography>
+              <Typography weight="medium">{item.name || t('noRegistration')}</Typography>
               {!item.is_active && (
                 <Typography variant="t2" color="secondary">
-                  {t("store.close.badge")}
+                  {t('store.close.badge')}
                 </Typography>
               )}
             </View>
@@ -62,10 +55,10 @@ const UserShopsSheet = ({ ref, data, onSelect, t }: Props) => {
         ))}
       </ScrollView>
     </UniTrueSheet>
-  );
-};
+  )
+}
 
-export default UserShopsSheet;
+export default UserShopsSheet
 
 const styles = StyleSheet.create((theme) => ({
   nameRow: {
@@ -88,8 +81,8 @@ const styles = StyleSheet.create((theme) => ({
     borderBottomWidth: isLast ? 0 : 1,
     borderBottomColor: theme.colors.stroke,
     gap: theme.spacing(2),
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   }),
   logoContainer: (hasLogo: boolean) => ({
     width: 70,
@@ -99,11 +92,11 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing(1),
   }),
   logo: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
   },
   icon: {
     color: theme.colors.blueMain,
-    margin: "auto",
+    margin: 'auto',
   },
-}));
+}))

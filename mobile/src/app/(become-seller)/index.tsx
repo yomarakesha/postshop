@@ -1,8 +1,8 @@
-import ShopTypeScreen from "@/screens/Client/ShopType";
-import React from "react";
+import ShopTypeScreen from '@/screens/Client/ShopType'
+import React from 'react'
 
 const ShopTypeRoute = () => {
-  return <ShopTypeScreen />;
-};
+  return <ShopTypeScreen />
+}
 
-export default ShopTypeRoute;
+export default ShopTypeRoute

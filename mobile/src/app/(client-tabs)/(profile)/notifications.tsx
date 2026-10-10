@@ -1,8 +1,8 @@
-import NotificationsScreen from "@/screens/Client/Notifications";
-import React from "react";
+import NotificationsScreen from '@/screens/Client/Notifications'
+import React from 'react'
 
 const NotificationsRoute = () => {
-  return <NotificationsScreen />;
-};
+  return <NotificationsScreen />
+}
 
-export default NotificationsRoute;
+export default NotificationsRoute

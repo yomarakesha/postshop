@@ -1,8 +1,8 @@
-import ProductScreen from "@/screens/Client/Product";
-import React from "react";
+import ProductScreen from '@/screens/Client/Product'
+import React from 'react'
 
 const ProductRoute = () => {
-  return <ProductScreen />;
-};
+  return <ProductScreen />
+}
 
-export default ProductRoute;
+export default ProductRoute

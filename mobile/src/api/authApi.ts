@@ -1,27 +1,23 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AxiosError } from "axios";
-import api from ".";
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { AxiosError } from 'axios'
+import api from '.'
 
 const useLogin = () => {
-  const mutation = useMutation<
-    undefined,
-    AxiosError<ApiErrorResponse>,
-    User.API.LoginBody
-  >({
-    mutationKey: ["login"],
+  const mutation = useMutation<undefined, AxiosError<ApiErrorResponse>, User.API.LoginBody>({
+    mutationKey: ['login'],
     mutationFn: async (data) => {
       const response = await api.req({
-        method: "POST",
-        url: "/auth/otp/request",
+        method: 'POST',
+        url: '/auth/otp/request',
         data,
-      });
+      })
 
-      return response.data;
+      return response.data
     },
-  });
+  })
 
-  return mutation;
-};
+  return mutation
+}
 
 const useVerify = () => {
   const mutation = useMutation<
@@ -29,22 +25,22 @@ const useVerify = () => {
     AxiosError<ApiErrorResponse>,
     User.API.VerifyBody
   >({
-    mutationKey: ["verify"],
+    mutationKey: ['verify'],
     mutationFn: async (data) => {
       const response = await api.req({
-        method: "POST",
-        url: "/auth/otp/verify",
+        method: 'POST',
+        url: '/auth/otp/verify',
         data,
-      });
+      })
 
-      return response.data;
+      return response.data
     },
-  });
+  })
 
-  return mutation;
-};
+  return mutation
+}
 
 export const authApi = {
   useLogin,
   useVerify,
-};
+}

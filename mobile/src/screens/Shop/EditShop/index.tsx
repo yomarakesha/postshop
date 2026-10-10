@@ -1,52 +1,48 @@
-import React from "react";
-import { View, Pressable } from "react-native";
-import { router } from "expo-router";
-import { StyleSheet } from "react-native-unistyles";
+import React from 'react'
+import { View, Pressable } from 'react-native'
+import { router } from 'expo-router'
+import { StyleSheet } from 'react-native-unistyles'
 
-import Typography from "@/ui/Typography";
-import Header from "@/components/Header";
-import RightChevronIcon from "@assets/icons/right-chevron.svg";
-import { useTranslation } from "react-i18next";
-import useShopStore from "@/store/useShopStore";
+import Typography from '@/ui/Typography'
+import Header from '@/components/Header'
+import RightChevronIcon from '@assets/icons/right-chevron.svg'
+import { useTranslation } from 'react-i18next'
+import useShopStore from '@/store/useShopStore'
 
-export type ShopAdditionalEditLinkType =
-  "name" | "addresses" | "phones" | "color" | "logo";
+export type ShopAdditionalEditLinkType = 'name' | 'addresses' | 'phones' | 'color' | 'logo'
 
 const EditShopScreen = () => {
-  const { t } = useTranslation();
-  const warehouseType = useShopStore((s) => s.shop?.warehouse_type);
+  const { t } = useTranslation()
+  const warehouseType = useShopStore((s) => s.shop?.warehouse_type)
   // Шаги — массив в переводах; без проверки на массив отсутствующий ключ
   // вернул бы строку-ключ, и map упал бы.
   const rawSteps = warehouseType
     ? t(`store.editShopAdditional.warehouse.howto.${warehouseType}.steps`, {
         returnObjects: true,
       })
-    : [];
-  const howtoSteps: string[] = Array.isArray(rawSteps) ? rawSteps : [];
+    : []
+  const howtoSteps: string[] = Array.isArray(rawSteps) ? rawSteps : []
 
   const steps: { key: ShopAdditionalEditLinkType; title: string }[] = [
-    { key: "name", title: t("store.editShopAdditional.baseInfo") },
-    { key: "addresses", title: t("store.editShopAdditional.address") },
-    { key: "phones", title: t("store.editShopAdditional.phoneNumbers") },
-    { key: "color", title: t("store.editShopAdditional.color") },
-    { key: "logo", title: t("store.editShopAdditional.logo") },
-  ];
+    { key: 'name', title: t('store.editShopAdditional.baseInfo') },
+    { key: 'addresses', title: t('store.editShopAdditional.address') },
+    { key: 'phones', title: t('store.editShopAdditional.phoneNumbers') },
+    { key: 'color', title: t('store.editShopAdditional.color') },
+    { key: 'logo', title: t('store.editShopAdditional.logo') },
+  ]
 
   const onPressStep = (step: ShopAdditionalEditLinkType) => {
     router.push({
-      pathname: "/(shop-tabs)/(profile)/edit-shop/[step]",
+      pathname: '/(shop-tabs)/(profile)/edit-shop/[step]',
       params: {
         step,
       },
-    });
-  };
+    })
+  }
 
   return (
     <>
-      <Header
-        title={t("store.editShopAdditional.headerTitle")}
-        backgroundColor="white"
-      />
+      <Header title={t('store.editShopAdditional.headerTitle')} backgroundColor="white" />
       <View style={styles.container}>
         {/*
           Тип склада раньше был закомментирован, и продавец нигде не видел,
@@ -56,7 +52,7 @@ const EditShopScreen = () => {
         {!!warehouseType && (
           <View style={[styles.tile, styles.infoTile]}>
             <Typography variant="p3" color="secondary">
-              {t("store.shopAdditional.warehouseType.headerTitle")}
+              {t('store.shopAdditional.warehouseType.headerTitle')}
             </Typography>
             <Typography weight="medium">
               {t(`store.editShopAdditional.warehouse.${warehouseType}`)}
@@ -66,9 +62,7 @@ const EditShopScreen = () => {
                 где товар и какой раздел за что отвечает. */}
             <View style={styles.howto}>
               <Typography variant="t1" weight="medium">
-                {t(
-                  `store.editShopAdditional.warehouse.howto.${warehouseType}.title`,
-                )}
+                {t(`store.editShopAdditional.warehouse.howto.${warehouseType}.title`)}
               </Typography>
               {howtoSteps.map((step) => (
                 <View key={step} style={styles.howtoStep}>
@@ -82,16 +76,12 @@ const EditShopScreen = () => {
               ))}
             </View>
             <Typography variant="t1" color="secondary">
-              {t("store.editShopAdditional.warehouse.hint")}
+              {t('store.editShopAdditional.warehouse.hint')}
             </Typography>
           </View>
         )}
         {steps.map((step) => (
-          <Pressable
-            key={step.key}
-            onPress={() => onPressStep(step.key)}
-            style={styles.tile}
-          >
+          <Pressable key={step.key} onPress={() => onPressStep(step.key)} style={styles.tile}>
             <Typography weight="medium" numberOfLines={1} style={styles.shrink}>
               {step.title}
             </Typography>
@@ -100,10 +90,10 @@ const EditShopScreen = () => {
         ))}
       </View>
     </>
-  );
-};
+  )
+}
 
-export default EditShopScreen;
+export default EditShopScreen
 
 const styles = StyleSheet.create((theme) => ({
   container: {
@@ -115,9 +105,9 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(2),
   },
   tile: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     gap: theme.spacing(3),
     paddingVertical: theme.spacing(4),
     paddingHorizontal: theme.spacing(4),
@@ -126,24 +116,24 @@ const styles = StyleSheet.create((theme) => ({
     ...theme.shadows.soft,
   },
   infoTile: {
-    flexDirection: "column",
-    alignItems: "flex-start",
-    justifyContent: "flex-start",
+    flexDirection: 'column',
+    alignItems: 'flex-start',
+    justifyContent: 'flex-start',
     gap: theme.spacing(1),
   },
   shrink: {
     flexShrink: 1,
   },
   howto: {
-    alignSelf: "stretch",
+    alignSelf: 'stretch',
     gap: theme.spacing(1),
     marginTop: theme.spacing(1),
   },
   howtoStep: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: theme.spacing(2),
   },
   chevron: {
     color: theme.colors.passive2,
   },
-}));
+}))

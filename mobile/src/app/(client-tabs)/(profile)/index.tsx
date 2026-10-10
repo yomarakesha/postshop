@@ -1,8 +1,8 @@
-import React from "react";
-import ProfileScreen from "@/screens/Client/Profile";
+import React from 'react'
+import ProfileScreen from '@/screens/Client/Profile'
 
 const ProfileRoute = () => {
-  return <ProfileScreen />;
-};
+  return <ProfileScreen />
+}
 
-export default ProfileRoute;
+export default ProfileRoute

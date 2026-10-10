@@ -1,9 +1,8 @@
-import React from 'react';
-import HomeScreen from "@/screens/Shop/Home";
+import React from 'react'
+import HomeScreen from '@/screens/Shop/Home'
 
 const HomeRoute = () => {
-  return <HomeScreen />;
-};
+  return <HomeScreen />
+}
 
-export default HomeRoute;
-
+export default HomeRoute

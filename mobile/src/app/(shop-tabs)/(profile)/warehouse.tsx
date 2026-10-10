@@ -1,8 +1,8 @@
-import ShopWarehouseScreen from "@/screens/Shop/Warehouse";
-import React from "react";
+import ShopWarehouseScreen from '@/screens/Shop/Warehouse'
+import React from 'react'
 
 const ShopWarehouseRoute = () => {
-  return <ShopWarehouseScreen />;
-};
+  return <ShopWarehouseScreen />
+}
 
-export default ShopWarehouseRoute;
+export default ShopWarehouseRoute

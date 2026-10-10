@@ -1,20 +1,16 @@
-import { PropsWithChildren } from "react";
-import { StyleProp, Text, TextStyle, GestureResponderEvent } from "react-native";
-import {
-  StyleSheet,
-  UnistylesVariants,
-  withUnistyles,
-} from "react-native-unistyles";
+import { PropsWithChildren } from 'react'
+import { StyleProp, Text, TextStyle, GestureResponderEvent } from 'react-native'
+import { StyleSheet, UnistylesVariants, withUnistyles } from 'react-native-unistyles'
 
 const UniText = withUnistyles(Text, (theme) => ({
   selectionColor: theme.colors.blueMain,
-}));
+}))
 
 export interface TypographyProps extends UnistylesVariants<typeof styles> {
-  style?: StyleProp<TextStyle>;
-  numberOfLines?: number;
-  selectable?: boolean;
-  onPress?: (event: GestureResponderEvent) => void;
+  style?: StyleProp<TextStyle>
+  numberOfLines?: number
+  selectable?: boolean
+  onPress?: (event: GestureResponderEvent) => void
 }
 const Typography = ({
   children,
@@ -23,7 +19,7 @@ const Typography = ({
   onPress,
   ...rest
 }: PropsWithChildren<TypographyProps>) => {
-  styles.useVariants(rest);
+  styles.useVariants(rest)
 
   return (
     <UniText
@@ -34,8 +30,8 @@ const Typography = ({
     >
       {children}
     </UniText>
-  );
-};
+  )
+}
 
 /**
  * Размеры взяты у витрины — но те, которые она показывает НА ТЕЛЕФОНЕ.
@@ -58,11 +54,11 @@ const TYPOGRAPHY_SCALE = {
   p3: { fontSize: 16, lineHeight: 16 * 1.5 }, // сайт: 16px
   t1: { fontSize: 14, lineHeight: 14 * 1.3 }, // сайт: 14px
   t2: { fontSize: 12, lineHeight: 12 * 1.3 }, // сайт: 12px
-} as const;
+} as const
 
 const styles = StyleSheet.create((theme) => ({
   baseText: {
-    fontFamily: "GoogleSans-Regular",
+    fontFamily: 'GoogleSans-Regular',
   },
   themedText: {
     variants: {
@@ -78,25 +74,25 @@ const styles = StyleSheet.create((theme) => ({
         default: TYPOGRAPHY_SCALE.p3,
       },
       weight: {
-        regular: { fontFamily: "GoogleSans-Regular" },
-        medium: { fontFamily: "GoogleSans-Medium" },
-        bold: { fontFamily: "GoogleSans-Bold" },
-        semiBold: { fontFamily: "GoogleSans-SemiBold" },
-        default: { fontFamily: "GoogleSans-Regular" },
+        regular: { fontFamily: 'GoogleSans-Regular' },
+        medium: { fontFamily: 'GoogleSans-Medium' },
+        bold: { fontFamily: 'GoogleSans-Bold' },
+        semiBold: { fontFamily: 'GoogleSans-SemiBold' },
+        default: { fontFamily: 'GoogleSans-Regular' },
       },
       isLineThrough: {
         true: {
-          textDecorationLine: "line-through",
+          textDecorationLine: 'line-through',
         },
       },
       isUnderlined: {
         true: {
-          textDecorationLine: "underline",
+          textDecorationLine: 'underline',
         },
       },
       isCentered: {
         true: {
-          textAlign: "center",
+          textAlign: 'center',
         },
       },
       color: {
@@ -132,6 +128,6 @@ const styles = StyleSheet.create((theme) => ({
       },
     },
   },
-}));
+}))
 
-export default Typography;
+export default Typography

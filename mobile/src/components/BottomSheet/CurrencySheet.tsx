@@ -1,48 +1,37 @@
-import { MAX_PAGE_SIZE } from "@/constants/pagination";
-import React from "react";
-import Typography from "@/ui/Typography";
-import { Pressable, ScrollView } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import HeaderSheet from "./HeaderSheet";
-import { UniTrueSheet } from "@/ui/BottomSheet";
-import { TrueSheet } from "@lodev09/react-native-true-sheet";
-import { TFunction } from "i18next";
-import { currencyApi } from "@/api/currencyApi";
-import ActivityIndicator from "@/ui/ActivityIndicator";
+import { MAX_PAGE_SIZE } from '@/constants/pagination'
+import React from 'react'
+import Typography from '@/ui/Typography'
+import { Pressable, ScrollView } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import HeaderSheet from './HeaderSheet'
+import { UniTrueSheet } from '@/ui/BottomSheet'
+import { TrueSheet } from '@lodev09/react-native-true-sheet'
+import { TFunction } from 'i18next'
+import { currencyApi } from '@/api/currencyApi'
+import ActivityIndicator from '@/ui/ActivityIndicator'
 
 type Props = {
-  ref: React.RefObject<TrueSheet | null>;
-  onSelect: (
-    brandId: number,
-    translations: Currency.Translation[],
-    code: string,
-  ) => void;
-  t: TFunction;
-};
+  ref: React.RefObject<TrueSheet | null>
+  onSelect: (brandId: number, translations: Currency.Translation[], code: string) => void
+  t: TFunction
+}
 
 const CurrencySheet = ({ ref, onSelect, t }: Props) => {
   const currenciesQuery = currencyApi.useGetAll({
     skip: 0,
     limit: MAX_PAGE_SIZE,
-  });
+  })
 
   const onClose = () => {
-    ref.current?.dismiss();
-  };
+    ref.current?.dismiss()
+  }
 
-  const data = currenciesQuery.data || [];
+  const data = currenciesQuery.data || []
 
   return (
-    <UniTrueSheet
-      ref={ref}
-      scrollable
-      detents={[0.5, 1]}
-      style={styles.wrapper}
-    >
-      <HeaderSheet title={t("currency")} onClose={onClose} />
-      {currenciesQuery.isPending ? (
-        <ActivityIndicator style={styles.loader} />
-      ) : null}
+    <UniTrueSheet ref={ref} scrollable detents={[0.5, 1]} style={styles.wrapper}>
+      <HeaderSheet title={t('currency')} onClose={onClose} />
+      {currenciesQuery.isPending ? <ActivityIndicator style={styles.loader} /> : null}
       <ScrollView contentContainerStyle={styles.contentContainer}>
         {data.map((item, index) => (
           <Pressable
@@ -53,7 +42,7 @@ const CurrencySheet = ({ ref, onSelect, t }: Props) => {
             <Typography weight="medium">
               {/* Без запасного варианта строка валюты оставалась пустой,
                   если для текущего языка перевода нет. */}
-              {item.translations.find((tr) => tr.language === t("key"))?.name ??
+              {item.translations.find((tr) => tr.language === t('key'))?.name ??
                 item.translations[0]?.name ??
                 item.code}
             </Typography>
@@ -61,10 +50,10 @@ const CurrencySheet = ({ ref, onSelect, t }: Props) => {
         ))}
       </ScrollView>
     </UniTrueSheet>
-  );
-};
+  )
+}
 
-export default CurrencySheet;
+export default CurrencySheet
 
 const styles = StyleSheet.create((theme) => ({
   wrapper: {
@@ -86,8 +75,8 @@ const styles = StyleSheet.create((theme) => ({
     borderBottomWidth: isLast ? 0 : 1,
     borderBottomColor: theme.colors.stroke,
     gap: theme.spacing(2),
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   }),
   logoContainer: {
     width: 70,
@@ -97,7 +86,7 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing(1),
   },
   logo: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
   },
-}));
+}))

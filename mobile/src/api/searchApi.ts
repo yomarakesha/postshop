@@ -1,11 +1,11 @@
-import { AxiosError } from "axios";
-import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-import api from ".";
+import { AxiosError } from 'axios'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import api from '.'
 
 type Options = Omit<
   UseQueryOptions<Search.Response, AxiosError<ApiErrorResponse>>,
-  "queryKey" | "queryFn"
->;
+  'queryKey' | 'queryFn'
+>
 
 /**
  * Поиск по товарам, магазинам, категориям и брендам одним запросом.
@@ -25,19 +25,19 @@ type Options = Omit<
  */
 const useSearch = (params: Search.API.Vars, options?: Options) => {
   return useQuery<Search.Response, AxiosError<ApiErrorResponse>>({
-    queryKey: ["search", params],
+    queryKey: ['search', params],
     queryFn: async () => {
       const res = await api.req({
-        method: "GET",
-        url: "/search/",
+        method: 'GET',
+        url: '/search/',
         params,
-      });
-      return res.data;
+      })
+      return res.data
     },
     ...options,
-  });
-};
+  })
+}
 
 export const searchApi = {
   useSearch,
-};
+}

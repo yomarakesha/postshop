@@ -1,7 +1,7 @@
-import EditShopStepScreen from "@/screens/Shop/EditShopStep";
+import EditShopStepScreen from '@/screens/Shop/EditShopStep'
 
 const EditShopStepRoute = () => {
-  return <EditShopStepScreen />;
-};
+  return <EditShopStepScreen />
+}
 
-export default EditShopStepRoute;
+export default EditShopStepRoute

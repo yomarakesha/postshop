@@ -1,14 +1,14 @@
-import React, { useState } from "react";
-import { StyleProp, TextInputProps, View, ViewStyle } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import TextInput from "@/ui/TextInput";
+import React, { useState } from 'react'
+import { StyleProp, TextInputProps, View, ViewStyle } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import TextInput from '@/ui/TextInput'
 
 type Props = TextInputProps & {
-  disabled?: boolean;
-  flex?: boolean;
-  leftElement?: React.ReactNode;
-  containerStyle?: StyleProp<ViewStyle>;
-};
+  disabled?: boolean
+  flex?: boolean
+  leftElement?: React.ReactNode
+  containerStyle?: StyleProp<ViewStyle>
+}
 
 const CustomTextInput = ({
   onFocus,
@@ -20,7 +20,7 @@ const CustomTextInput = ({
   flex = false,
   ...rest
 }: Props) => {
-  const [isFocused, setIsFocused] = useState(false);
+  const [isFocused, setIsFocused] = useState(false)
   return (
     <View
       style={[
@@ -35,26 +35,22 @@ const CustomTextInput = ({
       <TextInput
         {...rest}
         onFocus={(e) => {
-          setIsFocused(true);
-          onFocus?.(e);
+          setIsFocused(true)
+          onFocus?.(e)
         }}
         onBlur={(e) => {
-          setIsFocused(false);
-          onBlur?.(e);
+          setIsFocused(false)
+          onBlur?.(e)
         }}
         scrollEnabled={false}
-        style={[
-          styles.input,
-          disabled && styles.disabled,
-          rest.multiline && styles.multilineInput,
-        ]}
+        style={[styles.input, disabled && styles.disabled, rest.multiline && styles.multilineInput]}
         editable={!disabled}
       />
     </View>
-  );
-};
+  )
+}
 
-export default CustomTextInput;
+export default CustomTextInput
 
 const styles = StyleSheet.create((theme) => ({
   flex1: {
@@ -69,22 +65,22 @@ const styles = StyleSheet.create((theme) => ({
     // Одна высота с кнопками и SelectInput — раньше поля были ниже и
     // соседние элементы в строке не выравнивались.
     minHeight: 48,
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: theme.spacing(2),
   },
   focused: {
     borderColor: theme.colors.blueMain,
   },
   input: {
-    height: "auto",
+    height: 'auto',
     padding: 0,
     flex: 1,
     // Раньше цвет текста не задавался вовсе: в тёмной теме поле рисовало
     // системный чёрный текст на тёмном фоне. Плюс поле выпадало из типографики
     // приложения (системный шрифт 14px вместо GoogleSans 16px).
     color: theme.colors.text,
-    fontFamily: "GoogleSans-Regular",
+    fontFamily: 'GoogleSans-Regular',
     fontSize: 16,
     lineHeight: 24,
   },
@@ -94,10 +90,10 @@ const styles = StyleSheet.create((theme) => ({
   },
   multilineInput: {
     minHeight: 92,
-    textAlignVertical: "top",
+    textAlignVertical: 'top',
     // lineHeight 16 при 16px шрифте склеивал строки — строки многострочного
     // поля наезжали друг на друга.
     lineHeight: 24,
     paddingTop: theme.spacing(1),
   },
-}));
+}))

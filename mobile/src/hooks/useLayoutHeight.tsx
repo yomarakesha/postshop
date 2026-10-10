@@ -1,14 +1,14 @@
-import { useCallback, useState } from "react";
-import { LayoutChangeEvent } from "react-native";
+import { useCallback, useState } from 'react'
+import { LayoutChangeEvent } from 'react-native'
 
 const useLayoutHeight = () => {
-  const [height, setHeight] = useState(0);
+  const [height, setHeight] = useState(0)
 
   const onLayout = useCallback((e: LayoutChangeEvent) => {
-    setHeight(e.nativeEvent.layout.height);
-  }, []);
+    setHeight(e.nativeEvent.layout.height)
+  }, [])
 
-  return { height, onLayout };
-};
+  return { height, onLayout }
+}
 
-export default useLayoutHeight;
+export default useLayoutHeight

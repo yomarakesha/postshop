@@ -1,25 +1,25 @@
-import React from "react";
-import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import { useUserStore } from "@/store/useUserStore";
-import Typography from "@/ui/Typography";
-import prettyPhoneNumber from "@/utils/prettyPhoneNumber";
-import Button from "@/ui/Button";
-import HeaderRight from "./HeaderRight";
-import { useRouter } from "expo-router";
-import { TFunction } from "i18next";
+import React from 'react'
+import { View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import { useUserStore } from '@/store/useUserStore'
+import Typography from '@/ui/Typography'
+import prettyPhoneNumber from '@/utils/prettyPhoneNumber'
+import Button from '@/ui/Button'
+import HeaderRight from './HeaderRight'
+import { useRouter } from 'expo-router'
+import { TFunction } from 'i18next'
 
 type Props = {
-  t: TFunction;
-};
+  t: TFunction
+}
 
 const HeaderBottom = ({ t }: Props) => {
-  const user = useUserStore((s) => s.user);
-  const router = useRouter();
+  const user = useUserStore((s) => s.user)
+  const router = useRouter()
 
   const onPressAuth = () => {
-    router.push("/(auth)");
-  };
+    router.push('/(auth)')
+  }
 
   if (user) {
     return (
@@ -41,20 +41,20 @@ const HeaderBottom = ({ t }: Props) => {
           </View>
         </View>
       </View>
-    );
+    )
   }
 
   return (
     <Button
-      title={t("profile.logIn")}
+      title={t('profile.logIn')}
       onPress={onPressAuth}
       variant="secondary"
       style={styles.loginButton}
     />
-  );
-};
+  )
+}
 
-export default HeaderBottom;
+export default HeaderBottom
 
 const styles = StyleSheet.create((theme) => ({
   // Блок рисуется прямо в шапке, у которой своих боковых отступов нет:
@@ -63,14 +63,14 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing(3),
   },
   infoContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     gap: theme.spacing(3),
   },
   rightGroup: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: theme.spacing(3),
   },
   loginButton: {
@@ -78,4 +78,4 @@ const styles = StyleSheet.create((theme) => ({
     borderWidth: 1,
     borderColor: theme.colors.stroke,
   },
-}));
+}))

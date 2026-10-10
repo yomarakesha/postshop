@@ -1,8 +1,8 @@
-import EditProductScreen from "@/screens/Shop/CreateEditProduct/Edit";
-import React from "react";
+import EditProductScreen from '@/screens/Shop/CreateEditProduct/Edit'
+import React from 'react'
 
 const EditProductRoute = () => {
-  return <EditProductScreen />;
-};
+  return <EditProductScreen />
+}
 
-export default EditProductRoute;
+export default EditProductRoute

@@ -1,17 +1,17 @@
-import React from "react";
-import Typography from "@/ui/Typography";
-import { Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import ArrowLeft from "@assets/icons/arrow-left.svg";
-import SearchInput from "@/ui/SearchInput";
-import { TFunction } from "i18next";
+import React from 'react'
+import Typography from '@/ui/Typography'
+import { Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import ArrowLeft from '@assets/icons/arrow-left.svg'
+import SearchInput from '@/ui/SearchInput'
+import { TFunction } from 'i18next'
 
 type Props = {
-  onGoBack?: () => void;
-  onChangeSearch: (text: string) => void;
-  searchValue: string;
-  t: TFunction;
-};
+  onGoBack?: () => void
+  onChangeSearch: (text: string) => void
+  searchValue: string
+  t: TFunction
+}
 
 const HeaderBottom = ({ onGoBack, onChangeSearch, searchValue, t }: Props) => {
   return (
@@ -21,19 +21,19 @@ const HeaderBottom = ({ onGoBack, onChangeSearch, searchValue, t }: Props) => {
       </Pressable>
       <SearchInput
         flex
-        placeholder={t("client.shop.searchPlaceholder")}
+        placeholder={t('client.shop.searchPlaceholder')}
         value={searchValue}
         onChangeText={onChangeSearch}
       />
     </View>
-  );
-};
+  )
+}
 
-export default HeaderBottom;
+export default HeaderBottom
 
 const styles = StyleSheet.create((theme) => ({
   container: {
-    flexDirection: "row",
+    flexDirection: 'row',
     paddingHorizontal: theme.spacing(3),
     gap: theme.spacing(2),
   },
@@ -43,9 +43,9 @@ const styles = StyleSheet.create((theme) => ({
   goBackButton: {
     width: 48,
     height: 48,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     borderRadius: theme.spacing(3),
     backgroundColor: theme.colors.white,
   },
-}));
+}))

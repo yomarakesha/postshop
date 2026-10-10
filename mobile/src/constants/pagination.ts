@@ -14,4 +14,4 @@
  * когда-нибудь станет больше 500, хвост так же молча потеряется. Бэкенд для
  * этого отдаёт заголовки X-Total-Count / X-Has-More.
  */
-export const MAX_PAGE_SIZE = 500;
+export const MAX_PAGE_SIZE = 500

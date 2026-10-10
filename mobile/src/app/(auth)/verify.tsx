@@ -1,8 +1,8 @@
-import VerifyScreen from "@/screens/Verify";
-import React from "react";
+import VerifyScreen from '@/screens/Verify'
+import React from 'react'
 
 const VerifyRoute = () => {
-  return <VerifyScreen />;
-};
+  return <VerifyScreen />
+}
 
-export default VerifyRoute;
+export default VerifyRoute

@@ -1,23 +1,23 @@
-import CustomTextInput from "@/ui/CustomTextInput";
-import Typography from "@/ui/Typography";
-import TrashIcon from "@assets/icons/trash.svg";
-import React, { Ref, useEffect, useImperativeHandle } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import { RefType } from "..";
-import { TFunction } from "i18next";
+import CustomTextInput from '@/ui/CustomTextInput'
+import Typography from '@/ui/Typography'
+import TrashIcon from '@assets/icons/trash.svg'
+import React, { Ref, useEffect, useImperativeHandle } from 'react'
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import { Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import { RefType } from '..'
+import { TFunction } from 'i18next'
 
 type Inputs = {
-  addresses: { value: string }[];
-};
+  addresses: { value: string }[]
+}
 
 type Props = {
-  data: ShopAdditional.Item["addresses"];
-  setIsValid: (value: boolean) => void;
-  ref: Ref<RefType>;
-  t: TFunction;
-};
+  data: ShopAdditional.Item['addresses']
+  setIsValid: (value: boolean) => void
+  ref: Ref<RefType>
+  t: TFunction
+}
 
 const Addresses = ({ data, setIsValid, ref, t }: Props) => {
   const {
@@ -25,28 +25,26 @@ const Addresses = ({ data, setIsValid, ref, t }: Props) => {
     getValues,
     formState: { isValid },
   } = useForm<Inputs>({
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
-      addresses: data?.length
-        ? data.map((value) => ({ value }))
-        : [{ value: "" }],
+      addresses: data?.length ? data.map((value) => ({ value })) : [{ value: '' }],
     },
-  });
+  })
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "addresses",
-  });
+    name: 'addresses',
+  })
 
   useEffect(() => {
-    setIsValid(isValid);
-  }, [isValid]);
+    setIsValid(isValid)
+  }, [isValid])
 
   useImperativeHandle(ref, () => ({
     getData: () => ({
-      addresses: getValues("addresses").map((a) => a.value),
+      addresses: getValues('addresses').map((a) => a.value),
     }),
-  }));
+  }))
 
   return (
     <View style={styles.container}>
@@ -62,7 +60,7 @@ const Addresses = ({ data, setIsValid, ref, t }: Props) => {
                 value={value}
                 onBlur={onBlur}
                 onChangeText={onChange}
-                placeholder={t("store.shopAdditional.addressPlaceholder", {
+                placeholder={t('store.shopAdditional.addressPlaceholder', {
                   index: index + 1,
                 })}
               />
@@ -75,16 +73,16 @@ const Addresses = ({ data, setIsValid, ref, t }: Props) => {
           )}
         </View>
       ))}
-      <Pressable onPress={() => append({ value: "" })} style={styles.addButton}>
+      <Pressable onPress={() => append({ value: '' })} style={styles.addButton}>
         <Typography variant="p3" color="main">
-          + {t("store.shopAdditional.addAddress")}
+          + {t('store.shopAdditional.addAddress')}
         </Typography>
       </Pressable>
     </View>
-  );
-};
+  )
+}
 
-export default Addresses;
+export default Addresses
 
 const styles = StyleSheet.create((theme) => ({
   container: {
@@ -96,17 +94,17 @@ const styles = StyleSheet.create((theme) => ({
   },
   inputWrapper: {
     gap: theme.spacing(2),
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   addButton: {
     paddingVertical: theme.spacing(3),
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: theme.colors.gray2,
     borderRadius: theme.spacing(3),
   },
   trashIcon: {
     color: theme.colors.failure,
   },
-}));
+}))

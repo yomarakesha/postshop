@@ -1,15 +1,15 @@
-import React from "react";
-import Typography from "@/ui/Typography";
-import { Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import CloseIcon from "@assets/icons/close.svg";
-import ArrowLeftIcon from "@assets/icons/arrow-left.svg";
+import React from 'react'
+import Typography from '@/ui/Typography'
+import { Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import CloseIcon from '@assets/icons/close.svg'
+import ArrowLeftIcon from '@assets/icons/arrow-left.svg'
 
 type Props = {
-  title: string;
-  onClose: () => void;
-  onGoBack?: () => void;
-};
+  title: string
+  onClose: () => void
+  onGoBack?: () => void
+}
 
 const HeaderSheet = ({ title, onClose, onGoBack }: Props) => {
   return (
@@ -28,28 +28,28 @@ const HeaderSheet = ({ title, onClose, onGoBack }: Props) => {
         <CloseIcon width={24} height={24} style={styles.closeIcon} />
       </Pressable>
     </View>
-  );
-};
+  )
+}
 
-export default HeaderSheet;
+export default HeaderSheet
 
 const styles = StyleSheet.create((theme) => ({
   container: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingVertical: theme.spacing(4),
   },
   closeIcon: {
     color: theme.colors.passive1,
   },
   left: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: theme.spacing(3),
-    alignItems: "center",
+    alignItems: 'center',
     flex: 1,
   },
   arrowIcon: {
     color: theme.colors.passive2,
   },
-}));
+}))

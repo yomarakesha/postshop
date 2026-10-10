@@ -1,23 +1,23 @@
-import { AxiosError } from "axios";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import api from ".";
+import { AxiosError } from 'axios'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import api from '.'
 
-const LIST_KEY = "notifications";
-const COUNT_KEY = "notifications-unread-count";
+const LIST_KEY = 'notifications'
+const COUNT_KEY = 'notifications-unread-count'
 
 const useGetAll = (params: Notification.API.ListVars, enabled = true) =>
   useQuery<Notification.Item[], AxiosError<ApiErrorResponse>>({
     queryKey: [LIST_KEY, params],
     queryFn: async () => {
       const res = await api.req({
-        method: "GET",
-        url: "/notifications/",
+        method: 'GET',
+        url: '/notifications/',
         params,
-      });
-      return res.data;
+      })
+      return res.data
     },
     enabled,
-  });
+  })
 
 /**
  * Счётчик для значка у пункта «Уведомления».
@@ -30,55 +30,54 @@ const useUnreadCount = (enabled = true) =>
     queryKey: [COUNT_KEY],
     queryFn: async () => {
       const res = await api.req({
-        method: "GET",
-        url: "/notifications/unread-count",
-      });
-      return res.data;
+        method: 'GET',
+        url: '/notifications/unread-count',
+      })
+      return res.data
     },
     enabled,
-  });
+  })
 
 /** После любого изменения список и счётчик расходятся — обновляем оба. */
 const useInvalidate = () => {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   return () => {
-    queryClient.invalidateQueries({ queryKey: [LIST_KEY] });
-    queryClient.invalidateQueries({ queryKey: [COUNT_KEY] });
-  };
-};
+    queryClient.invalidateQueries({ queryKey: [LIST_KEY] })
+    queryClient.invalidateQueries({ queryKey: [COUNT_KEY] })
+  }
+}
 
 const useMarkRead = () => {
-  const invalidate = useInvalidate();
+  const invalidate = useInvalidate()
   return useMutation<unknown, AxiosError<ApiErrorResponse>, number>({
     mutationFn: async (notificationId) =>
       api.req({
-        method: "PATCH",
+        method: 'PATCH',
         url: `/notifications/${notificationId}/read`,
       }),
     onSuccess: invalidate,
-  });
-};
+  })
+}
 
 const useMarkAllRead = () => {
-  const invalidate = useInvalidate();
+  const invalidate = useInvalidate()
   return useMutation<unknown, AxiosError<ApiErrorResponse>, void>({
-    mutationFn: async () =>
-      api.req({ method: "PATCH", url: "/notifications/read-all" }),
+    mutationFn: async () => api.req({ method: 'PATCH', url: '/notifications/read-all' }),
     onSuccess: invalidate,
-  });
-};
+  })
+}
 
 const useDelete = () => {
-  const invalidate = useInvalidate();
+  const invalidate = useInvalidate()
   return useMutation<unknown, AxiosError<ApiErrorResponse>, number>({
     mutationFn: async (notificationId) =>
       api.req({
-        method: "DELETE",
+        method: 'DELETE',
         url: `/notifications/${notificationId}`,
       }),
     onSuccess: invalidate,
-  });
-};
+  })
+}
 
 export const notificationApi = {
   useGetAll,
@@ -86,4 +85,4 @@ export const notificationApi = {
   useMarkRead,
   useMarkAllRead,
   useDelete,
-};
+}

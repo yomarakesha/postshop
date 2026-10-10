@@ -1,8 +1,8 @@
-import ShopReturnsScreen from "@/screens/Shop/Returns";
-import React from "react";
+import ShopReturnsScreen from '@/screens/Shop/Returns'
+import React from 'react'
 
 const ShopReturnsRoute = () => {
-  return <ShopReturnsScreen />;
-};
+  return <ShopReturnsScreen />
+}
 
-export default ShopReturnsRoute;
+export default ShopReturnsRoute

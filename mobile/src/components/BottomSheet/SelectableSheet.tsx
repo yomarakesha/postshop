@@ -1,24 +1,24 @@
-import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import React, { RefObject } from "react";
-import Typography from "@/ui/Typography";
-import HeaderSheet from "./HeaderSheet";
-import Radio from "@/ui/Radio";
-import { TrueSheet } from "@lodev09/react-native-true-sheet";
-import { UniTrueSheet } from "@/ui/BottomSheet";
+import { Pressable, ScrollView, useWindowDimensions, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import React, { RefObject } from 'react'
+import Typography from '@/ui/Typography'
+import HeaderSheet from './HeaderSheet'
+import Radio from '@/ui/Radio'
+import { TrueSheet } from '@lodev09/react-native-true-sheet'
+import { UniTrueSheet } from '@/ui/BottomSheet'
 
 export type SelectableItem<T> = {
-  key: T;
-  value: string;
-};
+  key: T
+  value: string
+}
 
 type Props<T> = {
-  ref: RefObject<TrueSheet | null>;
-  title: string;
-  data: SelectableItem<T>[];
-  selectedKey: T | null;
-  onSelect: (key: T) => void;
-};
+  ref: RefObject<TrueSheet | null>
+  title: string
+  data: SelectableItem<T>[]
+  selectedKey: T | null
+  onSelect: (key: T) => void
+}
 const SelectableSheet = <T extends string | number>({
   ref,
   title,
@@ -26,10 +26,10 @@ const SelectableSheet = <T extends string | number>({
   selectedKey,
   onSelect,
 }: Props<T>) => {
-  const { height } = useWindowDimensions();
+  const { height } = useWindowDimensions()
   const handleClose = () => {
-    ref.current?.dismiss();
-  };
+    ref.current?.dismiss()
+  }
 
   return (
     // Высота окна — по содержимому, а список ограничен тремя четвертями
@@ -37,7 +37,7 @@ const SelectableSheet = <T extends string | number>({
     // на весь список, нижние пункты уходили за край экрана, а прокручивать
     // было нечего: в выборе региона из 13 городов последний, Aşgabat, выбрать
     // было нельзя. Короткие списки (язык, сортировка) выглядят как раньше.
-    <UniTrueSheet ref={ref} detents={["auto"]} style={styles.wrapper}>
+    <UniTrueSheet ref={ref} detents={['auto']} style={styles.wrapper}>
       <HeaderSheet title={title} onClose={handleClose} />
       <ScrollView
         style={{ maxHeight: height * 0.75 }}
@@ -48,8 +48,8 @@ const SelectableSheet = <T extends string | number>({
           {data.map((item, index) => (
             <Pressable
               onPress={() => {
-                onSelect(item.key);
-                handleClose();
+                onSelect(item.key)
+                handleClose()
               }}
               key={String(item.key)}
               style={styles.item(index === data.length - 1)}
@@ -63,10 +63,10 @@ const SelectableSheet = <T extends string | number>({
         </View>
       </ScrollView>
     </UniTrueSheet>
-  );
-};
+  )
+}
 
-export default SelectableSheet;
+export default SelectableSheet
 
 const styles = StyleSheet.create((theme) => ({
   wrapper: {
@@ -83,11 +83,11 @@ const styles = StyleSheet.create((theme) => ({
     paddingHorizontal: theme.spacing(4),
   },
   item: (isLast: boolean) => ({
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingVertical: theme.spacing(4),
     borderBottomWidth: isLast ? 0 : 1,
     borderBottomColor: theme.colors.stroke,
   }),
-}));
+}))

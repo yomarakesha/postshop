@@ -1,11 +1,11 @@
-import React from "react";
-import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import React from 'react'
+import { View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 
 type Props = {
-  isActive: boolean;
-  backgroundColor?: string;
-};
+  isActive: boolean
+  backgroundColor?: string
+}
 
 const Radio = ({ isActive, backgroundColor }: Props) => {
   return (
@@ -16,16 +16,16 @@ const Radio = ({ isActive, backgroundColor }: Props) => {
         isActive && styles.selectedRadio,
       ]}
     />
-  );
-};
+  )
+}
 
-export default Radio;
+export default Radio
 
 const styles = StyleSheet.create((theme) => ({
   radio: {
     width: 20,
     height: 20,
-    borderRadius: "100%",
+    borderRadius: '100%',
     backgroundColor: theme.colors.white,
     borderWidth: 1,
     borderColor: theme.colors.stroke,
@@ -34,4 +34,4 @@ const styles = StyleSheet.create((theme) => ({
     borderWidth: 5,
     borderColor: theme.colors.blueMain,
   },
-}));
+}))

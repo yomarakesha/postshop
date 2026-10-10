@@ -1,44 +1,44 @@
-import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-import api from ".";
-import { AxiosError } from "axios";
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import api from '.'
+import { AxiosError } from 'axios'
 
 const useGetAll = (params: Collection.API.GetAllVars) => {
   const query = useQuery<Collection.Item[], AxiosError<ApiErrorResponse>>({
-    queryKey: ["collections"],
+    queryKey: ['collections'],
     queryFn: async () => {
       const res = await api.req({
-        method: "GET",
-        url: "/collections/",
+        method: 'GET',
+        url: '/collections/',
         params,
-      });
+      })
 
-      return res.data;
+      return res.data
     },
-  });
-  return query;
-};
+  })
+  return query
+}
 
 type GetOptions = Omit<
   UseQueryOptions<Collection.Item, AxiosError<ApiErrorResponse>>,
-  "queryKey" | "queryFn"
->;
+  'queryKey' | 'queryFn'
+>
 const useGet = (collectionId: number, options: GetOptions) => {
   const query = useQuery<Collection.Item, AxiosError<ApiErrorResponse>>({
-    queryKey: ["collections", collectionId],
+    queryKey: ['collections', collectionId],
     queryFn: async () => {
       const res = await api.req({
-        method: "GET",
+        method: 'GET',
         url: `/collections/${collectionId}`,
-      });
+      })
 
-      return res.data;
+      return res.data
     },
     ...options,
-  });
-  return query;
-};
+  })
+  return query
+}
 
 export const collectionApi = {
   useGetAll,
   useGet,
-};
+}

@@ -1,8 +1,8 @@
-import AuthScreen from "@/screens/Auth";
-import React from "react";
+import AuthScreen from '@/screens/Auth'
+import React from 'react'
 
 const AuthRoute = () => {
-  return <AuthScreen />;
-};
+  return <AuthScreen />
+}
 
-export default AuthRoute;
+export default AuthRoute

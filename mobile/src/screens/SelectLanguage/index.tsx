@@ -1,25 +1,25 @@
-import { langs } from "@/constants/langs";
-import i18n from "@/localization";
-import useAppStore from "@/store/useAppStore";
-import Typography from "@/ui/Typography";
-import React, { useState } from "react";
-import { TouchableHighlight, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import splashBackground from "@assets/images/splash-background.png";
-import { Image } from "expo-image";
-import { StatusBar } from "expo-status-bar";
-import { useTranslation } from "react-i18next";
-import CheckIcon from "@assets/icons/check.svg";
+import { langs } from '@/constants/langs'
+import i18n from '@/localization'
+import useAppStore from '@/store/useAppStore'
+import Typography from '@/ui/Typography'
+import React, { useState } from 'react'
+import { TouchableHighlight, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import splashBackground from '@assets/images/splash-background.png'
+import { Image } from 'expo-image'
+import { StatusBar } from 'expo-status-bar'
+import { useTranslation } from 'react-i18next'
+import CheckIcon from '@assets/icons/check.svg'
 
 const SelectLanguageScreen = () => {
-  const [pressedKey, setPressedKey] = useState<AppLang | null>(null);
-  const currentLanguage = useAppStore((s) => s.lang);
-  const { t } = useTranslation();
+  const [pressedKey, setPressedKey] = useState<AppLang | null>(null)
+  const currentLanguage = useAppStore((s) => s.lang)
+  const { t } = useTranslation()
 
   const handleSelectLanguage = (lang: AppLang) => {
-    useAppStore.setState({ lang });
-    i18n.changeLanguage(lang);
-  };
+    useAppStore.setState({ lang })
+    i18n.changeLanguage(lang)
+  }
 
   return (
     <>
@@ -28,25 +28,21 @@ const SelectLanguageScreen = () => {
           прогрузится, экран всё равно останется тёмно-синим, а светлый
           статус-бар и белые заголовки — читаемыми. */}
       <View style={styles.root}>
-        <Image
-          source={splashBackground}
-          style={styles.backgroundImage}
-          contentFit="cover"
-        />
+        <Image source={splashBackground} style={styles.backgroundImage} contentFit="cover" />
         <View style={styles.container}>
           <View style={styles.titleWrapper}>
             <Typography variant="h3" weight="bold" color="white" isCentered>
-              {t("client.selectLanguage.title")}
+              {t('client.selectLanguage.title')}
             </Typography>
             <Typography variant="p3" weight="regular" color="white" isCentered>
-              {t("client.selectLanguage.subtitle")}
+              {t('client.selectLanguage.subtitle')}
             </Typography>
           </View>
 
           <View style={styles.selector}>
             {langs.map(({ key, value }) => {
-              const isPressed = pressedKey === key;
-              const isSelected = currentLanguage === key;
+              const isPressed = pressedKey === key
+              const isSelected = currentLanguage === key
 
               return (
                 <TouchableHighlight
@@ -61,29 +57,25 @@ const SelectLanguageScreen = () => {
                     <Typography
                       variant="p2"
                       weight="medium"
-                      color={isPressed ? "white" : undefined}
+                      color={isPressed ? 'white' : undefined}
                     >
                       {value}
                     </Typography>
                     {isSelected && (
-                      <CheckIcon
-                        width={20}
-                        height={20}
-                        style={styles.checkIcon(isPressed)}
-                      />
+                      <CheckIcon width={20} height={20} style={styles.checkIcon(isPressed)} />
                     )}
                   </View>
                 </TouchableHighlight>
-              );
+              )
             })}
           </View>
         </View>
       </View>
     </>
-  );
-};
+  )
+}
 
-export default SelectLanguageScreen;
+export default SelectLanguageScreen
 
 const styles = StyleSheet.create((theme, rt) => ({
   root: {
@@ -95,14 +87,14 @@ const styles = StyleSheet.create((theme, rt) => ({
     paddingTop: rt.insets.top + theme.spacing(12),
     paddingBottom: rt.insets.bottom + theme.spacing(4),
     paddingHorizontal: theme.spacing(4),
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
     gap: theme.spacing(8),
   },
   titleWrapper: {
     gap: theme.spacing(2),
   },
   selector: {
-    width: "100%",
+    width: '100%',
     gap: theme.spacing(2),
   },
   item: {
@@ -110,9 +102,9 @@ const styles = StyleSheet.create((theme, rt) => ({
     backgroundColor: theme.colors.white,
   },
   itemContent: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     gap: theme.spacing(2),
     paddingVertical: theme.spacing(3),
     paddingHorizontal: theme.spacing(4),
@@ -124,10 +116,10 @@ const styles = StyleSheet.create((theme, rt) => ({
     color: theme.colors.blueMain,
   },
   backgroundImage: {
-    position: "absolute",
+    position: 'absolute',
     top: 0,
     left: 0,
     right: 0,
     bottom: 0,
   },
-}));
+}))

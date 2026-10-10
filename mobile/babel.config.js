@@ -1,16 +1,16 @@
 /** @type {import('react-native-unistyles/plugin').UnistylesPluginOptions} */
 const unistylesPluginOptions = {
-  root: "src",
-};
+  root: 'src',
+}
 
 module.exports = function (api) {
-  api.cache(true);
+  api.cache(true)
 
   return {
-    presets: ["babel-preset-expo"],
+    presets: ['babel-preset-expo'],
     plugins: [
-      ["react-native-unistyles/plugin", unistylesPluginOptions],
-      "react-native-worklets/plugin",
+      ['react-native-unistyles/plugin', unistylesPluginOptions],
+      'react-native-worklets/plugin',
     ],
-  };
-};
+  }
+}

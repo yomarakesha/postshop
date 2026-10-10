@@ -1,46 +1,46 @@
-import { AxiosError } from "axios";
-import { useQuery, UseQueryOptions } from "@tanstack/react-query";
-import api from ".";
+import { AxiosError } from 'axios'
+import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import api from '.'
 
 const useGetAll = (params: Category.API.GetAllVars) => {
   const query = useQuery<Category.Item[], AxiosError<ApiErrorResponse>>({
-    queryKey: ["categories", params],
+    queryKey: ['categories', params],
     queryFn: async () => {
       const res = await api.req({
-        method: "GET",
-        url: "/categories/",
+        method: 'GET',
+        url: '/categories/',
         params,
-      });
+      })
 
-      return res.data;
+      return res.data
     },
-  });
+  })
 
-  return query;
-};
+  return query
+}
 
 type GetOptions = Omit<
   UseQueryOptions<Category.Item, AxiosError<ApiErrorResponse>>,
-  "queryKey" | "queryFn"
->;
+  'queryKey' | 'queryFn'
+>
 
 const useGet = (categoryId: number, options?: GetOptions) => {
   const query = useQuery<Category.Item, AxiosError<ApiErrorResponse>>({
-    queryKey: ["category", categoryId],
+    queryKey: ['category', categoryId],
     queryFn: async () => {
       const res = await api.req({
-        method: "GET",
-        url: "/categories/" + categoryId,
-      });
-      return res.data;
+        method: 'GET',
+        url: '/categories/' + categoryId,
+      })
+      return res.data
     },
     ...options,
-  });
+  })
 
-  return query;
-};
+  return query
+}
 
 export const categoryApi = {
   useGetAll,
   useGet,
-};
+}

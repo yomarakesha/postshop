@@ -1,8 +1,8 @@
-import OrderScreen from "@/screens/Shop/Order";
-import React from "react";
+import OrderScreen from '@/screens/Shop/Order'
+import React from 'react'
 
 const OrderRoute = () => {
-  return <OrderScreen />;
-};
+  return <OrderScreen />
+}
 
-export default OrderRoute;
+export default OrderRoute

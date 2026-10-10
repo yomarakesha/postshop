@@ -1,4 +1,4 @@
-import React from "react";
-import { ServerSetupScreen } from "@/screens/ServerSetup";
+import React from 'react'
+import { ServerSetupScreen } from '@/screens/ServerSetup'
 
-export default ServerSetupScreen;
+export default ServerSetupScreen

@@ -1,12 +1,12 @@
-import React, { useEffect } from "react";
-import Typography from "@/ui/Typography";
-import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import noInternetImg from "@assets/images/no-internet.png";
-import { Image } from "expo-image";
-import Button from "@/ui/Button";
-import { TFunction } from "i18next";
-import RefreshIcon from "@assets/icons/refresh.svg";
+import React, { useEffect } from 'react'
+import Typography from '@/ui/Typography'
+import { View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import noInternetImg from '@assets/images/no-internet.png'
+import { Image } from 'expo-image'
+import Button from '@/ui/Button'
+import { TFunction } from 'i18next'
+import RefreshIcon from '@assets/icons/refresh.svg'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -14,16 +14,16 @@ import Animated, {
   withTiming,
   cancelAnimation,
   Easing,
-} from "react-native-reanimated";
+} from 'react-native-reanimated'
 
 type Props = {
-  onRetry: () => void;
-  isLoading?: boolean;
-  t: TFunction;
-};
+  onRetry: () => void
+  isLoading?: boolean
+  t: TFunction
+}
 
 const InernetError = ({ onRetry, isLoading, t }: Props) => {
-  const rotation = useSharedValue(0);
+  const rotation = useSharedValue(0)
 
   useEffect(() => {
     if (isLoading) {
@@ -31,34 +31,30 @@ const InernetError = ({ onRetry, isLoading, t }: Props) => {
         withTiming(360, { duration: 800, easing: Easing.linear }),
         -1,
         false,
-      );
+      )
     } else {
-      cancelAnimation(rotation);
-      rotation.value = 0;
+      cancelAnimation(rotation)
+      rotation.value = 0
     }
-  }, [isLoading, rotation]);
+  }, [isLoading, rotation])
 
   const iconStyle = useAnimatedStyle(() => ({
     transform: [{ rotate: `${rotation.value}deg` }],
-  }));
+  }))
 
   return (
     <View style={styles.container}>
       <View style={styles.imageWrapper}>
-        <Image
-          source={noInternetImg}
-          style={styles.image}
-          contentFit="contain"
-        />
+        <Image source={noInternetImg} style={styles.image} contentFit="contain" />
         <Typography variant="p2" weight="semiBold">
-          {t("networkError.title")}
+          {t('networkError.title')}
         </Typography>
         <Typography variant="p3" color="secondary" isCentered>
-          {t("networkError.description")}
+          {t('networkError.description')}
         </Typography>
         <Button onPress={onRetry} variant="primary" style={styles.button}>
           <Typography variant="p3" weight="medium" color="white">
-            {t("common.retry")}
+            {t('common.retry')}
           </Typography>
           <Animated.View style={iconStyle}>
             <RefreshIcon width={20} height={20} color="white" />
@@ -66,10 +62,10 @@ const InernetError = ({ onRetry, isLoading, t }: Props) => {
         </Button>
       </View>
     </View>
-  );
-};
+  )
+}
 
-export default InernetError;
+export default InernetError
 
 const styles = StyleSheet.create((theme) => ({
   container: {
@@ -80,8 +76,8 @@ const styles = StyleSheet.create((theme) => ({
   },
   imageWrapper: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: 12,
     paddingVertical: 40,
     transform: [{ translateY: 50 }],
@@ -91,11 +87,11 @@ const styles = StyleSheet.create((theme) => ({
     height: 90,
   },
   button: {
-    width: "60%",
+    width: '60%',
     flexGrow: 0,
     marginTop: 30,
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: theme.spacing(2),
-    justifyContent: "center",
+    justifyContent: 'center',
   },
-}));
+}))

@@ -1,15 +1,15 @@
-import React from "react";
-import Typography from "@/ui/Typography";
-import { Pressable } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import { useRouter } from "expo-router";
-import CategoryIcon from "./CategoryIcon";
+import React from 'react'
+import Typography from '@/ui/Typography'
+import { Pressable } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import { useRouter } from 'expo-router'
+import CategoryIcon from './CategoryIcon'
 
 type Props = {
-  id: string;
-  label: string;
-  image?: string;
-};
+  id: string
+  label: string
+  image?: string
+}
 
 /**
  * Карточка категории.
@@ -21,16 +21,16 @@ type Props = {
  * иконка отдельно, название отдельно.
  */
 const CategoryItem = ({ id, label, image }: Props) => {
-  const router = useRouter();
+  const router = useRouter()
 
   const onPress = () => {
     router.push({
-      pathname: "/(client-tabs)/(categories)/[categoryId]",
+      pathname: '/(client-tabs)/(categories)/[categoryId]',
       params: {
         categoryId: id,
       },
-    });
-  };
+    })
+  }
 
   return (
     <Pressable style={styles.container} onPress={onPress}>
@@ -39,19 +39,14 @@ const CategoryItem = ({ id, label, image }: Props) => {
           самому длинному названию («Computers & laptops» в две строки), а
           сосед с коротким названием тянулся следом — карточки в сетке стояли
           разной высоты, и подпись висела у нижнего края. */}
-      <Typography
-        variant="p3"
-        weight="semiBold"
-        numberOfLines={2}
-        style={styles.label}
-      >
+      <Typography variant="p3" weight="semiBold" numberOfLines={2} style={styles.label}>
         {label}
       </Typography>
     </Pressable>
-  );
-};
+  )
+}
 
-export default CategoryItem;
+export default CategoryItem
 
 const styles = StyleSheet.create((theme, rn) => ({
   container: {
@@ -64,10 +59,10 @@ const styles = StyleSheet.create((theme, rn) => ({
     padding: theme.spacing(3),
     gap: theme.spacing(2),
     backgroundColor: theme.colors.white,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
   // p3 (16) * 1.3 = 20.8 на строку, две строки.
   label: {
     minHeight: 42,
   },
-}));
+}))

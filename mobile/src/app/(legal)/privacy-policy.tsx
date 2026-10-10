@@ -1,8 +1,8 @@
-import PrivacyPolicyScreen from "@/screens/Client/PrivacyPolicy";
-import React from "react";
+import PrivacyPolicyScreen from '@/screens/Client/PrivacyPolicy'
+import React from 'react'
 
 const PrivacyPolicyRoute = () => {
-    return <PrivacyPolicyScreen />;
-};
+  return <PrivacyPolicyScreen />
+}
 
-export default PrivacyPolicyRoute;
+export default PrivacyPolicyRoute

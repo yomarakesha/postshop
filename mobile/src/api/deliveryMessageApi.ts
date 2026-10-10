@@ -1,23 +1,23 @@
-import { useQuery } from "@tanstack/react-query";
-import api from ".";
-import { AxiosError } from "axios";
+import { useQuery } from '@tanstack/react-query'
+import api from '.'
+import { AxiosError } from 'axios'
 
 const useGet = () => {
   const query = useQuery<DeliveryMessage.Item, AxiosError<ApiErrorResponse>>({
-    queryKey: ["get-delivery-message"],
+    queryKey: ['get-delivery-message'],
     queryFn: async () => {
       const response = await api.req({
-        method: "GET",
-        url: "/delivery-message/",
-      });
+        method: 'GET',
+        url: '/delivery-message/',
+      })
 
-      return response.data;
+      return response.data
     },
-  });
+  })
 
-  return query;
-};
+  return query
+}
 
 export const deliveryMessageApi = {
   useGet,
-};
+}

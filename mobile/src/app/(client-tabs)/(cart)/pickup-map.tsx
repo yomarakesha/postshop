@@ -1,8 +1,8 @@
-import React from "react";
-import PickupMapScreen from "@/screens/Client/PickupMap";
+import React from 'react'
+import PickupMapScreen from '@/screens/Client/PickupMap'
 
 const PickupMapRoute = () => {
-  return <PickupMapScreen />;
-};
+  return <PickupMapScreen />
+}
 
-export default PickupMapRoute;
+export default PickupMapRoute

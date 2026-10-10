@@ -1,8 +1,8 @@
-import CartScreen from "@/screens/Client/Cart";
-import React from "react";
+import CartScreen from '@/screens/Client/Cart'
+import React from 'react'
 
 const CartRoute = () => {
-  return <CartScreen />;
-};
+  return <CartScreen />
+}
 
-export default CartRoute;
+export default CartRoute

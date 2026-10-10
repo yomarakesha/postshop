@@ -5,172 +5,165 @@ import {
   useQuery,
   useQueryClient,
   UseQueryOptions,
-} from "@tanstack/react-query";
-import api from ".";
-import { AxiosError } from "axios";
-import { buildMultipartFromBody } from "@/utils/buildMultipartFromBody";
+} from '@tanstack/react-query'
+import api from '.'
+import { AxiosError } from 'axios'
+import { buildMultipartFromBody } from '@/utils/buildMultipartFromBody'
 
 type GetAllOptions = Omit<
   UseQueryOptions<Product.Item[], AxiosError<ApiErrorResponse>>,
-  "queryKey" | "queryFn"
->;
+  'queryKey' | 'queryFn'
+>
 
 const useGetAll = (params: Product.API.GetAllVars, options?: GetAllOptions) => {
   const query = useQuery<Product.Item[], AxiosError<ApiErrorResponse>>({
-    queryKey: ["get-all-products", params],
+    queryKey: ['get-all-products', params],
     queryFn: async () => {
       const res = await api.req({
-        method: "GET",
-        url: "/products/",
+        method: 'GET',
+        url: '/products/',
         params,
-      });
+      })
 
-      return res.data;
+      return res.data
     },
     ...options,
-  });
+  })
 
-  return query;
-};
+  return query
+}
 
-const useGetInfiniteList = (
-  params: Product.API.GetAllVars,
-  options?: { enabled: boolean },
-) => {
-  const limit = params.limit ?? 10;
+const useGetInfiniteList = (params: Product.API.GetAllVars, options?: { enabled: boolean }) => {
+  const limit = params.limit ?? 10
 
   const query = useInfiniteQuery({
     initialPageParam: 0,
-    queryKey: ["products-infinite-list", params],
+    queryKey: ['products-infinite-list', params],
     queryFn: async ({ pageParam }) => {
       const res = await api.req({
-        method: "GET",
-        url: "/products/",
+        method: 'GET',
+        url: '/products/',
         params: {
           ...params,
           skip: pageParam,
           limit,
         },
-      });
+      })
 
-      return res.data;
+      return res.data
     },
     getNextPageParam: (lastPage, _allPages, lastPageParam) => {
-      if (lastPage.length < limit) return undefined;
-      return lastPageParam + limit;
+      if (lastPage.length < limit) return undefined
+      return lastPageParam + limit
     },
     ...options,
-  });
+  })
 
-  return query;
-};
+  return query
+}
 
 type GetOptions = Omit<
   UseQueryOptions<Product.Item, AxiosError<ApiErrorResponse>>,
-  "queryKey" | "queryFn"
->;
+  'queryKey' | 'queryFn'
+>
 
 const useGet = (productId: number, options?: GetOptions) => {
   const query = useQuery<Product.Item, AxiosError<ApiErrorResponse>>({
-    queryKey: ["get-product", productId],
+    queryKey: ['get-product', productId],
     queryFn: async () => {
       const res = await api.req({
-        method: "GET",
+        method: 'GET',
         url: `/products/${productId}`,
-      });
+      })
 
-      return res.data;
+      return res.data
     },
     ...options,
-  });
+  })
 
-  return query;
-};
+  return query
+}
 
 const useCreate = () => {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   const mutation = useMutation<undefined, AxiosError, Product.API.CreateBody>({
-    mutationKey: ["create-product"],
+    mutationKey: ['create-product'],
     mutationFn: async (data) => {
-      const { body, contentType } = await buildMultipartFromBody(data);
+      const { body, contentType } = await buildMultipartFromBody(data)
       const res = await api.req({
-        method: "POST",
-        url: "/products/",
-        headers: { "Content-Type": contentType },
+        method: 'POST',
+        url: '/products/',
+        headers: { 'Content-Type': contentType },
         data: body,
         transformRequest: (d) => d,
-      });
+      })
 
-      return res.data;
+      return res.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["get-all-products"] });
+      queryClient.invalidateQueries({ queryKey: ['get-all-products'] })
       queryClient.invalidateQueries({
-        queryKey: ["products-my-infinite-list"],
-      });
+        queryKey: ['products-my-infinite-list'],
+      })
     },
-  });
+  })
 
-  return mutation;
-};
+  return mutation
+}
 
 const useUpdate = (productId: number) => {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   // Ответ — товар после правки: по его status экран понимает, ушёл ли товар
   // на модерацию.
-  const mutation = useMutation<
-    Product.Item | undefined,
-    AxiosError,
-    Product.API.UpdateBody
-  >({
-    mutationKey: ["update-product", productId],
+  const mutation = useMutation<Product.Item | undefined, AxiosError, Product.API.UpdateBody>({
+    mutationKey: ['update-product', productId],
     mutationFn: async (data) => {
-      const { body, contentType } = await buildMultipartFromBody(data);
+      const { body, contentType } = await buildMultipartFromBody(data)
       const res = await api.req({
-        method: "PUT",
+        method: 'PUT',
         url: `/products/${productId}`,
         data: body,
         transformRequest: (d) => d,
-        headers: { "Content-Type": contentType },
-      });
+        headers: { 'Content-Type': contentType },
+      })
 
-      return res.data;
+      return res.data
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["get-all-products"] });
+      queryClient.invalidateQueries({ queryKey: ['get-all-products'] })
       queryClient.invalidateQueries({
-        queryKey: ["products-my-infinite-list"],
-      });
-      queryClient.removeQueries({ queryKey: ["get-product", productId] });
+        queryKey: ['products-my-infinite-list'],
+      })
+      queryClient.removeQueries({ queryKey: ['get-product', productId] })
     },
-  });
+  })
 
-  return mutation;
-};
+  return mutation
+}
 
 type GetByIdsOptions = Omit<
   UseQueryOptions<Product.Item, AxiosError<ApiErrorResponse>>,
-  "queryKey" | "queryFn"
->;
+  'queryKey' | 'queryFn'
+>
 
 type QueryResult = {
-  data: (Product.Item | undefined)[];
-  isLoading: boolean;
+  data: (Product.Item | undefined)[]
+  isLoading: boolean
   // Корзина обязана отличать «пусто» от «не загрузилось»: без этого
   // ошибка сети выглядела как пустая корзина.
-  isError: boolean;
-};
+  isError: boolean
+}
 
 const useGetByIds = (productIds: number[], options?: GetByIdsOptions) => {
   const query = useQueries({
     queries: productIds.map((productId) => ({
-      queryKey: ["get-product", productId] as const,
+      queryKey: ['get-product', productId] as const,
       queryFn: async (): Promise<Product.Item> => {
         const res = await api.req<Product.Item>({
-          method: "GET",
+          method: 'GET',
           url: `/products/${productId}`,
-        });
-        return res.data;
+        })
+        return res.data
       },
       ...options,
     })),
@@ -179,55 +172,55 @@ const useGetByIds = (productIds: number[], options?: GetByIdsOptions) => {
       isLoading: results.some((r) => r.isLoading),
       isError: results.some((r) => r.isError),
     }),
-  });
+  })
 
-  return query;
-};
+  return query
+}
 
 const useGetSimilar = (productId: number) => {
   const query = useQuery<Product.Item[], AxiosError<ApiErrorResponse>>({
-    queryKey: ["get-similar-products", productId],
+    queryKey: ['get-similar-products', productId],
     queryFn: async () => {
       const res = await api.req({
-        method: "GET",
+        method: 'GET',
         url: `/products/${productId}/similar`,
-      });
+      })
 
-      return res.data;
+      return res.data
     },
-  });
+  })
 
-  return query;
-};
+  return query
+}
 
 const useGetMyInfiniteList = (params: Product.API.GetMyVars) => {
-  const limit = params.limit ?? 10;
+  const limit = params.limit ?? 10
 
   const query = useInfiniteQuery({
     initialPageParam: 0,
-    queryKey: ["products-my-infinite-list", params],
+    queryKey: ['products-my-infinite-list', params],
     queryFn: async ({ pageParam }) => {
       const res = await api.req<Product.API.GetMyResponse>({
-        url: "/products/my",
-        method: "GET",
+        url: '/products/my',
+        method: 'GET',
         params: {
           ...params,
           skip: pageParam,
           limit,
         },
-      });
+      })
 
-      return res.data;
+      return res.data
     },
     enabled: !!params.shop_base_id,
     getNextPageParam: (lastPage, _allPages, lastPageParam) => {
-      if (lastPage.length < limit) return undefined;
-      return lastPageParam + limit;
+      if (lastPage.length < limit) return undefined
+      return lastPageParam + limit
     },
-  });
+  })
 
-  return query;
-};
+  return query
+}
 
 /**
  * Снять товар с продажи или вернуть его в продажу.
@@ -236,29 +229,29 @@ const useGetMyInfiniteList = (params: Product.API.GetMyVars) => {
  * показывается и в корзину не кладётся.
  */
 const useSetForSale = () => {
-  const queryClient = useQueryClient();
+  const queryClient = useQueryClient()
   return useMutation<
     unknown,
     AxiosError<ApiErrorResponse>,
     { productId: number; forSale: boolean }
   >({
-    mutationKey: ["product-for-sale"],
+    mutationKey: ['product-for-sale'],
     mutationFn: async ({ productId, forSale }) => {
       const res = await api.req({
-        method: "PATCH",
-        url: `/products/${productId}/${forSale ? "unblock" : "block"}`,
-      });
-      return res.data;
+        method: 'PATCH',
+        url: `/products/${productId}/${forSale ? 'unblock' : 'block'}`,
+      })
+      return res.data
     },
     onSuccess: (_, { productId }) => {
-      queryClient.invalidateQueries({ queryKey: ["get-all-products"] });
+      queryClient.invalidateQueries({ queryKey: ['get-all-products'] })
       queryClient.invalidateQueries({
-        queryKey: ["products-my-infinite-list"],
-      });
-      queryClient.removeQueries({ queryKey: ["get-product", productId] });
+        queryKey: ['products-my-infinite-list'],
+      })
+      queryClient.removeQueries({ queryKey: ['get-product', productId] })
     },
-  });
-};
+  })
+}
 
 export const productsApi = {
   useGetAll,
@@ -270,4 +263,4 @@ export const productsApi = {
   useGetSimilar,
   useGetMyInfiniteList,
   useSetForSale,
-};
+}

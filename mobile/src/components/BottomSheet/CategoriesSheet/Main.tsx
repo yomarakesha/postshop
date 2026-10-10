@@ -1,38 +1,38 @@
-import React, { useMemo } from "react";
-import Typography from "@/ui/Typography";
-import { Pressable, ScrollView } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import HeaderSheet from "../HeaderSheet";
-import { categoryApi } from "@/api/categoryApi";
-import ChevronRight from "@assets/icons/right-chevron.svg";
-import useAppStore from "@/store/useAppStore";
-import { TFunction } from "i18next";
+import React, { useMemo } from 'react'
+import Typography from '@/ui/Typography'
+import { Pressable, ScrollView } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import HeaderSheet from '../HeaderSheet'
+import { categoryApi } from '@/api/categoryApi'
+import ChevronRight from '@assets/icons/right-chevron.svg'
+import useAppStore from '@/store/useAppStore'
+import { TFunction } from 'i18next'
 
 type Props = {
-  onClose: () => void;
-  onSelect: (id: number) => void;
+  onClose: () => void
+  onSelect: (id: number) => void
   t: TFunction
-};
+}
 
 const CategoriesSheetMain = ({ onClose, onSelect, t }: Props) => {
-  const currentLang = useAppStore((state) => state.lang);
+  const currentLang = useAppStore((state) => state.lang)
   const categoriesQuery = categoryApi.useGetAll({
     skip: 0,
     limit: 10,
     only_parents: true,
-  });
+  })
 
   const categories = useMemo(() => {
-    return categoriesQuery.data || [];
-  }, [categoriesQuery.data]);
+    return categoriesQuery.data || []
+  }, [categoriesQuery.data])
 
   const getTranslation = (translation: Category.Translation[]) => {
-    return translation.find((t) => t.language === currentLang)?.name;
-  };
+    return translation.find((t) => t.language === currentLang)?.name
+  }
 
   return (
     <>
-      <HeaderSheet title={t("category")} onClose={onClose} />
+      <HeaderSheet title={t('category')} onClose={onClose} />
       <ScrollView contentContainerStyle={styles.contentContainer}>
         {categories.map((category, index) => (
           <Pressable
@@ -41,18 +41,17 @@ const CategoriesSheetMain = ({ onClose, onSelect, t }: Props) => {
             style={styles.item(index === categories.length - 1)}
           >
             <Typography weight="medium">
-              {getTranslation(category.translations) ||
-                category.translations[0].name}
+              {getTranslation(category.translations) || category.translations[0].name}
             </Typography>
             <ChevronRight style={styles.passive1} width={20} height={20} />
           </Pressable>
         ))}
       </ScrollView>
     </>
-  );
-};
+  )
+}
 
-export default CategoriesSheetMain;
+export default CategoriesSheetMain
 
 const styles = StyleSheet.create((theme) => ({
   contentContainer: {
@@ -65,11 +64,11 @@ const styles = StyleSheet.create((theme) => ({
     borderBottomWidth: isLast ? 0 : 1,
     borderBottomColor: theme.colors.stroke,
     gap: theme.spacing(2),
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
   }),
   passive1: {
     color: theme.colors.passive1,
   },
-}));
+}))

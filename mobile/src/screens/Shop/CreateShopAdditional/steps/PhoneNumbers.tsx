@@ -1,17 +1,17 @@
-import Header from "@/components/Header";
-import CustomTextInput from "@/ui/CustomTextInput";
-import Typography from "@/ui/Typography";
-import TrashIcon from "@assets/icons/trash.svg";
-import React, { useEffect, useImperativeHandle } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import { StepsProps } from "..";
-import { KeyboardAwareScrollView } from "react-native-keyboard-controller";
+import Header from '@/components/Header'
+import CustomTextInput from '@/ui/CustomTextInput'
+import Typography from '@/ui/Typography'
+import TrashIcon from '@assets/icons/trash.svg'
+import React, { useEffect, useImperativeHandle } from 'react'
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import { Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import { StepsProps } from '..'
+import { KeyboardAwareScrollView } from 'react-native-keyboard-controller'
 
 type Inputs = {
-  phone_numbers: { value: string }[];
-};
+  phone_numbers: { value: string }[]
+}
 
 const PhoneNumbers = ({
   ref,
@@ -24,40 +24,32 @@ const PhoneNumbers = ({
     getValues,
     formState: { isValid },
   } = useForm<Inputs>({
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
-      phone_numbers: [{ value: "" }],
+      phone_numbers: [{ value: '' }],
     },
-  });
+  })
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "phone_numbers",
-  });
+    name: 'phone_numbers',
+  })
 
   useEffect(() => {
-    setIsValid(isValid);
-  }, [isValid]);
+    setIsValid(isValid)
+  }, [isValid])
 
   useImperativeHandle(ref, () => ({
     getData: () => ({
-      phone_numbers: getValues("phone_numbers").map(
-        (a) => `+993${a.value.replace(" ", "")}`,
-      ),
+      phone_numbers: getValues('phone_numbers').map((a) => `+993${a.value.replace(' ', '')}`),
     }),
     isValid: isValid,
-  }));
+  }))
 
   return (
     <>
-      <Header
-        title={t("store.shopAdditional.phoneNumbers")}
-        backgroundColor="white"
-      />
-      <KeyboardAwareScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
-        bottomOffset={footerHeight}
-      >
+      <Header title={t('store.shopAdditional.phoneNumbers')} backgroundColor="white" />
+      <KeyboardAwareScrollView contentContainerStyle={{ flexGrow: 1 }} bottomOffset={footerHeight}>
         <View style={styles.container}>
           {fields.map((field, index) => (
             <View style={styles.inputWrapper} key={field.id}>
@@ -71,14 +63,12 @@ const PhoneNumbers = ({
                     value={value}
                     onBlur={onBlur}
                     onChangeText={(text) => {
-                      const digits = text.replace(/\D/g, "");
+                      const digits = text.replace(/\D/g, '')
 
                       const formatted =
-                        digits.length > 2
-                          ? `${digits.slice(0, 2)} ${digits.slice(2)}`
-                          : digits;
+                        digits.length > 2 ? `${digits.slice(0, 2)} ${digits.slice(2)}` : digits
 
-                      onChange(formatted);
+                      onChange(formatted)
                     }}
                     leftElement={<Typography variant="t1">+993</Typography>}
                     keyboardType="phone-pad"
@@ -93,21 +83,18 @@ const PhoneNumbers = ({
               )}
             </View>
           ))}
-          <Pressable
-            onPress={() => append({ value: "" })}
-            style={styles.addButton}
-          >
+          <Pressable onPress={() => append({ value: '' })} style={styles.addButton}>
             <Typography variant="p3" color="main">
-              + {t("store.shopAdditional.addPhoneNumber")}
+              + {t('store.shopAdditional.addPhoneNumber')}
             </Typography>
           </Pressable>
         </View>
       </KeyboardAwareScrollView>
     </>
-  );
-};
+  )
+}
 
-export default PhoneNumbers;
+export default PhoneNumbers
 
 const styles = StyleSheet.create((theme) => ({
   container: {
@@ -119,17 +106,17 @@ const styles = StyleSheet.create((theme) => ({
   },
   inputWrapper: {
     gap: theme.spacing(2),
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   addButton: {
     paddingVertical: theme.spacing(3),
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: theme.colors.gray2,
     borderRadius: theme.spacing(3),
   },
   trashIcon: {
     color: theme.colors.failure,
   },
-}));
+}))

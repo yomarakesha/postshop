@@ -14,13 +14,13 @@
  */
 
 /** Язык по умолчанию — тот же, что `fallbackLng` в src/localization/index.ts. */
-export const FALLBACK_LANGUAGE = "tk";
+export const FALLBACK_LANGUAGE = 'tk'
 
-type AnyTranslation = { language?: string | null };
+type AnyTranslation = { language?: string | null }
 
 /** Приводит `ru-RU` / `RU` к `ru`. */
 const normalize = (language?: string | null) =>
-  language ? language.toLowerCase().split("-")[0] : "";
+  language ? language.toLowerCase().split('-')[0] : ''
 
 /**
  * Возвращает перевод на текущем языке, а если его нет — по цепочке запасных
@@ -30,16 +30,14 @@ export const pickTranslation = <T extends AnyTranslation>(
   translations: T[] | null | undefined,
   language?: string | null,
 ): T | undefined => {
-  if (!translations?.length) return undefined;
+  if (!translations?.length) return undefined
 
-  const wanted = normalize(language);
+  const wanted = normalize(language)
   const byLanguage = (code: string) =>
-    code ? translations.find((item) => normalize(item.language) === code) : undefined;
+    code ? translations.find((item) => normalize(item.language) === code) : undefined
 
-  return (
-    byLanguage(wanted) || byLanguage(FALLBACK_LANGUAGE) || translations[0]
-  );
-};
+  return byLanguage(wanted) || byLanguage(FALLBACK_LANGUAGE) || translations[0]
+}
 
 /**
  * Название на текущем языке. Пустая строка, если переводов нет вовсе —
@@ -48,16 +46,12 @@ export const pickTranslation = <T extends AnyTranslation>(
 export const pickTranslatedName = (
   translations: { language?: string | null; name?: string | null }[] | null | undefined,
   language?: string | null,
-): string => pickTranslation(translations, language)?.name?.trim() || "";
+): string => pickTranslation(translations, language)?.name?.trim() || ''
 
 /** Описание на текущем языке. Пустая строка — значит описания нет. */
 export const pickTranslatedDescription = (
-  translations:
-    | { language?: string | null; description?: string | null }[]
-    | null
-    | undefined,
+  translations: { language?: string | null; description?: string | null }[] | null | undefined,
   language?: string | null,
-): string =>
-  pickTranslation(translations, language)?.description?.trim() || "";
+): string => pickTranslation(translations, language)?.description?.trim() || ''
 
-export default pickTranslation;
+export default pickTranslation

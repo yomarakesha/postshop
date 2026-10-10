@@ -1,4 +1,4 @@
-import { lightThemeColors } from "./light";
+import { lightThemeColors } from './light'
 
 /**
  * Тёмная тема.
@@ -21,6 +21,6 @@ import { lightThemeColors } from "./light";
  */
 const darkThemeColors = {
   ...lightThemeColors,
-};
+}
 
-export { darkThemeColors };
+export { darkThemeColors }

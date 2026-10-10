@@ -10,16 +10,16 @@
  */
 export const DOCUMENT_KINDS: Record<ShopBase.Type, ShopBase.DocumentKind[]> = {
   individual_entrepreneur: [
-    "individual_registration",
-    "individual_patent",
-    "individual_certificate",
-    "individual_passport",
+    'individual_registration',
+    'individual_patent',
+    'individual_certificate',
+    'individual_passport',
   ],
   legal_entity: [
-    "legal_charter",
-    "legal_extract",
-    "legal_certificate",
-    "legal_statistics",
-    "legal_power_of_attorney",
+    'legal_charter',
+    'legal_extract',
+    'legal_certificate',
+    'legal_statistics',
+    'legal_power_of_attorney',
   ],
-};
+}

@@ -1,10 +1,10 @@
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
-import storage from "./storage";
+import { create } from 'zustand'
+import { createJSONStorage, persist } from 'zustand/middleware'
+import storage from './storage'
 
 interface ShopStoreState {
-  activeShopBaseId: number | null;
-  shop: ShopAdditional.Item | null;
+  activeShopBaseId: number | null
+  shop: ShopAdditional.Item | null
 }
 
 const useShopStore = create<ShopStoreState>()(
@@ -14,10 +14,10 @@ const useShopStore = create<ShopStoreState>()(
       shop: null,
     }),
     {
-      name: "shop-storage",
+      name: 'shop-storage',
       storage: createJSONStorage(() => storage.zustandStorage),
     },
   ),
-);
+)
 
-export default useShopStore;
+export default useShopStore

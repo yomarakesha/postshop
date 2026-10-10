@@ -1,12 +1,12 @@
-import { create } from "zustand";
-import { persist, createJSONStorage } from "zustand/middleware";
-import storage from "./storage";
+import { create } from 'zustand'
+import { persist, createJSONStorage } from 'zustand/middleware'
+import storage from './storage'
 
 type FavoriteState = {
-  favorites: number[];
-  toggleFavorite: (productId: number) => void;
-  clearFavorites: () => void;
-};
+  favorites: number[]
+  toggleFavorite: (productId: number) => void
+  clearFavorites: () => void
+}
 
 const useFavoriteStore = create<FavoriteState>()(
   persist(
@@ -23,10 +23,10 @@ const useFavoriteStore = create<FavoriteState>()(
       clearFavorites: () => set({ favorites: [] }),
     }),
     {
-      name: "favorites-storage",
+      name: 'favorites-storage',
       storage: createJSONStorage(() => storage.zustandStorage),
     },
   ),
-);
+)
 
-export default useFavoriteStore;
+export default useFavoriteStore

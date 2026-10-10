@@ -1,23 +1,23 @@
-import CustomTextInput from "@/ui/CustomTextInput";
-import Typography from "@/ui/Typography";
-import TrashIcon from "@assets/icons/trash.svg";
-import React, { Ref, useEffect, useImperativeHandle } from "react";
-import { Controller, useFieldArray, useForm } from "react-hook-form";
-import { Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import { RefType } from "..";
-import { TFunction } from "i18next";
+import CustomTextInput from '@/ui/CustomTextInput'
+import Typography from '@/ui/Typography'
+import TrashIcon from '@assets/icons/trash.svg'
+import React, { Ref, useEffect, useImperativeHandle } from 'react'
+import { Controller, useFieldArray, useForm } from 'react-hook-form'
+import { Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import { RefType } from '..'
+import { TFunction } from 'i18next'
 
 type Inputs = {
-  phone_numbers: { value: string }[];
-};
+  phone_numbers: { value: string }[]
+}
 
 type Props = {
-  data: ShopAdditional.Item["phone_numbers"];
-  setIsValid: (value: boolean) => void;
-  ref: Ref<RefType>;
-  t: TFunction;
-};
+  data: ShopAdditional.Item['phone_numbers']
+  setIsValid: (value: boolean) => void
+  ref: Ref<RefType>
+  t: TFunction
+}
 
 const PhoneNumbers = ({ data, setIsValid, ref, t }: Props) => {
   const {
@@ -25,30 +25,28 @@ const PhoneNumbers = ({ data, setIsValid, ref, t }: Props) => {
     getValues,
     formState: { isValid },
   } = useForm<Inputs>({
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
       phone_numbers: data?.length
         ? data.map((phone) => ({ value: phone.slice(4) }))
-        : [{ value: "" }],
+        : [{ value: '' }],
     },
-  });
+  })
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "phone_numbers",
-  });
+    name: 'phone_numbers',
+  })
 
   useEffect(() => {
-    setIsValid(isValid);
-  }, [isValid]);
+    setIsValid(isValid)
+  }, [isValid])
 
   useImperativeHandle(ref, () => ({
     getData: () => ({
-      phone_numbers: getValues("phone_numbers").map(
-        (a) => `+993${a.value.replace(" ", "")}`,
-      ),
+      phone_numbers: getValues('phone_numbers').map((a) => `+993${a.value.replace(' ', '')}`),
     }),
-  }));
+  }))
 
   return (
     <View style={styles.container}>
@@ -64,14 +62,12 @@ const PhoneNumbers = ({ data, setIsValid, ref, t }: Props) => {
                 value={value}
                 onBlur={onBlur}
                 onChangeText={(text) => {
-                  const digits = text.replace(/\D/g, "");
+                  const digits = text.replace(/\D/g, '')
 
                   const formatted =
-                    digits.length > 2
-                      ? `${digits.slice(0, 2)} ${digits.slice(2)}`
-                      : digits;
+                    digits.length > 2 ? `${digits.slice(0, 2)} ${digits.slice(2)}` : digits
 
-                  onChange(formatted);
+                  onChange(formatted)
                 }}
                 leftElement={<Typography variant="t1">+993</Typography>}
                 keyboardType="phone-pad"
@@ -86,16 +82,16 @@ const PhoneNumbers = ({ data, setIsValid, ref, t }: Props) => {
           )}
         </View>
       ))}
-      <Pressable onPress={() => append({ value: "" })} style={styles.addButton}>
+      <Pressable onPress={() => append({ value: '' })} style={styles.addButton}>
         <Typography variant="p3" color="main">
-          + {t("store.shopAdditional.addPhoneNumber")}
+          + {t('store.shopAdditional.addPhoneNumber')}
         </Typography>
       </Pressable>
     </View>
-  );
-};
+  )
+}
 
-export default PhoneNumbers;
+export default PhoneNumbers
 
 const styles = StyleSheet.create((theme) => ({
   container: {
@@ -107,17 +103,17 @@ const styles = StyleSheet.create((theme) => ({
   },
   inputWrapper: {
     gap: theme.spacing(2),
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
   },
   addButton: {
     paddingVertical: theme.spacing(3),
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     backgroundColor: theme.colors.gray2,
     borderRadius: theme.spacing(3),
   },
   trashIcon: {
     color: theme.colors.failure,
   },
-}));
+}))

@@ -1,8 +1,8 @@
-import CheckoutScreen from "@/screens/Client/Checkout";
-import React from "react";
+import CheckoutScreen from '@/screens/Client/Checkout'
+import React from 'react'
 
 const CheckoutRout = () => {
-  return <CheckoutScreen />;
-};
+  return <CheckoutScreen />
+}
 
-export default CheckoutRout;
+export default CheckoutRout

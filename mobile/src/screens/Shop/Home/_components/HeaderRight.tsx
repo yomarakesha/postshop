@@ -1,12 +1,12 @@
-import React from "react";
-import Typography from "@/ui/Typography";
-import { Pressable } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import React from 'react'
+import Typography from '@/ui/Typography'
+import { Pressable } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 
 type Props = {
-  user: User.Item;
-  onPressProfile: () => void;
-};
+  user: User.Item
+  onPressProfile: () => void
+}
 
 const HeaderRight = ({ user, onPressProfile }: Props) => {
   return (
@@ -15,10 +15,10 @@ const HeaderRight = ({ user, onPressProfile }: Props) => {
         {user.name?.toLocaleLowerCase().charAt(0).toUpperCase()}
       </Typography>
     </Pressable>
-  );
-};
+  )
+}
 
-export default HeaderRight;
+export default HeaderRight
 
 const styles = StyleSheet.create((theme) => ({
   profile: {
@@ -27,8 +27,8 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: 999,
     // Белый кружок пропадал на шапке магазина без своего цвета (она белая).
     backgroundColor: theme.colors.gray2,
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-}));
+}))

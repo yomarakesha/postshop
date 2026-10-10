@@ -1,10 +1,10 @@
-import api from "@/api";
-import useAppStore from "@/store/useAppStore";
+import api from '@/api'
+import useAppStore from '@/store/useAppStore'
 
 export const getImageUrl = (path: string | null | undefined) => {
   if (!path) {
-    return "";
+    return ''
   }
-  const apiUrl = useAppStore.getState().apiUrl || api.BASE_URL;
-  return apiUrl + "/" + path;
-};
+  const apiUrl = useAppStore.getState().apiUrl || api.BASE_URL
+  return apiUrl + '/' + path
+}

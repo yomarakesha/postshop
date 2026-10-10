@@ -1,49 +1,40 @@
-import { Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import React, { RefObject, useState } from "react";
-import Typography from "@/ui/Typography";
-import HeaderSheet from "./HeaderSheet";
-import Radio from "@/ui/Radio";
-import { TrueSheet } from "@lodev09/react-native-true-sheet";
-import { UniTrueSheet } from "@/ui/BottomSheet";
+import { Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import React, { RefObject, useState } from 'react'
+import Typography from '@/ui/Typography'
+import HeaderSheet from './HeaderSheet'
+import Radio from '@/ui/Radio'
+import { TrueSheet } from '@lodev09/react-native-true-sheet'
+import { UniTrueSheet } from '@/ui/BottomSheet'
 
-type RegionsType =
-  | "ahal"
-  | "ashgabat"
-  | "balkan"
-  | "dashoguz"
-  | "lebab"
-  | "mary"
-  | "arkadag";
+type RegionsType = 'ahal' | 'ashgabat' | 'balkan' | 'dashoguz' | 'lebab' | 'mary' | 'arkadag'
 
 type Props = {
-  ref: RefObject<TrueSheet | null>;
-};
+  ref: RefObject<TrueSheet | null>
+}
 
 const RegionSheet = ({ ref }: Props) => {
-  const [selectedRegion, setSelectedRegion] = useState<RegionsType | null>(
-    null,
-  );
+  const [selectedRegion, setSelectedRegion] = useState<RegionsType | null>(null)
 
   const regions: { key: RegionsType; value: string }[] = [
-    { key: "ahal", value: "Ahal" },
-    { key: "ashgabat", value: "Aşgabat" },
-    { key: "balkan", value: "Balkan" },
-    { key: "dashoguz", value: "Daşoguz" },
-    { key: "lebab", value: "Lebap" },
-    { key: "mary", value: "Mary" },
-    { key: "arkadag", value: "Arkadag" },
-  ];
+    { key: 'ahal', value: 'Ahal' },
+    { key: 'ashgabat', value: 'Aşgabat' },
+    { key: 'balkan', value: 'Balkan' },
+    { key: 'dashoguz', value: 'Daşoguz' },
+    { key: 'lebab', value: 'Lebap' },
+    { key: 'mary', value: 'Mary' },
+    { key: 'arkadag', value: 'Arkadag' },
+  ]
 
   const onSelect = (region: RegionsType) => {
-    setSelectedRegion(region);
-  };
+    setSelectedRegion(region)
+  }
 
   const handleClose = () => {
-    ref.current?.dismiss();
-  };
+    ref.current?.dismiss()
+  }
   return (
-    <UniTrueSheet ref={ref} detents={["auto"]} style={styles.wrapper}>
+    <UniTrueSheet ref={ref} detents={['auto']} style={styles.wrapper}>
       <HeaderSheet title="Region saýlaň" onClose={handleClose} />
       <View style={styles.container}>
         <View style={styles.content}>
@@ -62,10 +53,10 @@ const RegionSheet = ({ ref }: Props) => {
         </View>
       </View>
     </UniTrueSheet>
-  );
-};
+  )
+}
 
-export default RegionSheet;
+export default RegionSheet
 
 const styles = StyleSheet.create((theme) => ({
   wrapper: {
@@ -79,9 +70,9 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(2),
   },
   regionItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     padding: theme.spacing(3),
   },
-}));
+}))

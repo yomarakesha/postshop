@@ -1,22 +1,22 @@
-import React from "react";
-import { Pressable, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import Typography from "@/ui/Typography";
-import CloseIcon from "@assets/icons/close.svg";
-import { TFunction } from "i18next";
-import { STATUS_COMMENT_KINDS } from "@/utils/notificationTarget";
-import { orderStatus } from "@/utils/orderStatus";
-import { formatApiDate } from "@/utils/formatDate";
+import React from 'react'
+import { Pressable, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import Typography from '@/ui/Typography'
+import CloseIcon from '@assets/icons/close.svg'
+import { TFunction } from 'i18next'
+import { STATUS_COMMENT_KINDS } from '@/utils/notificationTarget'
+import { orderStatus } from '@/utils/orderStatus'
+import { formatApiDate } from '@/utils/formatDate'
 
 type Props = {
-  data: Notification.Item;
+  data: Notification.Item
   /** Есть ли куда вести: без адреса строка не выглядит нажимаемой. */
-  hasTarget: boolean;
-  onPress: () => void;
-  onDismiss: () => void;
-  language: string;
-  t: TFunction;
-};
+  hasTarget: boolean
+  onPress: () => void
+  onDismiss: () => void
+  language: string
+  t: TFunction
+}
 
 /**
  * Одно уведомление.
@@ -24,14 +24,7 @@ type Props = {
  * Непрочитанное отличается фоном, а не точкой сбоку: точку легко не заметить,
  * а список читается сверху вниз одним взглядом.
  */
-const NotificationRow = ({
-  data,
-  hasTarget,
-  onPress,
-  onDismiss,
-  language,
-  t,
-}: Props) => {
+const NotificationRow = ({ data, hasTarget, onPress, onDismiss, language, t }: Props) => {
   // У части видов в comment лежит код статуса заказа («ready_to_deliver»), а
   // не текст человека. Переводить его напрямую нельзя — на экран попал бы сам
   // ключ. Подпись та же, что в «Моих заказах», но способа получения в
@@ -40,39 +33,35 @@ const NotificationRow = ({
   const statusLabelKey =
     data.comment && data.comment in orderStatus.client.map
       ? orderStatus.buyer.getLabelKey(data.comment as Order.StatusCode, null)
-      : "";
+      : ''
 
   // Заказ с доставкой подтверждён: в comment «доставка|итог». Цену
   // доставки назначает оператор, и раньше сумма просто вырастала.
-  const [deliveryPrice, orderTotal] = (data.comment ?? "").split("|");
+  const [deliveryPrice, orderTotal] = (data.comment ?? '').split('|')
   const detail = data.comment
     ? STATUS_COMMENT_KINDS.has(data.kind)
       ? statusLabelKey
         ? t(statusLabelKey)
         : null
-      : data.kind === "order_approved_delivery" && orderTotal
-        ? t("notifications.deliveryDetail", {
+      : data.kind === 'order_approved_delivery' && orderTotal
+        ? t('notifications.deliveryDetail', {
             delivery: deliveryPrice,
             total: orderTotal,
           })
         : data.comment
-    : null;
+    : null
 
   // Без даты лучше пустая строка, чем 01.01.1970: у старых уведомлений
   // сервер отдаёт created_at пустым.
   // Время — по Ашхабаду, а не по поясу телефона (см. utils/formatDate).
   const date = formatApiDate(data.created_at, language, {
-    dateStyle: "short",
-    timeStyle: "short",
-  });
+    dateStyle: 'short',
+    timeStyle: 'short',
+  })
 
   return (
     <View style={styles.container(data.is_read)}>
-      <Pressable
-        style={styles.main}
-        onPress={onPress}
-        disabled={!hasTarget && data.is_read}
-      >
+      <Pressable style={styles.main} onPress={onPress} disabled={!hasTarget && data.is_read}>
         <Typography variant="p3" weight="medium">
           {t(`notifications.kind.${data.kind}`)}
         </Typography>
@@ -92,21 +81,21 @@ const NotificationRow = ({
         onPress={onDismiss}
         hitSlop={10}
         accessibilityRole="button"
-        accessibilityLabel={t("notifications.dismiss")}
+        accessibilityLabel={t('notifications.dismiss')}
         style={styles.dismiss}
       >
         <CloseIcon width={16} height={16} style={styles.dismissIcon} />
       </Pressable>
     </View>
-  );
-};
+  )
+}
 
-export default NotificationRow;
+export default NotificationRow
 
 const styles = StyleSheet.create((theme) => ({
   container: (isRead: boolean) => ({
-    flexDirection: "row",
-    alignItems: "flex-start",
+    flexDirection: 'row',
+    alignItems: 'flex-start',
     gap: theme.spacing(2),
     padding: theme.spacing(4),
     borderRadius: theme.radius.base,
@@ -122,4 +111,4 @@ const styles = StyleSheet.create((theme) => ({
   dismissIcon: {
     color: theme.colors.passive2,
   },
-}));
+}))

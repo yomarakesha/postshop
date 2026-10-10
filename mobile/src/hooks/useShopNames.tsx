@@ -1,6 +1,6 @@
-import { useMemo } from "react";
-import { shopAdditionalApi } from "@/api/shopAdditionalApi";
-import { MAX_PAGE_SIZE } from "@/constants/pagination";
+import { useMemo } from 'react'
+import { shopAdditionalApi } from '@/api/shopAdditionalApi'
+import { MAX_PAGE_SIZE } from '@/constants/pagination'
 
 /**
  * Названия магазинов по идентификатору базы магазина.
@@ -17,15 +17,15 @@ export const useShopNames = () => {
   const { data } = shopAdditionalApi.useGetAll({
     skip: 0,
     limit: MAX_PAGE_SIZE,
-  });
+  })
 
   return useMemo(() => {
-    const map = new Map<number, string>();
+    const map = new Map<number, string>()
     for (const shop of data ?? []) {
-      if (shop.name) map.set(shop.shop_base_id, shop.name);
+      if (shop.name) map.set(shop.shop_base_id, shop.name)
     }
-    return map;
-  }, [data]);
-};
+    return map
+  }, [data])
+}
 
-export default useShopNames;
+export default useShopNames

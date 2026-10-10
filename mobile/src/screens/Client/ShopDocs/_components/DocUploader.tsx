@@ -1,27 +1,21 @@
-import { ActivityIndicator, Pressable, View } from "react-native";
-import FileIcon from "@assets/icons/file-solid.svg";
-import Typography from "@/ui/Typography";
-import CloseIcon from "@assets/icons/close.svg";
-import UploadIcon from "@assets/icons/upload-solid.svg";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import { DocumentPickerAsset } from "expo-document-picker";
+import { ActivityIndicator, Pressable, View } from 'react-native'
+import FileIcon from '@assets/icons/file-solid.svg'
+import Typography from '@/ui/Typography'
+import CloseIcon from '@assets/icons/close.svg'
+import UploadIcon from '@assets/icons/upload-solid.svg'
+import { StyleSheet, useUnistyles } from 'react-native-unistyles'
+import { DocumentPickerAsset } from 'expo-document-picker'
 
 type DocUploaderProps = {
-  label: string;
-  file?: DocumentPickerAsset;
-  isPreparing?: boolean;
-  onUpload: () => void;
-  onRemove: () => void;
-};
+  label: string
+  file?: DocumentPickerAsset
+  isPreparing?: boolean
+  onUpload: () => void
+  onRemove: () => void
+}
 
-const DocUploader = ({
-  label,
-  file,
-  isPreparing,
-  onUpload,
-  onRemove,
-}: DocUploaderProps) => {
-  const { theme } = useUnistyles();
+const DocUploader = ({ label, file, isPreparing, onUpload, onRemove }: DocUploaderProps) => {
+  const { theme } = useUnistyles()
 
   if (isPreparing) {
     return (
@@ -31,7 +25,7 @@ const DocUploader = ({
           {label}
         </Typography>
       </View>
-    );
+    )
   }
 
   if (file) {
@@ -47,7 +41,7 @@ const DocUploader = ({
           <CloseIcon style={styles.passive2} />
         </Pressable>
       </View>
-    );
+    )
   }
 
   return (
@@ -57,25 +51,25 @@ const DocUploader = ({
         {label}
       </Typography>
     </Pressable>
-  );
-};
+  )
+}
 
-export default DocUploader;
+export default DocUploader
 
 const styles = StyleSheet.create((theme) => ({
   uploadZone: {
     borderWidth: 1.5,
-    borderStyle: "dashed",
+    borderStyle: 'dashed',
     borderColor: theme.colors.stroke,
     borderRadius: theme.spacing(3),
     padding: theme.spacing(4),
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: theme.spacing(2),
   },
   fileItem: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     // blue3 — насыщенный синий: карточка загруженного файла выбивалась из
     // спокойной палитры экрана. blue2 — тот же цвет, что у остальных
     // «выбранных» состояний в потоке продавца.
@@ -98,4 +92,4 @@ const styles = StyleSheet.create((theme) => ({
   fileIcon: {
     color: theme.colors.blueMain,
   },
-}));
+}))

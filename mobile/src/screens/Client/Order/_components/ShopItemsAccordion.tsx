@@ -1,89 +1,80 @@
-import React, { useState } from "react";
-import { Pressable, View } from "react-native";
-import { Image } from "expo-image";
-import { StyleSheet } from "react-native-unistyles";
+import React, { useState } from 'react'
+import { Pressable, View } from 'react-native'
+import { Image } from 'expo-image'
+import { StyleSheet } from 'react-native-unistyles'
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
   withTiming,
   interpolate,
   Easing,
-} from "react-native-reanimated";
-import Typography from "@/ui/Typography";
-import ChevronRightIcon from "@assets/icons/right-chevron.svg";
-import { getImageUrl } from "@/utils/getImageUrl";
-import { TFunction } from "i18next";
-import { orderStatus } from "@/utils/orderStatus";
-import { formatMoney, toMoneyNumber } from "@/utils/formatMoney";
-import { useRouter } from "expo-router";
+} from 'react-native-reanimated'
+import Typography from '@/ui/Typography'
+import ChevronRightIcon from '@assets/icons/right-chevron.svg'
+import { getImageUrl } from '@/utils/getImageUrl'
+import { TFunction } from 'i18next'
+import { orderStatus } from '@/utils/orderStatus'
+import { formatMoney, toMoneyNumber } from '@/utils/formatMoney'
+import { useRouter } from 'expo-router'
 
 type Props = {
-  shopLogoPath?: string;
+  shopLogoPath?: string
   /**
    * Название магазина. Живёт не в `orderShop.shop` (это база магазина, у неё
    * названия нет), а в его карточке `additional` — её знает только родитель,
    * он же достаёт оттуда логотип.
    */
-  shopName?: string;
-  data: Order.OrderShop;
-  t: TFunction;
+  shopName?: string
+  data: Order.OrderShop
+  t: TFunction
   /**
    * Возвраты — только у завершённого заказа (раньше товар не получен, и
    * сервер заявку не примет). Без этого поля строки товаров без кнопки.
    */
   returns?: {
     /** Последняя заявка по строке заказа, если была. */
-    byItemId: Map<number, ReturnRequest.Item>;
-    onReturn: (item: Order.ItemProduct) => void;
+    byItemId: Map<number, ReturnRequest.Item>
+    onReturn: (item: Order.ItemProduct) => void
     /** Отозвать нерассмотренную заявку. */
-    onCancelReturn: (returnId: number) => void;
+    onCancelReturn: (returnId: number) => void
     /** Срок подачи возврата; после него кнопки нет. */
-    returnUntil: string | null;
-  };
-};
+    returnUntil: string | null
+  }
+}
 
 /** Пока заявка в этих состояниях, вторую по той же покупке сервер не примет. */
-const ACTIVE_RETURN_STATUSES: ReturnRequest.Status[] = ["pending", "approved"];
+const ACTIVE_RETURN_STATUSES: ReturnRequest.Status[] = ['pending', 'approved']
 
-const getProductName = (product: Product.Item) =>
-  product.translations[0]?.name ?? "";
+const getProductName = (product: Product.Item) => product.translations[0]?.name ?? ''
 
-const ShopItemsAccordion = ({
-  data,
-  shopLogoPath,
-  shopName,
-  t,
-  returns,
-}: Props) => {
-  const router = useRouter();
-  const [isOpen, setIsOpen] = useState(true);
-  const [contentHeight, setContentHeight] = useState(0);
-  const progress = useSharedValue(1);
+const ShopItemsAccordion = ({ data, shopLogoPath, shopName, t, returns }: Props) => {
+  const router = useRouter()
+  const [isOpen, setIsOpen] = useState(true)
+  const [contentHeight, setContentHeight] = useState(0)
+  const progress = useSharedValue(1)
 
-  const items = data.items;
-  const isRejected = data.status === "rejected";
-  const RejectedIcon = orderStatus.shop.getIcon(data.status);
+  const items = data.items
+  const isRejected = data.status === 'rejected'
+  const RejectedIcon = orderStatus.shop.getIcon(data.status)
 
   const toggle = () => {
-    const toValue = isOpen ? 0 : 1;
+    const toValue = isOpen ? 0 : 1
     progress.value = withTiming(toValue, {
       duration: 250,
       easing: Easing.out(Easing.cubic),
-    });
-    setIsOpen((prev) => !prev);
-  };
+    })
+    setIsOpen((prev) => !prev)
+  }
 
   const contentStyle = useAnimatedStyle(() => ({
     height: progress.value * contentHeight,
     opacity: progress.value,
-    overflow: "hidden",
-  }));
+    overflow: 'hidden',
+  }))
 
   const chevronStyle = useAnimatedStyle(() => ({
-    transform: [
-      { rotate: `${interpolate(progress.value, [0, 1], [0, 90])}deg` },
-    ],
-  }));
+    transform: [{ rotate: `${interpolate(progress.value, [0, 1], [0, 90])}deg` }],
+  }))
 
   return (
     <View style={styles.container}>
@@ -95,7 +86,7 @@ const ShopItemsAccordion = ({
           style={styles.headerLeft}
           onPress={() =>
             router.push({
-              pathname: "/shops/[id]",
+              pathname: '/shops/[id]',
               params: { id: String(data.shop_base_id) },
             })
           }
@@ -121,11 +112,7 @@ const ShopItemsAccordion = ({
             {isRejected ? (
               <View style={styles.rejectedRow}>
                 {RejectedIcon ? (
-                  <RejectedIcon
-                    width={14}
-                    height={14}
-                    style={styles.rejectedIcon}
-                  />
+                  <RejectedIcon width={14} height={14} style={styles.rejectedIcon} />
                 ) : null}
                 <Typography variant="t2" weight="medium" color="error">
                   {t(orderStatus.shop.getLabelKey(data.status))}
@@ -142,7 +129,7 @@ const ShopItemsAccordion = ({
       {isRejected && data.comment ? (
         <View style={styles.rejectionComment}>
           <Typography variant="t2" weight="medium" color="error">
-            {t("client.order.rejectionReasonLabel")}
+            {t('client.order.rejectionReasonLabel')}
           </Typography>
           <Typography variant="t1" weight="medium">
             {data.comment}
@@ -159,35 +146,30 @@ const ShopItemsAccordion = ({
             // Цена, по которой товар ушёл в заказ, и цена самого товара.
             // Если первая ниже — скидка была применена, и её видно только
             // так: отдельного поля скидки в позиции заказа нет.
-            const paid = toMoneyNumber(item.price_at_order);
-            const listed = toMoneyNumber(item.product.price);
-            const hadDiscount = listed > paid;
+            const paid = toMoneyNumber(item.price_at_order)
+            const listed = toMoneyNumber(item.product.price)
+            const hadDiscount = listed > paid
 
             // Отклонённую магазином часть покупатель не получал — возвращать
             // нечего.
-            const canRequestReturn = !!returns && !isRejected;
+            const canRequestReturn = !!returns && !isRejected
             // Возврат — 14 дней после завершения: сервер позднюю заявку не
             // примет, поэтому и кнопку не предлагаем.
             const returnClosed =
-              !!returns?.returnUntil &&
-              new Date(returns.returnUntil).getTime() < Date.now();
-            const lastReturn = returns?.byItemId.get(item.id);
+              !!returns?.returnUntil && new Date(returns.returnUntil).getTime() < Date.now()
+            const lastReturn = returns?.byItemId.get(item.id)
             const hasActiveReturn =
-              !!lastReturn &&
-              ACTIVE_RETURN_STATUSES.includes(lastReturn.status);
+              !!lastReturn && ACTIVE_RETURN_STATUSES.includes(lastReturn.status)
 
             return (
-              <View
-                key={item.id}
-                style={[styles.itemBlock, index === 0 && styles.firstRow]}
-              >
+              <View key={item.id} style={[styles.itemBlock, index === 0 && styles.firstRow]}>
                 {/* Нажатие открывает товар: раньше строка была неинтерактивной,
                   и вернуться к купленному товару из заказа было нельзя. */}
                 <Pressable
                   style={styles.row}
                   onPress={() =>
                     router.push({
-                      pathname: "/products/[id]",
+                      pathname: '/products/[id]',
                       params: { id: String(item.product_id) },
                     })
                   }
@@ -205,33 +187,18 @@ const ShopItemsAccordion = ({
                       <Typography
                         variant="p3"
                         weight="medium"
-                        color={hadDiscount ? "error" : "secondary"}
+                        color={hadDiscount ? 'error' : 'secondary'}
                       >
-                        {formatMoney(
-                          item.price_at_order,
-                          item.product.currency,
-                        )}
+                        {formatMoney(item.price_at_order, item.product.currency)}
                       </Typography>
                       {hadDiscount ? (
-                        <Typography
-                          variant="t2"
-                          weight="medium"
-                          color="secondary"
-                          isLineThrough
-                        >
-                          {formatMoney(
-                            item.product.price,
-                            item.product.currency,
-                          )}
+                        <Typography variant="t2" weight="medium" color="secondary" isLineThrough>
+                          {formatMoney(item.product.price, item.product.currency)}
                         </Typography>
                       ) : null}
-                      <Typography
-                        variant="p3"
-                        weight="medium"
-                        color="secondary"
-                      >
-                        {" • "}
-                        {item.quantity} {t("common.pieces")}
+                      <Typography variant="p3" weight="medium" color="secondary">
+                        {' • '}
+                        {item.quantity} {t('common.pieces')}
                       </Typography>
                     </View>
                   </View>
@@ -245,18 +212,18 @@ const ShopItemsAccordion = ({
                         variant="t2"
                         weight="medium"
                         color={
-                          lastReturn.status === "rejected"
-                            ? "error"
-                            : lastReturn.status === "approved"
-                              ? "success"
-                              : "secondary"
+                          lastReturn.status === 'rejected'
+                            ? 'error'
+                            : lastReturn.status === 'approved'
+                              ? 'success'
+                              : 'secondary'
                         }
                         style={styles.returnStatus}
                       >
                         {/* Получённый назад товар закрывает возврат: раньше
                           «одобрен» висел навсегда. */}
                         {lastReturn.received_at
-                          ? t("client.order.returns.status.received")
+                          ? t('client.order.returns.status.received')
                           : t(`client.order.returns.status.${lastReturn.status}`)}
                       </Typography>
                     ) : (
@@ -264,20 +231,20 @@ const ShopItemsAccordion = ({
                     )}
                     {/* После отказа можно попросить снова — например, с
                       другой причиной; сервер это допускает. */}
-                    {lastReturn?.status === "pending" ? (
+                    {lastReturn?.status === 'pending' ? (
                       <Pressable
                         onPress={() => returns?.onCancelReturn(lastReturn.id)}
                         hitSlop={10}
                         accessibilityRole="button"
                       >
                         <Typography variant="t1" weight="semiBold" color="error">
-                          {t("client.order.returns.cancel")}
+                          {t('client.order.returns.cancel')}
                         </Typography>
                       </Pressable>
                     ) : null}
                     {!hasActiveReturn && returnClosed ? (
                       <Typography variant="t2" color="secondary">
-                        {t("client.order.returns.periodOver")}
+                        {t('client.order.returns.periodOver')}
                       </Typography>
                     ) : null}
                     {!hasActiveReturn && !returnClosed ? (
@@ -287,7 +254,7 @@ const ShopItemsAccordion = ({
                         accessibilityRole="button"
                       >
                         <Typography variant="t1" weight="semiBold" color="main">
-                          {t("client.order.returns.action")}
+                          {t('client.order.returns.action')}
                         </Typography>
                       </Pressable>
                     ) : null}
@@ -295,27 +262,27 @@ const ShopItemsAccordion = ({
                 ) : null}
                 {/* Одобренный возврат: куда нести товар и сколько вернут. */}
                 {canRequestReturn &&
-                lastReturn?.status === "approved" &&
+                lastReturn?.status === 'approved' &&
                 !lastReturn.received_at ? (
                   <Typography variant="t2" color="secondary">
-                    {t("client.order.returns.bringToPickup")}
+                    {t('client.order.returns.bringToPickup')}
                     {lastReturn.amount
-                      ? ` ${t("client.order.returns.amount", {
+                      ? ` ${t('client.order.returns.amount', {
                           amount: Number(lastReturn.amount).toFixed(2),
                         })}`
-                      : ""}
+                      : ''}
                   </Typography>
                 ) : null}
               </View>
-            );
+            )
           })}
         </View>
       </Animated.View>
     </View>
-  );
-};
+  )
+}
 
-export default ShopItemsAccordion;
+export default ShopItemsAccordion
 
 const styles = StyleSheet.create((theme) => ({
   container: {
@@ -329,16 +296,16 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing(3),
   },
   header: (isOpen: boolean) => ({
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     borderBottomWidth: isOpen ? 1 : 0,
     borderBottomColor: theme.colors.stroke,
     paddingBottom: isOpen ? theme.spacing(3) : 0,
   }),
   headerLeft: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: theme.spacing(3),
     flex: 1,
   },
@@ -347,8 +314,8 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(1),
   },
   rejectedRow: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: theme.spacing(1),
   },
   // Причина отказа читалась как обычный текст между шапкой и товарами.
@@ -368,13 +335,13 @@ const styles = StyleSheet.create((theme) => ({
     borderRadius: theme.spacing(3),
     borderWidth: 1,
     borderColor: theme.colors.stroke,
-    alignItems: "center",
-    justifyContent: "center",
-    overflow: "hidden",
+    alignItems: 'center',
+    justifyContent: 'center',
+    overflow: 'hidden',
   },
   logo: {
-    width: "100%",
-    height: "100%",
+    width: '100%',
+    height: '100%',
   },
   chevron: {
     color: theme.colors.passive1,
@@ -385,7 +352,7 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.failure,
   },
   measure: {
-    position: "absolute",
+    position: 'absolute',
     left: 0,
     right: 0,
     top: 0,
@@ -399,14 +366,14 @@ const styles = StyleSheet.create((theme) => ({
     borderTopColor: theme.colors.stroke,
   },
   row: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: theme.spacing(3),
   },
   returnRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     gap: theme.spacing(3),
   },
   returnStatus: {
@@ -426,9 +393,9 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(2),
   },
   priceRow: {
-    flexDirection: "row",
-    alignItems: "baseline",
-    flexWrap: "wrap",
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    flexWrap: 'wrap',
     gap: theme.spacing(1),
   },
-}));
+}))

@@ -1,30 +1,30 @@
-import React, { useMemo, useState } from "react";
-import { Pressable, ScrollView, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import useAppStore from "@/store/useAppStore";
-import { cityApi } from "@/api/cityApi";
-import Typography from "@/ui/Typography";
-import Radio from "@/ui/Radio";
-import Button from "@/ui/Button";
-import { useUserStore } from "@/store/useUserStore";
-import ScreenFooter from "@/ui/ScreenFooter";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { useTranslation } from "react-i18next";
-import InernetError from "@/ui/InternetError";
-import ActivityIndicator from "@/ui/ActivityIndicator";
+import React, { useMemo, useState } from 'react'
+import { Pressable, ScrollView, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import useAppStore from '@/store/useAppStore'
+import { cityApi } from '@/api/cityApi'
+import Typography from '@/ui/Typography'
+import Radio from '@/ui/Radio'
+import Button from '@/ui/Button'
+import { useUserStore } from '@/store/useUserStore'
+import ScreenFooter from '@/ui/ScreenFooter'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useTranslation } from 'react-i18next'
+import InernetError from '@/ui/InternetError'
+import ActivityIndicator from '@/ui/ActivityIndicator'
 
 const SelectCityScreen = () => {
-  const currentLanguage = useAppStore((s) => s.lang);
-  const [selectedCityId, setSelectedCityId] = useState<number | null>(null);
-  const citiesQuery = cityApi.useGetAll();
-  const insets = useSafeAreaInsets();
-  const { t } = useTranslation();
-  const hasInternetConnection = useAppStore((s) => s.hasInternetConnection);
-  const isServerAvailable = useAppStore((s) => s.isServerAvailable);
+  const currentLanguage = useAppStore((s) => s.lang)
+  const [selectedCityId, setSelectedCityId] = useState<number | null>(null)
+  const citiesQuery = cityApi.useGetAll()
+  const insets = useSafeAreaInsets()
+  const { t } = useTranslation()
+  const hasInternetConnection = useAppStore((s) => s.hasInternetConnection)
+  const isServerAvailable = useAppStore((s) => s.isServerAvailable)
 
   const cities = useMemo(() => {
-    return citiesQuery.data || [];
-  }, [citiesQuery.data]);
+    return citiesQuery.data || []
+  }, [citiesQuery.data])
 
   // Раньше при отсутствии перевода на текущем языке строка списка
   // отрисовывалась пустой — оставался белый прямоугольник без названия.
@@ -32,27 +32,23 @@ const SelectCityScreen = () => {
     return (
       translations.find((tr) => tr.language === currentLanguage)?.name ||
       translations.find((tr) => !!tr.name)?.name ||
-      ""
-    );
-  };
+      ''
+    )
+  }
 
   const handleSubmit = () => {
     if (selectedCityId) {
       useUserStore.setState({
         cityId: selectedCityId,
-      });
+      })
     }
-    return;
-  };
+    return
+  }
 
   if (!hasInternetConnection || !isServerAvailable) {
     return (
-      <InernetError
-        isLoading={citiesQuery.isLoading}
-        t={t}
-        onRetry={() => citiesQuery.refetch()}
-      />
-    );
+      <InernetError isLoading={citiesQuery.isLoading} t={t} onRetry={() => citiesQuery.refetch()} />
+    )
   }
   return (
     <>
@@ -63,15 +59,10 @@ const SelectCityScreen = () => {
       >
         <View style={styles.titleWrapper}>
           <Typography variant="p1" weight="bold" isCentered>
-            {t("client.selectRegion.headerTitle")}
+            {t('client.selectRegion.headerTitle')}
           </Typography>
-          <Typography
-            variant="t1"
-            weight="regular"
-            color="secondary"
-            isCentered
-          >
-            {t("client.selectRegion.description")}
+          <Typography variant="t1" weight="regular" color="secondary" isCentered>
+            {t('client.selectRegion.description')}
           </Typography>
         </View>
 
@@ -79,13 +70,8 @@ const SelectCityScreen = () => {
           <ActivityIndicator isFullScreen />
         ) : cities.length === 0 ? (
           <View style={styles.emptyWrapper}>
-            <Typography
-              variant="p3"
-              weight="medium"
-              color="secondary"
-              isCentered
-            >
-              {t("emptyState.cities.title")}
+            <Typography variant="p3" weight="medium" color="secondary" isCentered>
+              {t('emptyState.cities.title')}
             </Typography>
           </View>
         ) : (
@@ -96,12 +82,7 @@ const SelectCityScreen = () => {
                 key={String(city.id)}
                 style={styles.item}
               >
-                <Typography
-                  variant="p2"
-                  weight="medium"
-                  numberOfLines={1}
-                  style={styles.itemTitle}
-                >
+                <Typography variant="p2" weight="medium" numberOfLines={1} style={styles.itemTitle}>
                   {getTranslation(city.translations)}
                 </Typography>
                 <Radio isActive={selectedCityId === city.id} />
@@ -113,16 +94,16 @@ const SelectCityScreen = () => {
       <ScreenFooter bottomOffset={insets.bottom}>
         <Button
           variant="primary"
-          title={t("common.save")}
+          title={t('common.save')}
           onPress={handleSubmit}
           disabled={!selectedCityId}
         />
       </ScreenFooter>
     </>
-  );
-};
+  )
+}
 
-export default SelectCityScreen;
+export default SelectCityScreen
 
 const styles = StyleSheet.create((theme, rt) => ({
   scroll: {
@@ -145,7 +126,7 @@ const styles = StyleSheet.create((theme, rt) => ({
   },
   emptyWrapper: {
     flexGrow: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
     paddingVertical: theme.spacing(10),
   },
   itemsContainer: {
@@ -155,13 +136,13 @@ const styles = StyleSheet.create((theme, rt) => ({
     flexShrink: 1,
   },
   item: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     gap: theme.spacing(3),
     padding: theme.spacing(3),
     borderRadius: theme.spacing(3),
     backgroundColor: theme.colors.white,
     ...theme.shadows.soft,
   },
-}));
+}))

@@ -1,30 +1,30 @@
-import { create } from "zustand";
+import { create } from 'zustand'
 
 export type ConfirmationModalState = {
-  isOpen: boolean;
-  title: string;
-  description: string;
+  isOpen: boolean
+  title: string
+  description: string
   /** text — то, что ввели в поле (если поле показано). */
-  onConfirm?: (text?: string) => void;
+  onConfirm?: (text?: string) => void
   /**
    * Необязательное поле ввода — например, причина отказа. Без него окно
    * только спрашивает «да / нет».
    */
-  inputPlaceholder?: string;
-  animation: boolean;
-  type: "danger" | "warning" | "success" | "info";
-  Icon: SvgType | null;
-  confirmTitle?: string;
-  cancelTitle?: string;
-  okTitle?: string;
-};
+  inputPlaceholder?: string
+  animation: boolean
+  type: 'danger' | 'warning' | 'success' | 'info'
+  Icon: SvgType | null
+  confirmTitle?: string
+  cancelTitle?: string
+  okTitle?: string
+}
 
 export const useConfirmationModal = create<ConfirmationModalState>((set) => ({
   isOpen: false,
-  title: "",
-  description: "",
+  title: '',
+  description: '',
   onConfirm: () => {},
-  type: "danger",
+  type: 'danger',
   Icon: null,
   animation: false,
-}));
+}))

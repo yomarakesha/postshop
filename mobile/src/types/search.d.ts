@@ -9,23 +9,23 @@ declare namespace Search {
    * между ними у базы карточки ещё нет.
    */
   type Shop = ShopBase.Item & {
-    additional?: ShopAdditional.Item | null;
-  };
+    additional?: ShopAdditional.Item | null
+  }
 
   type Response = {
-    products: Product.Item[];
-    shops: Shop[];
-    categories: Category.Item[];
-    brands: Brand.Item[];
-  };
+    products: Product.Item[]
+    shops: Shop[]
+    categories: Category.Item[]
+    brands: Brand.Item[]
+  }
 
   namespace API {
     type Vars = {
-      q: string;
+      q: string
       /** Город покупателя: товары его магазинов поднимаются в выдаче. */
-      city_id?: number | null;
-      skip?: number;
-      limit?: number;
-    };
+      city_id?: number | null
+      skip?: number
+      limit?: number
+    }
   }
 }

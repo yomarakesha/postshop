@@ -1,17 +1,17 @@
-import { create } from "zustand";
-import { createJSONStorage, persist } from "zustand/middleware";
-import storage from "./storage";
+import { create } from 'zustand'
+import { createJSONStorage, persist } from 'zustand/middleware'
+import storage from './storage'
 
 type JWT = {
-  accessToken: string;
-  refreshToken: string;
-};
+  accessToken: string
+  refreshToken: string
+}
 
 interface UserStoreState {
-  isGuest: boolean;
-  user: User.Item | null;
-  cityId: number | null;
-  jwt: JWT | null;
+  isGuest: boolean
+  user: User.Item | null
+  cityId: number | null
+  jwt: JWT | null
 }
 
 export const useUserStore = create<UserStoreState>()(
@@ -23,8 +23,8 @@ export const useUserStore = create<UserStoreState>()(
       jwt: null,
     }),
     {
-      name: "user-storage",
+      name: 'user-storage',
       storage: createJSONStorage(() => storage.zustandStorage),
     },
   ),
-);
+)

@@ -1,55 +1,49 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import { TrueSheet } from "@lodev09/react-native-true-sheet";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import { useLocalSearchParams, useRouter } from 'expo-router'
+import { TrueSheet } from '@lodev09/react-native-true-sheet'
 
-import Typography from "@/ui/Typography";
-import SearchInput from "@/ui/SearchInput";
-import Header from "@/components/Header";
-import ProductsVerticalList from "@/components/ProductsVerticalList";
-import FilterSheet from "@/components/BottomSheet/FilterSheet";
-import SortSheet from "@/components/BottomSheet/SortSheet";
-import { brandApi } from "@/api/brandApi";
-import { productsApi } from "@/api/products";
-import { useProductListStore } from "@/store/useProductListStore";
-import { getImageUrl } from "@/utils/getImageUrl";
+import Typography from '@/ui/Typography'
+import SearchInput from '@/ui/SearchInput'
+import Header from '@/components/Header'
+import ProductsVerticalList from '@/components/ProductsVerticalList'
+import FilterSheet from '@/components/BottomSheet/FilterSheet'
+import SortSheet from '@/components/BottomSheet/SortSheet'
+import { brandApi } from '@/api/brandApi'
+import { productsApi } from '@/api/products'
+import { useProductListStore } from '@/store/useProductListStore'
+import { getImageUrl } from '@/utils/getImageUrl'
 
-import HeaderCenter from "./_components/HeaderCenter";
-import HeaderRight from "./_components/HederRight";
-import HeaderBottom from "./_components/HeaderBottom";
-import useDebounceSearch from "@/hooks/useDebounceSearch";
-import ActivityIndicator from "@/ui/ActivityIndicator";
-import { Image } from "expo-image";
-import emptySearchImage from "@assets/images/empty-search.png";
-import { useTranslation } from "react-i18next";
+import HeaderCenter from './_components/HeaderCenter'
+import HeaderRight from './_components/HederRight'
+import HeaderBottom from './_components/HeaderBottom'
+import useDebounceSearch from '@/hooks/useDebounceSearch'
+import ActivityIndicator from '@/ui/ActivityIndicator'
+import { Image } from 'expo-image'
+import emptySearchImage from '@assets/images/empty-search.png'
+import { useTranslation } from 'react-i18next'
 
 const BrandScreen = () => {
-  const { id } = useLocalSearchParams<{ id: string }>();
-  const router = useRouter();
-  const filter = useProductListStore((s) => s.filter);
-  const sort = useProductListStore((s) => s.sort);
-  const { t } = useTranslation();
+  const { id } = useLocalSearchParams<{ id: string }>()
+  const router = useRouter()
+  const filter = useProductListStore((s) => s.filter)
+  const sort = useProductListStore((s) => s.sort)
+  const { t } = useTranslation()
 
-  const [isSearch, setIsSearch] = useState(false);
-  const [search, setSearch] = useState("");
-  const debouncedSearch = useDebounceSearch(search);
-  const [sortSheetOpen, setSortSheetOpen] = useState(false);
-  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+  const [isSearch, setIsSearch] = useState(false)
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounceSearch(search)
+  const [sortSheetOpen, setSortSheetOpen] = useState(false)
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false)
 
-  const filterSheetRef = useRef<TrueSheet | null>(null);
-  const sortSheetRef = useRef<TrueSheet | null>(null);
+  const filterSheetRef = useRef<TrueSheet | null>(null)
+  const sortSheetRef = useRef<TrueSheet | null>(null)
 
   // 2. API
   const brandQuery = brandApi.useGet(Number(id), {
     enabled: !!id,
-  });
+  })
   const { data, fetchNextPage, isLoading, isFetchingNextPage, hasNextPage } =
     productsApi.useGetInfiniteList(
       {
@@ -65,81 +59,72 @@ const BrandScreen = () => {
       {
         enabled: !!id,
       },
-    );
+    )
 
   const handleFilter = () => {
-    filterSheetRef.current?.present();
-    setFilterSheetOpen(true);
-  };
+    filterSheetRef.current?.present()
+    setFilterSheetOpen(true)
+  }
 
   const handleSort = () => {
-    sortSheetRef.current?.present();
-    setSortSheetOpen(true);
-  };
+    sortSheetRef.current?.present()
+    setSortSheetOpen(true)
+  }
 
   const handleOnChangeSearch = (text: string) => {
-    setSearch(text);
-  };
+    setSearch(text)
+  }
 
   const handleCloseSearch = () => {
-    setIsSearch(false);
-    setSearch("");
-  };
+    setIsSearch(false)
+    setSearch('')
+  }
 
   const handlePressProduct = useCallback(
     (id: number) => {
-      router.push({ pathname: "/products/[id]", params: { id: String(id) } });
+      router.push({ pathname: '/products/[id]', params: { id: String(id) } })
     },
     [router],
-  );
+  )
 
   const handleEndReached = () => {
     if (!isFetchingNextPage && hasNextPage) {
-      fetchNextPage();
+      fetchNextPage()
     }
-  };
+  }
 
-  const products = useMemo(() => data?.pages.flat() || [], [data]);
+  const products = useMemo(() => data?.pages.flat() || [], [data])
 
   useEffect(() => {
     if (!id || brandQuery.isError) {
-      router.back();
+      router.back()
     }
-  }, [id, brandQuery.isError]);
+  }, [id, brandQuery.isError])
 
   useEffect(() => {
     return () => {
-      useProductListStore.getState().reset();
-    };
-  }, []);
+      useProductListStore.getState().reset()
+    }
+  }, [])
 
   const hasFilterApplied = useMemo(
-    () =>
-      Boolean(
-        filter.shops?.length ||
-        filter.priceFrom !== null ||
-        filter.priceTo !== null,
-      ),
+    () => Boolean(filter.shops?.length || filter.priceFrom !== null || filter.priceTo !== null),
     [filter],
-  );
+  )
 
-  const hasSortApplied = useMemo(() => sort !== null, [sort]);
+  const hasSortApplied = useMemo(() => sort !== null, [sort])
 
-  const openFilter = filterSheetOpen || hasFilterApplied;
-  const openSort = sortSheetOpen || hasSortApplied;
+  const openFilter = filterSheetOpen || hasFilterApplied
+  const openSort = sortSheetOpen || hasSortApplied
 
   if (!id || brandQuery.isError || brandQuery.isLoading) {
-    return null;
+    return null
   }
 
   return (
     <>
       <Header
-        headerRight={
-          isSearch ? undefined : (
-            <HeaderRight onSearch={() => setIsSearch(true)} />
-          )
-        }
+        headerRight={isSearch ? undefined : <HeaderRight onSearch={() => setIsSearch(true)} />}
         backgroundColor="white"
         headerCenter={
           isSearch ? (
@@ -148,7 +133,7 @@ const BrandScreen = () => {
               autoFocus
               onChangeText={handleOnChangeSearch}
               value={search}
-              placeholder={t("common.search")}
+              placeholder={t('common.search')}
               style={{ flexGrow: 1 }}
             />
           ) : (
@@ -180,14 +165,10 @@ const BrandScreen = () => {
               <ActivityIndicator isFullScreen />
             ) : (
               <View style={styles.imageWrapper}>
-                <Image
-                  source={emptySearchImage}
-                  style={styles.image}
-                  contentFit="contain"
-                />
+                <Image source={emptySearchImage} style={styles.image} contentFit="contain" />
                 <View>
                   <Typography variant="p1" weight="semiBold" isCentered>
-                    {t("emptyState.search.title")}
+                    {t('emptyState.search.title')}
                   </Typography>
                   <Typography
                     variant="t1"
@@ -196,7 +177,7 @@ const BrandScreen = () => {
                     isCentered
                     style={{ marginTop: 8 }}
                   >
-                    {t("emptyState.search.description")}
+                    {t('emptyState.search.description')}
                   </Typography>
                 </View>
               </View>
@@ -211,23 +192,19 @@ const BrandScreen = () => {
         withoutBrands
         t={t}
       />
-      <SortSheet
-        ref={sortSheetRef}
-        onDidDismiss={() => setSortSheetOpen(false)}
-        t={t}
-      />
+      <SortSheet ref={sortSheetRef} onDidDismiss={() => setSortSheetOpen(false)} t={t} />
     </>
-  );
-};
+  )
+}
 
-export default BrandScreen;
+export default BrandScreen
 
 const styles = StyleSheet.create((theme) => ({
   container: {},
   imageWrapper: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     gap: 12,
     paddingVertical: 40,
   },
@@ -235,4 +212,4 @@ const styles = StyleSheet.create((theme) => ({
     width: 120,
     height: 80,
   },
-}));
+}))

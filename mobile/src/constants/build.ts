@@ -17,5 +17,4 @@
  * Сам экран `/server-setup` остаётся доступен всегда: на него ведёт редирект
  * с корня, пока адрес не задан, — иначе приложение без адреса не запустить.
  */
-export const SHOW_SERVER_SETTING =
-  __DEV__ || process.env.EXPO_PUBLIC_SHOW_SERVER_SETTING === "1";
+export const SHOW_SERVER_SETTING = __DEV__ || process.env.EXPO_PUBLIC_SHOW_SERVER_SETTING === '1'

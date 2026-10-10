@@ -1,8 +1,8 @@
-import EditProfileScreen from "@/screens/Client/EditProfile";
-import React from "react";
+import EditProfileScreen from '@/screens/Client/EditProfile'
+import React from 'react'
 
 const EditProfileRoute = () => {
-  return <EditProfileScreen />;
-};
+  return <EditProfileScreen />
+}
 
-export default EditProfileRoute;
+export default EditProfileRoute

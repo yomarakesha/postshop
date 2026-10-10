@@ -1,8 +1,8 @@
-import ShopIntakeScreen from "@/screens/Shop/Intake";
-import React from "react";
+import ShopIntakeScreen from '@/screens/Shop/Intake'
+import React from 'react'
 
 const ShopIntakeRoute = () => {
-  return <ShopIntakeScreen />;
-};
+  return <ShopIntakeScreen />
+}
 
-export default ShopIntakeRoute;
+export default ShopIntakeRoute

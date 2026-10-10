@@ -1,9 +1,9 @@
-import React from "react";
-import { Stack } from "expo-router";
-import { useUnistyles } from "react-native-unistyles";
+import React from 'react'
+import { Stack } from 'expo-router'
+import { useUnistyles } from 'react-native-unistyles'
 
 const AuthLayout = () => {
-  const { theme } = useUnistyles();
+  const { theme } = useUnistyles()
   return (
     <Stack
       screenOptions={{
@@ -16,7 +16,7 @@ const AuthLayout = () => {
       <Stack.Screen name="index" />
       <Stack.Screen name="verify" />
     </Stack>
-  );
-};
+  )
+}
 
-export default AuthLayout;
+export default AuthLayout

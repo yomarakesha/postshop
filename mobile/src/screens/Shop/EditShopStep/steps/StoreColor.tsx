@@ -1,88 +1,79 @@
-import CustomTextInput from "@/ui/CustomTextInput";
-import Typography from "@/ui/Typography";
-import React, { Ref, useEffect, useImperativeHandle, useState } from "react";
-import { View } from "react-native";
-import { runOnJS } from "react-native-reanimated";
-import { StyleSheet } from "react-native-unistyles";
-import ColorPicker, {
-  HueSlider,
-  Panel1,
-  Preview,
-  Swatches,
-} from "reanimated-color-picker";
-import { RefType } from "..";
-import { TFunction } from "i18next";
+import CustomTextInput from '@/ui/CustomTextInput'
+import Typography from '@/ui/Typography'
+import React, { Ref, useEffect, useImperativeHandle, useState } from 'react'
+import { View } from 'react-native'
+import { runOnJS } from 'react-native-reanimated'
+import { StyleSheet } from 'react-native-unistyles'
+import ColorPicker, { HueSlider, Panel1, Preview, Swatches } from 'reanimated-color-picker'
+import { RefType } from '..'
+import { TFunction } from 'i18next'
 
 const PRESET_COLORS = [
-  "#1E6FFF",
-  "#4B6FFF",
-  "#00B4D8",
-  "#00C9A7",
-  "#00B96B",
-  "#4CAF50",
-  "#FFC107",
-  "#FF9800",
-  "#FF5722",
-  "#F44336",
-  "#E91E96",
-  "#A855F7",
-  "#7C3AED",
-  "#374151",
-  "#9CA3AF",
-];
+  '#1E6FFF',
+  '#4B6FFF',
+  '#00B4D8',
+  '#00C9A7',
+  '#00B96B',
+  '#4CAF50',
+  '#FFC107',
+  '#FF9800',
+  '#FF5722',
+  '#F44336',
+  '#E91E96',
+  '#A855F7',
+  '#7C3AED',
+  '#374151',
+  '#9CA3AF',
+]
 
-const HEX_REGEX = /^#([0-9A-Fa-f]{6})$/;
+const HEX_REGEX = /^#([0-9A-Fa-f]{6})$/
 
 type Props = {
-  data: ShopAdditional.Item["color"];
-  setIsValid: (value: boolean) => void;
-  ref: Ref<RefType>;
-  t: TFunction;
-};
+  data: ShopAdditional.Item['color']
+  setIsValid: (value: boolean) => void
+  ref: Ref<RefType>
+  t: TFunction
+}
 
 const StoreColor = ({ data, setIsValid, ref, t }: Props) => {
-  const [selectedColor, setSelectedColor] = useState(data);
-  const [inputValue, setInputValue] = useState(data);
-  const [inputError, setInputError] = useState(false);
+  const [selectedColor, setSelectedColor] = useState(data)
+  const [inputValue, setInputValue] = useState(data)
+  const [inputError, setInputError] = useState(false)
 
   useEffect(() => {
-    setIsValid(!!selectedColor);
-  }, [selectedColor]);
+    setIsValid(!!selectedColor)
+  }, [selectedColor])
 
   useImperativeHandle(ref, () => ({
     getData: () => ({ color: selectedColor }),
-  }));
+  }))
 
   const handleColorSelect = (hex: string) => {
-    setSelectedColor(hex);
-    setInputValue(hex);
-    setInputError(false);
-  };
+    setSelectedColor(hex)
+    setInputValue(hex)
+    setInputError(false)
+  }
 
   const onColorSelect = ({ hex }: { hex: string }) => {
-    "worklet";
-    runOnJS(handleColorSelect)(hex);
-  };
+    'worklet'
+    runOnJS(handleColorSelect)(hex)
+  }
 
   const handleInputChange = (text: string) => {
-    const value = text.startsWith("#") ? text : `#${text}`;
-    setInputValue(value);
+    const value = text.startsWith('#') ? text : `#${text}`
+    setInputValue(value)
 
     if (HEX_REGEX.test(value)) {
-      setSelectedColor(value);
-      setInputError(false);
+      setSelectedColor(value)
+      setInputError(false)
     } else {
-      setInputError(true);
+      setInputError(true)
     }
-  };
+  }
 
   return (
     <View style={styles.container}>
-      <ColorPicker
-        value={selectedColor}
-        onComplete={onColorSelect}
-        style={styles.picker}
-      >
+      <ColorPicker value={selectedColor} onComplete={onColorSelect} style={styles.picker}>
         <Preview style={styles.preview} />
         <Panel1 style={styles.panel} />
         <HueSlider style={styles.slider} />
@@ -103,14 +94,14 @@ const StoreColor = ({ data, setIsValid, ref, t }: Props) => {
       </View>
       {inputError && (
         <Typography variant="t1" color="error">
-          {t("store.shopAdditional.colorInvalid")}
+          {t('store.shopAdditional.colorInvalid')}
         </Typography>
       )}
     </View>
-  );
-};
+  )
+}
 
-export default StoreColor;
+export default StoreColor
 
 const styles = StyleSheet.create((theme) => ({
   container: {
@@ -136,12 +127,12 @@ const styles = StyleSheet.create((theme) => ({
   },
   swatches: {
     paddingTop: theme.spacing(2),
-    flexWrap: "wrap",
+    flexWrap: 'wrap',
     gap: theme.spacing(2),
   },
   inputWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: theme.spacing(3),
   },
   colorDot: {
@@ -151,4 +142,4 @@ const styles = StyleSheet.create((theme) => ({
     borderWidth: 1,
     borderColor: theme.colors.stroke,
   },
-}));
+}))

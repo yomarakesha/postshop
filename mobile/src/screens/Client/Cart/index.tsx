@@ -1,79 +1,76 @@
-import { cartApi } from "@/api/cartApi";
-import Header from "@/components/Header";
-import useAppStore from "@/store/useAppStore";
-import { useCartStore } from "@/store/useCartStore";
-import { useConfirmationModal } from "@/store/useConfirmationModal";
-import { useUserStore } from "@/store/useUserStore";
-import ActivityIndicator from "@/ui/ActivityIndicator";
-import ScreenFooter from "@/ui/ScreenFooter";
-import Typography from "@/ui/Typography";
-import CircleInfoIcon from "@assets/icons/circle-info.svg";
-import LoginIcon from "@assets/icons/log-in.svg";
-import emptyCartImage from "@assets/images/empty-cart.png";
-import { Image } from "expo-image";
-import { useRouter } from "expo-router";
-import React from "react";
-import { useTranslation } from "react-i18next";
-import { ScrollView, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import useCartData from "@/hooks/useCartData";
-import ShopProductsAccordion from "@/ui/ShopProductAccordion";
-import HeaderRight from "./_components/HeaderRight";
-import PriceSummary from "@/ui/PriceSummary";
+import { cartApi } from '@/api/cartApi'
+import Header from '@/components/Header'
+import useAppStore from '@/store/useAppStore'
+import { useCartStore } from '@/store/useCartStore'
+import { useConfirmationModal } from '@/store/useConfirmationModal'
+import { useUserStore } from '@/store/useUserStore'
+import ActivityIndicator from '@/ui/ActivityIndicator'
+import ScreenFooter from '@/ui/ScreenFooter'
+import Typography from '@/ui/Typography'
+import CircleInfoIcon from '@assets/icons/circle-info.svg'
+import LoginIcon from '@assets/icons/log-in.svg'
+import emptyCartImage from '@assets/images/empty-cart.png'
+import { Image } from 'expo-image'
+import { useRouter } from 'expo-router'
+import React from 'react'
+import { useTranslation } from 'react-i18next'
+import { ScrollView, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import useCartData from '@/hooks/useCartData'
+import ShopProductsAccordion from '@/ui/ShopProductAccordion'
+import HeaderRight from './_components/HeaderRight'
+import PriceSummary from '@/ui/PriceSummary'
 
 const CartScreen = () => {
-  const currentLanguage = useAppStore((s) => s.lang);
-  const isGuest = useUserStore((s) => s.isGuest);
-  const clearCartMutation = cartApi.useClear();
-  const { t } = useTranslation();
-  const router = useRouter();
+  const currentLanguage = useAppStore((s) => s.lang)
+  const isGuest = useUserStore((s) => s.isGuest)
+  const clearCartMutation = cartApi.useClear()
+  const { t } = useTranslation()
+  const router = useRouter()
   const onDelete = () => {
     useConfirmationModal.setState({
       isOpen: true,
-      title: t("client.cart.clearConfirm.title"),
-      description: t("client.cart.clearConfirm.description"),
+      title: t('client.cart.clearConfirm.title'),
+      description: t('client.cart.clearConfirm.description'),
       Icon: CircleInfoIcon,
-      type: "warning",
-      confirmTitle: t("common.clear"),
-      cancelTitle: t("common.close"),
+      type: 'warning',
+      confirmTitle: t('common.clear'),
+      cancelTitle: t('common.close'),
       onConfirm: async () => {
         if (isGuest) {
-          useCartStore.getState().clearCart();
+          useCartStore.getState().clearCart()
         } else {
-          await clearCartMutation.mutateAsync();
+          await clearCartMutation.mutateAsync()
         }
       },
-    });
-  };
-  const { groups, price, discountPrice, total, isLoading, isError } =
-    useCartData();
+    })
+  }
+  const { groups, price, discountPrice, total, isLoading, isError } = useCartData()
 
   // Валюта берётся из данных корзины, а не из захардкоженного «TMT».
-  const currency = groups[0]?.products[0]?.currency;
+  const currency = groups[0]?.products[0]?.currency
 
   const onSubmit = () => {
     if (isGuest) {
       useConfirmationModal.setState({
         isOpen: true,
-        title: t("client.cart.loginRequired.title"),
-        description: t("client.cart.loginRequired.description"),
-        okTitle: t("common.close"),
+        title: t('client.cart.loginRequired.title'),
+        description: t('client.cart.loginRequired.description'),
+        okTitle: t('common.close'),
         Icon: LoginIcon,
-        type: "info",
+        type: 'info',
         onConfirm: undefined,
-      });
-      return;
+      })
+      return
     }
-    router.push("/checkout");
-  };
+    router.push('/checkout')
+  }
 
   return (
     <>
       <Header
         backgroundColor="white"
-        headerRight={
-          <HeaderRight onDelete={onDelete} isEmpty={groups.length === 0} />
-        }
+        headerRight={<HeaderRight onDelete={onDelete} isEmpty={groups.length === 0} />}
       />
       {isLoading ? (
         // Без этой ветки на время загрузки показывалась «пустая корзина»,
@@ -82,30 +79,20 @@ const CartScreen = () => {
       ) : isError ? (
         <View style={styles.center}>
           <Typography variant="p1" weight="semiBold" style={styles.centerText}>
-            {t("networkError.title")}
+            {t('networkError.title')}
           </Typography>
-          <Typography
-            variant="t1"
-            weight="medium"
-            color="secondary"
-            style={styles.centerHint}
-          >
-            {t("networkError.description")}
+          <Typography variant="t1" weight="medium" color="secondary" style={styles.centerHint}>
+            {t('networkError.description')}
           </Typography>
         </View>
       ) : groups.length === 0 ? (
         <View style={styles.center}>
           <Image source={emptyCartImage} style={styles.emptyImage} />
           <Typography variant="p1" weight="semiBold" style={styles.centerText}>
-            {t("emptyState.cart.title")}
+            {t('emptyState.cart.title')}
           </Typography>
-          <Typography
-            variant="t1"
-            weight="medium"
-            color="secondary"
-            style={styles.centerHint}
-          >
-            {t("emptyState.cart.description")}
+          <Typography variant="t1" weight="medium" color="secondary" style={styles.centerHint}>
+            {t('emptyState.cart.description')}
           </Typography>
         </View>
       ) : (
@@ -149,10 +136,10 @@ const CartScreen = () => {
         </>
       )}
     </>
-  );
-};
+  )
+}
 
-export default CartScreen;
+export default CartScreen
 
 const styles = StyleSheet.create((theme) => ({
   flex1: {
@@ -160,17 +147,17 @@ const styles = StyleSheet.create((theme) => ({
   },
   center: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: theme.spacing(8),
   },
   centerText: {
     marginTop: theme.spacing(6),
-    textAlign: "center",
+    textAlign: 'center',
   },
   centerHint: {
     marginTop: theme.spacing(2),
-    textAlign: "center",
+    textAlign: 'center',
   },
   contentContainer: {
     padding: theme.spacing(4),
@@ -183,4 +170,4 @@ const styles = StyleSheet.create((theme) => ({
     width: 120,
     aspectRatio: 1,
   },
-}));
+}))

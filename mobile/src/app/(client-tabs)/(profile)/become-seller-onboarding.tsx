@@ -1,8 +1,8 @@
-import BecomeSellerOnboardingScreen from "@/screens/Client/BecomeSellerOnboarding";
-import React from "react";
+import BecomeSellerOnboardingScreen from '@/screens/Client/BecomeSellerOnboarding'
+import React from 'react'
 
 const BecomeSellerOnboardingRoute = () => {
-  return <BecomeSellerOnboardingScreen />;
-};
+  return <BecomeSellerOnboardingScreen />
+}
 
-export default BecomeSellerOnboardingRoute;
+export default BecomeSellerOnboardingRoute

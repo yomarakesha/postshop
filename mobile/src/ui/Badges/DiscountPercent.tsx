@@ -1,11 +1,11 @@
-import Typography from "@/ui/Typography";
-import React from "react";
-import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
+import Typography from '@/ui/Typography'
+import React from 'react'
+import { View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
 
 type Props = {
-  discountPercent: number;
-};
+  discountPercent: number
+}
 
 const DiscountPercentBadge = ({ discountPercent }: Props) => {
   return (
@@ -14,10 +14,10 @@ const DiscountPercentBadge = ({ discountPercent }: Props) => {
         {discountPercent}%
       </Typography>
     </View>
-  );
-};
+  )
+}
 
-export default DiscountPercentBadge;
+export default DiscountPercentBadge
 
 const styles = StyleSheet.create((theme) => ({
   container: {
@@ -25,6 +25,6 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing(0.5),
     paddingHorizontal: theme.spacing(2),
     borderRadius: theme.spacing(3),
-    alignSelf: "flex-start",
+    alignSelf: 'flex-start',
   },
-}));
+}))

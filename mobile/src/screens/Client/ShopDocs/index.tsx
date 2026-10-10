@@ -1,125 +1,121 @@
-import { shopBaseApi } from "@/api/shopBaseApi";
-import Header from "@/components/Header";
-import ActivityIndicator from "@/ui/ActivityIndicator";
-import Button from "@/ui/Button";
-import ScreenFooter from "@/ui/ScreenFooter";
-import Typography from "@/ui/Typography";
-import * as DocumentPicker from "expo-document-picker";
-import { DocumentPickerAsset } from "expo-document-picker";
-import { useLocalSearchParams, useRouter } from "expo-router";
-import React, { useState } from "react";
-import { Platform, ScrollView, View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
-import DocUploader from "./_components/DocUploader";
-import ErrorAlert from "@/utils/errorAlert";
-import { useTranslation } from "react-i18next";
-import { useConfirmationModal } from "@/store/useConfirmationModal";
-import * as FileSystem from "expo-file-system/legacy";
-import { DOCUMENT_KINDS } from "@/constants/documentKinds";
+import { shopBaseApi } from '@/api/shopBaseApi'
+import Header from '@/components/Header'
+import ActivityIndicator from '@/ui/ActivityIndicator'
+import Button from '@/ui/Button'
+import ScreenFooter from '@/ui/ScreenFooter'
+import Typography from '@/ui/Typography'
+import * as DocumentPicker from 'expo-document-picker'
+import { DocumentPickerAsset } from 'expo-document-picker'
+import { useLocalSearchParams, useRouter } from 'expo-router'
+import React, { useState } from 'react'
+import { Platform, ScrollView, View } from 'react-native'
+import { StyleSheet, useUnistyles } from 'react-native-unistyles'
+import DocUploader from './_components/DocUploader'
+import ErrorAlert from '@/utils/errorAlert'
+import { useTranslation } from 'react-i18next'
+import { useConfirmationModal } from '@/store/useConfirmationModal'
+import * as FileSystem from 'expo-file-system/legacy'
+import { DOCUMENT_KINDS } from '@/constants/documentKinds'
 
 const getMimeType = (name: string, mimeType?: string) => {
-  if (mimeType) return mimeType;
-  const ext = name.split(".").pop()?.toLowerCase();
-  if (ext === "pdf") return "application/pdf";
-  if (["jpg", "jpeg"].includes(ext ?? "")) return "image/jpeg";
-  if (ext === "png") return "image/png";
-  return "application/octet-stream";
-};
+  if (mimeType) return mimeType
+  const ext = name.split('.').pop()?.toLowerCase()
+  if (ext === 'pdf') return 'application/pdf'
+  if (['jpg', 'jpeg'].includes(ext ?? '')) return 'image/jpeg'
+  if (ext === 'png') return 'image/png'
+  return 'application/octet-stream'
+}
 
 const ShopDocsScreen = () => {
-  const router = useRouter();
-  const { t } = useTranslation();
+  const router = useRouter()
+  const { t } = useTranslation()
   const { type, shopId } = useLocalSearchParams<{
-    type: ShopBase.Type;
-    shopId: string;
-  }>();
-  const [docs, setDocs] = useState<(DocumentPickerAsset | undefined)[]>([]);
-  const [preparingIndexes, setPreparingIndexes] = useState<Set<number>>(
-    new Set(),
-  );
-  const shopUploadDocsMutation = shopBaseApi.useUploadDocs(Number(shopId));
-  const { theme } = useUnistyles();
+    type: ShopBase.Type
+    shopId: string
+  }>()
+  const [docs, setDocs] = useState<(DocumentPickerAsset | undefined)[]>([])
+  const [preparingIndexes, setPreparingIndexes] = useState<Set<number>>(new Set())
+  const shopUploadDocsMutation = shopBaseApi.useUploadDocs(Number(shopId))
+  const { theme } = useUnistyles()
 
-  const isPreparing = preparingIndexes.size > 0;
+  const isPreparing = preparingIndexes.size > 0
 
   const docsData = {
-    legal_entity: t("client.sellerDocs.docs.legal", {
+    legal_entity: t('client.sellerDocs.docs.legal', {
       returnObjects: true,
     }) as string[],
-    individual_entrepreneur: t("client.sellerDocs.docs.individual", {
+    individual_entrepreneur: t('client.sellerDocs.docs.individual', {
       returnObjects: true,
     }) as string[],
-  };
+  }
 
-  const uploadedCount = docs.filter((doc) => doc !== undefined).length;
+  const uploadedCount = docs.filter((doc) => doc !== undefined).length
   // Подписи приходят из переводов, виды — из кода. Если их станет разное
   // число, файл уедет на сервер с чужим видом, и заметить это будет нечем.
   if (__DEV__ && docsData[type].length !== DOCUMENT_KINDS[type].length) {
     console.warn(
       `ShopDocs: подписей ${docsData[type].length}, видов ${DOCUMENT_KINDS[type].length} — проверьте переводы и DOCUMENT_KINDS`,
-    );
+    )
   }
-  const hasAllDocs =
-    docs.length === docsData[type].length &&
-    docs.every((doc) => doc !== undefined);
+  const hasAllDocs = docs.length === docsData[type].length && docs.every((doc) => doc !== undefined)
 
   const handleUpload = async (index: number) => {
     const result = await DocumentPicker.getDocumentAsync({
       type: [
-        "application/pdf",
-        "image/jpeg",
-        "image/png",
-        "public.image",
-        "public.heic",
-        "public.heif",
+        'application/pdf',
+        'image/jpeg',
+        'image/png',
+        'public.image',
+        'public.heic',
+        'public.heif',
       ],
-    });
+    })
 
-    if (result.canceled) return;
+    if (result.canceled) return
 
-    const asset = result.assets[0];
+    const asset = result.assets[0]
 
     // помечаем, что этот файл ещё готовится
-    setPreparingIndexes((prev) => new Set(prev).add(index));
+    setPreparingIndexes((prev) => new Set(prev).add(index))
 
     try {
-      let ready = false;
+      let ready = false
       for (let attempt = 0; attempt < 10 && !ready; attempt++) {
-        const info = await FileSystem.getInfoAsync(asset.uri);
+        const info = await FileSystem.getInfoAsync(asset.uri)
         if (info.exists) {
-          ready = true;
+          ready = true
         } else {
-          await new Promise((resolve) => setTimeout(resolve, 100));
+          await new Promise((resolve) => setTimeout(resolve, 100))
         }
       }
 
       if (!ready) {
-        throw new Error(`File not ready: ${asset.uri}`);
+        throw new Error(`File not ready: ${asset.uri}`)
       }
 
       setDocs((prev) => {
-        const next = [...prev];
-        next[index] = asset;
-        return next;
-      });
+        const next = [...prev]
+        next[index] = asset
+        return next
+      })
     } catch (e) {
-      ErrorAlert(t, e as any);
+      ErrorAlert(t, e as any)
     } finally {
       setPreparingIndexes((prev) => {
-        const next = new Set(prev);
-        next.delete(index);
-        return next;
-      });
+        const next = new Set(prev)
+        next.delete(index)
+        return next
+      })
     }
-  };
+  }
 
   const handleRemove = (index: number) => {
     setDocs((prev) => {
-      const next = [...prev];
-      next[index] = undefined;
-      return next;
-    });
-  };
+      const next = [...prev]
+      next[index] = undefined
+      return next
+    })
+  }
 
   const handleSubmit = async () => {
     try {
@@ -127,49 +123,43 @@ const ShopDocsScreen = () => {
       // видом и сверяет, что видов столько же, сколько файлов, и что они
       // подходят выбранному виду собственника. Вид берётся по номеру поля —
       // там же, где взята подпись.
-      const kinds = DOCUMENT_KINDS[type];
-      const chosen = docs.flatMap((doc, index) =>
-        doc ? [{ doc, kind: kinds[index] }] : [],
-      );
+      const kinds = DOCUMENT_KINDS[type]
+      const chosen = docs.flatMap((doc, index) => (doc ? [{ doc, kind: kinds[index] }] : []))
 
       await shopUploadDocsMutation.mutateAsync({
         files: chosen.map(({ doc }) => ({
-          uri: Platform.OS === "ios" ? doc.uri.replace("file://", "") : doc.uri,
-          name: doc.name ?? "file",
-          type: getMimeType(doc.name ?? "", doc.mimeType),
+          uri: Platform.OS === 'ios' ? doc.uri.replace('file://', '') : doc.uri,
+          name: doc.name ?? 'file',
+          type: getMimeType(doc.name ?? '', doc.mimeType),
         })),
         kinds: chosen.map(({ kind }) => kind),
-      });
+      })
 
       useConfirmationModal.setState({
         isOpen: true,
         animation: true,
         Icon: undefined,
-        okTitle: t("common.close"),
-        type: "info",
-        title: t("client.sellerDocs.submittedModal.title"),
-        description: t("client.sellerDocs.submittedModal.description"),
+        okTitle: t('common.close'),
+        type: 'info',
+        title: t('client.sellerDocs.submittedModal.title'),
+        description: t('client.sellerDocs.submittedModal.description'),
         onConfirm: undefined,
-      });
+      })
 
-      router.replace("/(client-tabs)/(home)");
+      router.replace('/(client-tabs)/(home)')
     } catch (e: any) {
-      ErrorAlert(t, e);
+      ErrorAlert(t, e)
     }
-  };
+  }
 
   if (!shopId || !type) {
-    router.back();
-    return null;
+    router.back()
+    return null
   }
 
   return (
     <>
-      <Header
-        withGoBack
-        title={t("postshopSeller")}
-        backgroundColor={theme.colors.white}
-      />
+      <Header withGoBack title={t('postshopSeller')} backgroundColor={theme.colors.white} />
       <ScrollView
         style={styles.wrapper}
         contentContainerStyle={styles.contentContainer}
@@ -178,10 +168,10 @@ const ShopDocsScreen = () => {
         <View style={styles.docsWrapper}>
           <View style={styles.headlineWrapper}>
             <Typography variant="p3" weight="semiBold" isCentered>
-              {t("client.sellerDocs.headline")}
+              {t('client.sellerDocs.headline')}
             </Typography>
             <Typography variant="t1" color="secondary" isCentered>
-              {t("client.sellerDocs.progress", {
+              {t('client.sellerDocs.progress', {
                 uploaded: uploadedCount,
                 total: docsData[type].length,
               })}
@@ -203,11 +193,9 @@ const ShopDocsScreen = () => {
       </ScrollView>
       <ScreenFooter>
         <Button
-          title={t("common.confirm")}
+          title={t('common.confirm')}
           onPress={handleSubmit}
-          disabled={
-            !hasAllDocs || isPreparing || shopUploadDocsMutation.isPending
-          }
+          disabled={!hasAllDocs || isPreparing || shopUploadDocsMutation.isPending}
           variant="primary"
         >
           {shopUploadDocsMutation.isPending ? (
@@ -216,10 +204,10 @@ const ShopDocsScreen = () => {
         </Button>
       </ScreenFooter>
     </>
-  );
-};
+  )
+}
 
-export default ShopDocsScreen;
+export default ShopDocsScreen
 
 const styles = StyleSheet.create((theme) => ({
   wrapper: {
@@ -241,4 +229,4 @@ const styles = StyleSheet.create((theme) => ({
   headlineWrapper: {
     gap: theme.spacing(2),
   },
-}));
+}))

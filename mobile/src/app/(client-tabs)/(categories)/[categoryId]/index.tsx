@@ -1,8 +1,8 @@
-import SubCategoriesScreen from "@/screens/Client/SubCategories";
-import React from "react";
+import SubCategoriesScreen from '@/screens/Client/SubCategories'
+import React from 'react'
 
 const SubCategoriesRoute = () => {
-  return <SubCategoriesScreen />;
-};
+  return <SubCategoriesScreen />
+}
 
-export default SubCategoriesRoute;
+export default SubCategoriesRoute

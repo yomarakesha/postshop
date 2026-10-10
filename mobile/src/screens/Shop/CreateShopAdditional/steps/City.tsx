@@ -1,63 +1,50 @@
-import { cityApi } from "@/api/cityApi";
-import Header from "@/components/Header";
-import useAppStore from "@/store/useAppStore";
-import Radio from "@/ui/Radio";
-import Typography from "@/ui/Typography";
-import React, {
-  useCallback,
-  useEffect,
-  useImperativeHandle,
-  useMemo,
-  useState,
-} from "react";
-import { Pressable, ScrollView, View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import { StepsProps } from "..";
-import ActivityIndicator from "@/ui/ActivityIndicator";
+import { cityApi } from '@/api/cityApi'
+import Header from '@/components/Header'
+import useAppStore from '@/store/useAppStore'
+import Radio from '@/ui/Radio'
+import Typography from '@/ui/Typography'
+import React, { useCallback, useEffect, useImperativeHandle, useMemo, useState } from 'react'
+import { Pressable, ScrollView, View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import { StepsProps } from '..'
+import ActivityIndicator from '@/ui/ActivityIndicator'
 
-const City = ({
-  setIsValid,
-  ref,
-  t,
-  footerHeight,
-}: StepsProps & { footerHeight: number }) => {
-  const citiesQuery = cityApi.useGetAll();
-  const [selectedCity, setSelectedCity] = useState<number | undefined>();
-  const currentLang = useAppStore((s) => s.lang);
+const City = ({ setIsValid, ref, t, footerHeight }: StepsProps & { footerHeight: number }) => {
+  const citiesQuery = cityApi.useGetAll()
+  const [selectedCity, setSelectedCity] = useState<number | undefined>()
+  const currentLang = useAppStore((s) => s.lang)
 
   useEffect(() => {
-    setIsValid(!!selectedCity);
-  }, [selectedCity]);
+    setIsValid(!!selectedCity)
+  }, [selectedCity])
 
   useImperativeHandle(ref, () => ({
     getData: () => ({
       city_id: selectedCity,
     }),
     isValid: !!selectedCity,
-  }));
+  }))
 
   const handlePress = (cityId: number) => {
-    setSelectedCity(cityId);
-  };
+    setSelectedCity(cityId)
+  }
 
   const getTranslation = useCallback(
     (translations: City.Translation[]) => {
       return (
-        translations?.find((t) => t.language === currentLang)?.name ||
-        translations?.[0]?.name ||
-        ""
-      );
+        translations?.find((t) => t.language === currentLang)?.name || translations?.[0]?.name || ''
+      )
     },
     [currentLang],
-  );
+  )
 
   const cities = useMemo(() => {
-    return citiesQuery.data || [];
-  }, [citiesQuery.data]);
+    return citiesQuery.data || []
+  }, [citiesQuery.data])
 
   return (
     <>
-      <Header title={t("store.shopAdditional.city")} backgroundColor="white" />
+      <Header title={t('store.shopAdditional.city')} backgroundColor="white" />
       <ScrollView
         style={styles.flex1}
         contentContainerStyle={styles.contentContainer(footerHeight)}
@@ -67,16 +54,12 @@ const City = ({
         ) : cities.length === 0 ? (
           <View style={styles.empty}>
             <Typography color="tertiary" isCentered>
-              {t("emptyState.cities.title")}
+              {t('emptyState.cities.title')}
             </Typography>
           </View>
         ) : (
           cities.map((city) => (
-            <Pressable
-              key={city.id}
-              style={styles.item}
-              onPress={() => handlePress(city.id)}
-            >
+            <Pressable key={city.id} style={styles.item} onPress={() => handlePress(city.id)}>
               <Typography style={styles.cityName} numberOfLines={2}>
                 {getTranslation(city.translations)}
               </Typography>
@@ -86,10 +69,10 @@ const City = ({
         )}
       </ScrollView>
     </>
-  );
-};
+  )
+}
 
-export default City;
+export default City
 
 const styles = StyleSheet.create((theme) => ({
   flex1: {
@@ -97,8 +80,8 @@ const styles = StyleSheet.create((theme) => ({
   },
   empty: {
     flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingHorizontal: theme.spacing(6),
   },
   cityName: {
@@ -117,9 +100,9 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(3),
     backgroundColor: theme.colors.white,
     borderRadius: theme.spacing(3),
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     ...theme.shadows.soft,
   },
-}));
+}))

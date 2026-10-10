@@ -1,7 +1,7 @@
-import FavoritesScreen from "@/screens/Client/Favorites";
+import FavoritesScreen from '@/screens/Client/Favorites'
 
 const FavoritesRouter = () => {
-  return <FavoritesScreen />;
-};
+  return <FavoritesScreen />
+}
 
-export default FavoritesRouter;
+export default FavoritesRouter

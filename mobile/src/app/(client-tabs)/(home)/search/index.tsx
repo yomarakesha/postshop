@@ -1,8 +1,8 @@
-import SearchScreen from "@/screens/Client/Search";
-import React from "react";
+import SearchScreen from '@/screens/Client/Search'
+import React from 'react'
 
 const SearchRoute = () => {
-  return <SearchScreen />;
-};
+  return <SearchScreen />
+}
 
-export default SearchRoute;
+export default SearchRoute

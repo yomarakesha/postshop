@@ -1,25 +1,21 @@
-import Button from "@/ui/Button";
-import Typography from "@/ui/Typography";
-import {
-  CurrencySource,
-  formatMoney,
-  formatMoneyDiscount,
-} from "@/utils/formatMoney";
-import React from "react";
-import { Pressable, View, ViewStyle } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import CircleInfoIcon from "@assets/icons/info.svg";
+import Button from '@/ui/Button'
+import Typography from '@/ui/Typography'
+import { CurrencySource, formatMoney, formatMoneyDiscount } from '@/utils/formatMoney'
+import React from 'react'
+import { Pressable, View, ViewStyle } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import CircleInfoIcon from '@assets/icons/info.svg'
 
 type Props = {
-  price: number;
-  discountPrice: number;
-  total: number;
-  onSubmit?: () => void;
-  style?: ViewStyle;
-  onPressDeliveryDetail?: () => void;
-  t: (key: string) => string;
-  buttonDisabled?: boolean;
-  alwaysShowSubtotal?: boolean;
+  price: number
+  discountPrice: number
+  total: number
+  onSubmit?: () => void
+  style?: ViewStyle
+  onPressDeliveryDetail?: () => void
+  t: (key: string) => string
+  buttonDisabled?: boolean
+  alwaysShowSubtotal?: boolean
   /**
    * Итог показывается внутри кнопки, как на витрине: на кнопке сумма к оплате,
    * рядом зачёркнутая цена без скидки.
@@ -33,7 +29,7 @@ type Props = {
    * Работает только вместе с `onSubmit` — на экранах заказа кнопки нет и итог
    * обязан остаться строкой.
    */
-  totalInButton?: boolean;
+  totalInButton?: boolean
   /**
    * Убрать разбивку над кнопкой совсем — так устроена корзина витрины
    * (`widgets/CartSidebar`): над кнопкой нет ни «Общей стоимости», ни
@@ -43,20 +39,20 @@ type Props = {
    * (`pages/checkout`) — последний экран перед оплатой должен объяснять,
    * из чего сложилась сумма.
    */
-  withoutSummary?: boolean;
+  withoutSummary?: boolean
   /**
    * Цена доставки отдельной строкой. Она входит в `total`, и без этой строки
    * итог оказывался больше стоимости товаров без объяснения.
    */
-  deliveryPrice?: number;
+  deliveryPrice?: number
   /** Валюта из данных корзины; при отсутствии formatMoney подставит TMT. */
-  currency?: CurrencySource;
+  currency?: CurrencySource
   /**
    * Подпись строки вычета. По умолчанию «Скидка»; в заказе вычитаются товары
    * отказавшихся магазинов, и называть их скидкой — неправда.
    */
-  discountLabel?: string;
-};
+  discountLabel?: string
+}
 
 const PriceSummary = ({
   price,
@@ -74,24 +70,20 @@ const PriceSummary = ({
   currency,
   discountLabel,
 }: Props) => {
-  const hasDiscount = discountPrice > 0;
-  const hasDelivery = typeof deliveryPrice === "number" && deliveryPrice > 0;
-  const showSubtotal = hasDiscount || hasDelivery || alwaysShowSubtotal;
-  const isTotalInButton = !!totalInButton && !!onSubmit;
+  const hasDiscount = discountPrice > 0
+  const hasDelivery = typeof deliveryPrice === 'number' && deliveryPrice > 0
+  const showSubtotal = hasDiscount || hasDelivery || alwaysShowSubtotal
+  const isTotalInButton = !!totalInButton && !!onSubmit
   // Отключённая кнопка серая: белый текст на ней не читается.
-  const buttonTextColor = buttonDisabled ? "disabled" : "white";
+  const buttonTextColor = buttonDisabled ? 'disabled' : 'white'
 
   return (
     <View style={[styles.container, style]}>
       {onPressDeliveryDetail && (
-        <Pressable
-          onPress={onPressDeliveryDetail}
-          style={styles.deliveryLink}
-          hitSlop={8}
-        >
+        <Pressable onPress={onPressDeliveryDetail} style={styles.deliveryLink} hitSlop={8}>
           <CircleInfoIcon style={styles.blueMain} />
           <Typography variant="p3" weight="medium" color="main">
-            {t("client.cart.aboutDelivery")}
+            {t('client.cart.aboutDelivery')}
           </Typography>
         </Pressable>
       )}
@@ -100,13 +92,8 @@ const PriceSummary = ({
         <View style={styles.summary}>
           {showSubtotal && (
             <View style={styles.dataContainer}>
-              <Typography
-                variant="p3"
-                weight="medium"
-                color="secondary"
-                style={styles.label}
-              >
-                {t("client.cart.footer.totalPrice")}
+              <Typography variant="p3" weight="medium" color="secondary" style={styles.label}>
+                {t('client.cart.footer.totalPrice')}
               </Typography>
               <Typography variant="p3" weight="medium" style={styles.value}>
                 {formatMoney(price, currency)}
@@ -116,20 +103,10 @@ const PriceSummary = ({
 
           {hasDiscount && (
             <View style={styles.dataContainer}>
-              <Typography
-                variant="p3"
-                weight="medium"
-                color="secondary"
-                style={styles.label}
-              >
-                {discountLabel ?? t("client.cart.footer.discount")}
+              <Typography variant="p3" weight="medium" color="secondary" style={styles.label}>
+                {discountLabel ?? t('client.cart.footer.discount')}
               </Typography>
-              <Typography
-                variant="p3"
-                weight="medium"
-                color="error"
-                style={styles.value}
-              >
+              <Typography variant="p3" weight="medium" color="error" style={styles.value}>
                 {formatMoneyDiscount(discountPrice, currency)}
               </Typography>
             </View>
@@ -137,13 +114,8 @@ const PriceSummary = ({
 
           {hasDelivery && (
             <View style={styles.dataContainer}>
-              <Typography
-                variant="p3"
-                weight="medium"
-                color="secondary"
-                style={styles.label}
-              >
-                {t("client.cart.footer.delivery")}
+              <Typography variant="p3" weight="medium" color="secondary" style={styles.label}>
+                {t('client.cart.footer.delivery')}
               </Typography>
               <Typography variant="p3" weight="medium" style={styles.value}>
                 {formatMoney(deliveryPrice, currency)}
@@ -156,7 +128,7 @@ const PriceSummary = ({
           {!isTotalInButton && (
             <View style={styles.dataContainer}>
               <Typography variant="p2" weight="bold" style={styles.label}>
-                {t("client.cart.footer.total")}
+                {t('client.cart.footer.total')}
               </Typography>
               <Typography variant="p2" weight="bold" style={styles.value}>
                 {formatMoney(total, currency)}
@@ -183,12 +155,7 @@ const PriceSummary = ({
                 число стоит и строкой «Общая стоимость», и на кнопке. */}
             <View style={styles.totalButtonContent}>
               <View style={styles.totalButtonRow}>
-                <Typography
-                  variant="p2"
-                  weight="bold"
-                  color={buttonTextColor}
-                  numberOfLines={1}
-                >
+                <Typography variant="p2" weight="bold" color={buttonTextColor} numberOfLines={1}>
                   {formatMoney(total, currency)}
                 </Typography>
                 {hasDiscount && withoutSummary && (
@@ -197,11 +164,7 @@ const PriceSummary = ({
                     weight="medium"
                     isLineThrough
                     numberOfLines={1}
-                    style={
-                      buttonDisabled
-                        ? styles.oldPriceDisabled
-                        : styles.oldPriceOnPrimary
-                    }
+                    style={buttonDisabled ? styles.oldPriceDisabled : styles.oldPriceOnPrimary}
                   >
                     {formatMoney(price, currency)}
                   </Typography>
@@ -211,17 +174,17 @@ const PriceSummary = ({
           </Button>
         ) : (
           <Button
-            title={t("client.cart.footer.submit")}
+            title={t('client.cart.footer.submit')}
             variant="primary"
             onPress={onSubmit}
             disabled={buttonDisabled}
           />
         ))}
     </View>
-  );
-};
+  )
+}
 
-export default PriceSummary;
+export default PriceSummary
 
 const styles = StyleSheet.create((theme) => ({
   container: {
@@ -229,17 +192,17 @@ const styles = StyleSheet.create((theme) => ({
     gap: theme.spacing(3),
   },
   deliveryLink: {
-    flexDirection: "row",
-    alignItems: "center",
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: theme.spacing(2),
   },
   summary: {
     gap: theme.spacing(2),
   },
   dataContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     // Без зазора длинная сумма вплотную прилипала к двоеточию подписи
     // («Общая стоимость:4303.9 TMT») и вылезала за отступ экрана.
     gap: theme.spacing(3),
@@ -250,7 +213,7 @@ const styles = StyleSheet.create((theme) => ({
   },
   value: {
     flexShrink: 0,
-    textAlign: "right",
+    textAlign: 'right',
   },
   divider: {
     height: 1,
@@ -266,7 +229,7 @@ const styles = StyleSheet.create((theme) => ({
     paddingVertical: theme.spacing(2),
   },
   totalButtonContent: {
-    alignItems: "center",
+    alignItems: 'center',
   },
   oldPriceOnPrimary: {
     // Приглушённый белый: старая цена не должна спорить с суммой к оплате.
@@ -276,8 +239,8 @@ const styles = StyleSheet.create((theme) => ({
     color: theme.colors.passive1,
   },
   totalButtonRow: {
-    flexDirection: "row",
-    alignItems: "baseline",
+    flexDirection: 'row',
+    alignItems: 'baseline',
     gap: theme.spacing(2),
   },
-}));
+}))

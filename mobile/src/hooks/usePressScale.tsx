@@ -4,18 +4,18 @@ import {
   useReducedMotion,
   useSharedValue,
   withTiming,
-} from "react-native-reanimated";
-import { useEffect } from "react";
+} from 'react-native-reanimated'
+import { useEffect } from 'react'
 
 /**
  * Отклик на нажатие — ровно как на витрине: `active:scale-[0.97]`
  * (postshop_client/src/shared/ui/Button.tsx). Нажатие подтверждается сразу,
  * пока запрос ещё идёт, и человек не жмёт второй раз.
  */
-export const PRESS_SCALE = 0.97;
-export const PRESS_DURATION = 120;
+export const PRESS_SCALE = 0.97
+export const PRESS_DURATION = 120
 /** Отклик для режима «уменьшить движение»: без движения, только прозрачность. */
-export const PRESS_OPACITY = 0.8;
+export const PRESS_OPACITY = 0.8
 
 /**
  * Живёт отдельно от `ui/Button`, потому что кнопками дело не ограничивается:
@@ -26,16 +26,16 @@ export const PRESS_OPACITY = 0.8;
  * `Animated.createAnimatedComponent(Pressable)`.
  */
 export const usePressScale = (disabled?: boolean) => {
-  const reduceMotion = useReducedMotion();
-  const isPressed = useSharedValue(false);
+  const reduceMotion = useReducedMotion()
+  const isPressed = useSharedValue(false)
 
   // Элемент часто гасят прямо по нажатию («Сохранить» -> disabled на время
   // запроса). Тогда onPressOut может не прийти, и он залипнет уменьшенным.
   useEffect(() => {
     if (disabled) {
-      isPressed.value = false;
+      isPressed.value = false
     }
-  }, [disabled, isPressed]);
+  }, [disabled, isPressed])
 
   const pressStyle = useAnimatedStyle(() => {
     if (reduceMotion) {
@@ -44,7 +44,7 @@ export const usePressScale = (disabled?: boolean) => {
       return {
         opacity: isPressed.value ? PRESS_OPACITY : 1,
         transform: [{ scale: 1 }],
-      };
+      }
     }
 
     return {
@@ -57,18 +57,18 @@ export const usePressScale = (disabled?: boolean) => {
           }),
         },
       ],
-    };
-  });
+    }
+  })
 
   return {
     pressStyle,
     onPressIn: () => {
-      isPressed.value = true;
+      isPressed.value = true
     },
     onPressOut: () => {
-      isPressed.value = false;
+      isPressed.value = false
     },
-  };
-};
+  }
+}
 
-export default usePressScale;
+export default usePressScale

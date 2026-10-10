@@ -1,8 +1,7 @@
-import ProfileScreen from "@/screens/Shop/Profile";
+import ProfileScreen from '@/screens/Shop/Profile'
 
 const ProfileRoute = () => {
-  return <ProfileScreen />;
-};
+  return <ProfileScreen />
+}
 
-export default ProfileRoute;
-
+export default ProfileRoute

@@ -1,8 +1,8 @@
-import TermsOfUseScreen from "@/screens/Client/TermsOfUse";
-import React from "react";
+import TermsOfUseScreen from '@/screens/Client/TermsOfUse'
+import React from 'react'
 
 const TermsOfUseRoute = () => {
-  return <TermsOfUseScreen />;
-};
+  return <TermsOfUseScreen />
+}
 
-export default TermsOfUseRoute;
+export default TermsOfUseRoute

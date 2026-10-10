@@ -1,20 +1,20 @@
-import CustomTextInput from "@/ui/CustomTextInput";
-import Typography from "@/ui/Typography";
-import React, { Ref, useEffect, useImperativeHandle } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import { RefType } from "..";
-import { TFunction } from "i18next";
+import CustomTextInput from '@/ui/CustomTextInput'
+import Typography from '@/ui/Typography'
+import React, { Ref, useEffect, useImperativeHandle } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import { RefType } from '..'
+import { TFunction } from 'i18next'
 
-type Inputs = Pick<ShopAdditional.Item, "name" | "description">;
+type Inputs = Pick<ShopAdditional.Item, 'name' | 'description'>
 
 type Props = {
-  data: Pick<ShopAdditional.Item, "name" | "description">;
-  setIsValid: (value: boolean) => void;
-  ref: Ref<RefType>;
-  t: TFunction;
-};
+  data: Pick<ShopAdditional.Item, 'name' | 'description'>
+  setIsValid: (value: boolean) => void
+  ref: Ref<RefType>
+  t: TFunction
+}
 
 const NameAndDescription = ({ data, setIsValid, ref, t }: Props) => {
   const {
@@ -22,26 +22,26 @@ const NameAndDescription = ({ data, setIsValid, ref, t }: Props) => {
     getValues,
     formState: { isValid },
   } = useForm<Inputs>({
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
       name: data?.name,
       description: data?.description,
     },
-  });
+  })
 
   useEffect(() => {
-    setIsValid(isValid);
-  }, [isValid]);
+    setIsValid(isValid)
+  }, [isValid])
 
   useImperativeHandle(ref, () => ({
     getData: () => getValues(),
-  }));
+  }))
 
   return (
     <View style={styles.container}>
       <View style={styles.inputWrapper}>
         <Typography variant="t1" weight="semiBold">
-          {t("store.shopAdditional.storeName")}
+          {t('store.shopAdditional.storeName')}
         </Typography>
         <Controller
           control={control}
@@ -52,17 +52,13 @@ const NameAndDescription = ({ data, setIsValid, ref, t }: Props) => {
             maxLength: 32,
           }}
           render={({ field: { onChange, onBlur, value } }) => (
-            <CustomTextInput
-              value={value}
-              onBlur={onBlur}
-              onChangeText={onChange}
-            />
+            <CustomTextInput value={value} onBlur={onBlur} onChangeText={onChange} />
           )}
         />
       </View>
       <View style={styles.inputWrapper}>
         <Typography variant="t1" weight="semiBold">
-          {t("inputs.description")}
+          {t('inputs.description')}
         </Typography>
         <Controller
           control={control}
@@ -82,10 +78,10 @@ const NameAndDescription = ({ data, setIsValid, ref, t }: Props) => {
         />
       </View>
     </View>
-  );
-};
+  )
+}
 
-export default NameAndDescription;
+export default NameAndDescription
 
 const styles = StyleSheet.create((theme) => ({
   container: {
@@ -98,4 +94,4 @@ const styles = StyleSheet.create((theme) => ({
   inputWrapper: {
     gap: theme.spacing(2),
   },
-}));
+}))

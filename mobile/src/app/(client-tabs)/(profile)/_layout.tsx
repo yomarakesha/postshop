@@ -1,9 +1,9 @@
-import React from "react";
-import { Stack } from "expo-router";
-import useScreenOptions from "@/hooks/useScreenOptions";
+import React from 'react'
+import { Stack } from 'expo-router'
+import useScreenOptions from '@/hooks/useScreenOptions'
 
 const ProfileStack = () => {
-  const screenOption = useScreenOptions();
+  const screenOption = useScreenOptions()
   return (
     <Stack screenOptions={screenOption}>
       <Stack.Screen name="index" />
@@ -15,7 +15,7 @@ const ProfileStack = () => {
       <Stack.Screen name="favorites" />
       <Stack.Screen name="notifications" />
     </Stack>
-  );
-};
+  )
+}
 
-export default ProfileStack;
+export default ProfileStack

@@ -1,14 +1,14 @@
-import Header from "@/components/Header";
-import CustomTextInput from "@/ui/CustomTextInput";
-import Typography from "@/ui/Typography";
-import React, { useEffect, useImperativeHandle } from "react";
-import { Controller, useForm } from "react-hook-form";
-import { View } from "react-native";
-import { ScrollView } from "react-native-gesture-handler";
-import { StyleSheet } from "react-native-unistyles";
-import { StepsProps } from "..";
+import Header from '@/components/Header'
+import CustomTextInput from '@/ui/CustomTextInput'
+import Typography from '@/ui/Typography'
+import React, { useEffect, useImperativeHandle } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { View } from 'react-native'
+import { ScrollView } from 'react-native-gesture-handler'
+import { StyleSheet } from 'react-native-unistyles'
+import { StepsProps } from '..'
 
-type Inputs = Pick<ShopAdditional.Item, "name" | "description">;
+type Inputs = Pick<ShopAdditional.Item, 'name' | 'description'>
 
 const NameAndDescription = ({ ref, setIsValid, t }: StepsProps) => {
   const {
@@ -16,33 +16,30 @@ const NameAndDescription = ({ ref, setIsValid, t }: StepsProps) => {
     getValues,
     formState: { isValid },
   } = useForm<Inputs>({
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
-      name: "",
-      description: "",
+      name: '',
+      description: '',
     },
-  });
+  })
 
   useEffect(() => {
-    setIsValid(isValid);
-  }, [isValid]);
+    setIsValid(isValid)
+  }, [isValid])
 
   useImperativeHandle(ref, () => ({
     getData: () => getValues(),
     isValid: isValid,
-  }));
+  }))
 
   return (
     <>
-      <Header
-        title={t("store.shopAdditional.nameAndDescription")}
-        backgroundColor="white"
-      />
+      <Header title={t('store.shopAdditional.nameAndDescription')} backgroundColor="white" />
       <ScrollView style={styles.wrapper}>
         <View style={styles.container}>
           <View style={styles.inputWrapper}>
             <Typography variant="t1" weight="semiBold">
-              {t("store.shopAdditional.storeName")}
+              {t('store.shopAdditional.storeName')}
             </Typography>
             <Controller
               control={control}
@@ -53,17 +50,13 @@ const NameAndDescription = ({ ref, setIsValid, t }: StepsProps) => {
                 maxLength: 32,
               }}
               render={({ field: { onChange, onBlur, value } }) => (
-                <CustomTextInput
-                  value={value}
-                  onBlur={onBlur}
-                  onChangeText={onChange}
-                />
+                <CustomTextInput value={value} onBlur={onBlur} onChangeText={onChange} />
               )}
             />
           </View>
           <View style={styles.inputWrapper}>
             <Typography variant="t1" weight="semiBold">
-              {t("inputs.description")}
+              {t('inputs.description')}
             </Typography>
             <Controller
               control={control}
@@ -85,10 +78,10 @@ const NameAndDescription = ({ ref, setIsValid, t }: StepsProps) => {
         </View>
       </ScrollView>
     </>
-  );
-};
+  )
+}
 
-export default NameAndDescription;
+export default NameAndDescription
 
 const styles = StyleSheet.create((theme) => ({
   wrapper: {
@@ -106,6 +99,6 @@ const styles = StyleSheet.create((theme) => ({
   },
   input: {
     minHeight: 128,
-    textAlignVertical: "top",
+    textAlignVertical: 'top',
   },
-}));
+}))

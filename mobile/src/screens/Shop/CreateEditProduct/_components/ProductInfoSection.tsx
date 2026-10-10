@@ -1,21 +1,21 @@
-import React from "react";
-import { View } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import { Control, Controller } from "react-hook-form";
-import CustomTextInput from "@/ui/CustomTextInput";
-import Typography from "@/ui/Typography";
-import { TFunction } from "i18next";
+import React from 'react'
+import { View } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import { Control, Controller } from 'react-hook-form'
+import CustomTextInput from '@/ui/CustomTextInput'
+import Typography from '@/ui/Typography'
+import { TFunction } from 'i18next'
 
 interface Props {
-  control: Control<Product.Form.CreateBody>;
-  t: TFunction;
+  control: Control<Product.Form.CreateBody>
+  t: TFunction
 }
 
 const ProductInfoSection = ({ control, t }: Props) => (
   <View style={styles.container}>
     <View style={styles.field}>
       <Typography weight="medium">
-        {t("inputs.title")} <Typography color="error">*</Typography>
+        {t('inputs.title')} <Typography color="error">*</Typography>
       </Typography>
       <Controller
         control={control}
@@ -23,7 +23,7 @@ const ProductInfoSection = ({ control, t }: Props) => (
         rules={{ required: true }}
         render={({ field: { onChange, value } }) => (
           <CustomTextInput
-            placeholder={t("store.addEditProduct.inputs.titlePlaceholder")}
+            placeholder={t('store.addEditProduct.inputs.titlePlaceholder')}
             value={value}
             onChangeText={onChange}
           />
@@ -32,7 +32,7 @@ const ProductInfoSection = ({ control, t }: Props) => (
     </View>
     <View style={styles.field}>
       <Typography weight="medium">
-        {t("inputs.description")} <Typography color="error">*</Typography>
+        {t('inputs.description')} <Typography color="error">*</Typography>
       </Typography>
       <Controller
         control={control}
@@ -40,9 +40,7 @@ const ProductInfoSection = ({ control, t }: Props) => (
         rules={{ required: true }}
         render={({ field: { onChange, value } }) => (
           <CustomTextInput
-            placeholder={t(
-              "store.addEditProduct.inputs.descriptionPlaceholder",
-            )}
+            placeholder={t('store.addEditProduct.inputs.descriptionPlaceholder')}
             multiline
             value={value}
             onChangeText={onChange}
@@ -54,9 +52,9 @@ const ProductInfoSection = ({ control, t }: Props) => (
       />
     </View>
   </View>
-);
+)
 
-export default ProductInfoSection;
+export default ProductInfoSection
 
 const styles = StyleSheet.create((theme) => ({
   container: {
@@ -67,4 +65,4 @@ const styles = StyleSheet.create((theme) => ({
   },
   field: { gap: theme.spacing(2) },
   textarea: { minHeight: 120 },
-}));
+}))

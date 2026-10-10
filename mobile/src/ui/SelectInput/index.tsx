@@ -1,22 +1,22 @@
 // ui/SelectInput.tsx
-import React from "react";
-import { Pressable } from "react-native";
-import { StyleSheet } from "react-native-unistyles";
-import Typography from "@/ui/Typography";
-import ChevronRightIcon from "@assets/icons/right-chevron.svg";
+import React from 'react'
+import { Pressable } from 'react-native'
+import { StyleSheet } from 'react-native-unistyles'
+import Typography from '@/ui/Typography'
+import ChevronRightIcon from '@assets/icons/right-chevron.svg'
 
 type Props = {
-  placeholder: string;
-  value?: string;
-  onPress: () => void;
-};
+  placeholder: string
+  value?: string
+  onPress: () => void
+}
 
 const SelectInput = ({ placeholder, value, onPress }: Props) => {
   return (
     <Pressable style={styles.container} onPress={onPress}>
       <Typography
         variant="p3"
-        color={value ? undefined : "tertiary"}
+        color={value ? undefined : 'tertiary'}
         numberOfLines={1}
         style={styles.value}
       >
@@ -24,10 +24,10 @@ const SelectInput = ({ placeholder, value, onPress }: Props) => {
       </Typography>
       <ChevronRightIcon style={styles.icon} width={20} height={20} />
     </Pressable>
-  );
-};
+  )
+}
 
-export default SelectInput;
+export default SelectInput
 
 const styles = StyleSheet.create((theme) => ({
   container: {
@@ -39,9 +39,9 @@ const styles = StyleSheet.create((theme) => ({
     // Одна высота с CustomTextInput и кнопками.
     minHeight: 48,
     gap: theme.spacing(2),
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     flex: 1,
   },
   // Длинное значение раньше выдавливало стрелку за пределы поля.
@@ -51,4 +51,4 @@ const styles = StyleSheet.create((theme) => ({
   icon: {
     color: theme.colors.passive1,
   },
-}));
+}))

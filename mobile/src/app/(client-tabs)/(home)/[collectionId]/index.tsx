@@ -1,8 +1,8 @@
-import CollectionProductsScreen from "@/screens/Client/CollectionProducts";
-import React from "react";
+import CollectionProductsScreen from '@/screens/Client/CollectionProducts'
+import React from 'react'
 
 const CollectionProductsRoute = () => {
-  return <CollectionProductsScreen />;
-};
+  return <CollectionProductsScreen />
+}
 
-export default CollectionProductsRoute;
+export default CollectionProductsRoute

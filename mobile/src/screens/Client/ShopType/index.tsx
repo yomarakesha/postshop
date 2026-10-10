@@ -1,65 +1,63 @@
-import { shopBaseApi } from "@/api/shopBaseApi";
-import Header from "@/components/Header";
-import ActivityIndicator from "@/ui/ActivityIndicator";
-import Button from "@/ui/Button";
-import ScreenFooter from "@/ui/ScreenFooter";
-import Typography from "@/ui/Typography";
-import ShopMainIcon from "@assets/icons/shop-main.svg";
-import ShopNeutralIcon from "@assets/icons/shop-neutral.svg";
-import { useRouter } from "expo-router";
-import React, { useState } from "react";
-import { useTranslation } from "react-i18next";
-import { Pressable, View } from "react-native";
-import { StyleSheet, useUnistyles } from "react-native-unistyles";
+import { shopBaseApi } from '@/api/shopBaseApi'
+import Header from '@/components/Header'
+import ActivityIndicator from '@/ui/ActivityIndicator'
+import Button from '@/ui/Button'
+import ScreenFooter from '@/ui/ScreenFooter'
+import Typography from '@/ui/Typography'
+import ShopMainIcon from '@assets/icons/shop-main.svg'
+import ShopNeutralIcon from '@assets/icons/shop-neutral.svg'
+import { useRouter } from 'expo-router'
+import React, { useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import { Pressable, View } from 'react-native'
+import { StyleSheet, useUnistyles } from 'react-native-unistyles'
 
 const ShopTypeScreen = () => {
-  const router = useRouter();
-  const [selectedType, setSelectedType] = useState<ShopBase.Type | undefined>(
-    undefined,
-  );
-  const shopCreateMutation = shopBaseApi.useCreate();
-  const { theme } = useUnistyles();
-  const { t } = useTranslation();
+  const router = useRouter()
+  const [selectedType, setSelectedType] = useState<ShopBase.Type | undefined>(undefined)
+  const shopCreateMutation = shopBaseApi.useCreate()
+  const { theme } = useUnistyles()
+  const { t } = useTranslation()
 
   const typeData: { key: ShopBase.Type; title: string }[] = [
     {
-      key: "individual_entrepreneur",
-      title: t("client.sellerType.individual"),
+      key: 'individual_entrepreneur',
+      title: t('client.sellerType.individual'),
     },
     {
-      key: "legal_entity",
-      title: t("client.sellerType.legalEntity"),
+      key: 'legal_entity',
+      title: t('client.sellerType.legalEntity'),
     },
-  ];
+  ]
 
   const handleSelectType = (type: ShopBase.Type) => {
-    setSelectedType(type);
-  };
+    setSelectedType(type)
+  }
 
   const handleNext = async () => {
-    if (!selectedType) return;
+    if (!selectedType) return
     try {
       const res = await shopCreateMutation.mutateAsync({
         legal_entity_type: selectedType,
         documents: [],
-      });
+      })
 
       router.push({
-        pathname: "/(become-seller)/[type]",
+        pathname: '/(become-seller)/[type]',
         params: {
           type: selectedType,
           shopId: res.id,
         },
-      });
+      })
     } catch {
-      return;
+      return
     }
-  };
+  }
   return (
     <>
       <Header
         withGoBack
-        title={t("client.sellerType.headerTitle")}
+        title={t('client.sellerType.headerTitle')}
         backgroundColor={theme.colors.white}
       />
       <View style={styles.wrapper}>
@@ -74,17 +72,9 @@ const ShopTypeScreen = () => {
             >
               <View style={styles.badge(item.key === selectedType)}>
                 {item.key === selectedType ? (
-                  <ShopNeutralIcon
-                    width={32}
-                    height={32}
-                    style={styles.shopSolid}
-                  />
+                  <ShopNeutralIcon width={32} height={32} style={styles.shopSolid} />
                 ) : (
-                  <ShopMainIcon
-                    width={32}
-                    height={32}
-                    style={styles.shopOutline}
-                  />
+                  <ShopMainIcon width={32} height={32} style={styles.shopOutline} />
                 )}
               </View>
               <View style={styles.cardTextContainer}>
@@ -97,7 +87,7 @@ const ShopTypeScreen = () => {
         </View>
         <ScreenFooter>
           <Button
-            title={t("common.next")}
+            title={t('common.next')}
             onPress={handleNext}
             disabled={!selectedType || shopCreateMutation.isPending}
             variant="primary"
@@ -109,10 +99,10 @@ const ShopTypeScreen = () => {
         </ScreenFooter>
       </View>
     </>
-  );
-};
+  )
+}
 
-export default ShopTypeScreen;
+export default ShopTypeScreen
 
 const styles = StyleSheet.create((theme) => ({
   wrapper: {
@@ -129,8 +119,8 @@ const styles = StyleSheet.create((theme) => ({
     padding: theme.spacing(4),
     gap: theme.spacing(3),
     borderRadius: theme.spacing(3),
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems: 'center',
+    justifyContent: 'center',
     borderWidth: 1,
     borderColor: isActive ? theme.colors.blueMain : theme.colors.stroke,
     // Выбранный вариант отличался только цветом рамки в 1px — на телефоне
@@ -145,8 +135,8 @@ const styles = StyleSheet.create((theme) => ({
     width: 56,
     height: 56,
     borderRadius: 28,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
   }),
   shopOutline: {
     color: theme.colors.passive2,
@@ -154,4 +144,4 @@ const styles = StyleSheet.create((theme) => ({
   shopSolid: {
     color: theme.colors.blueMain,
   },
-}));
+}))
