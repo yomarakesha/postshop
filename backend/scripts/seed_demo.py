@@ -26,6 +26,7 @@ from decimal import Decimal
 
 sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
+from PIL import Image, ImageDraw
 from sqlalchemy import or_, select
 from app.database import AsyncSessionLocal, engine
 from app.core.security import hash_password
@@ -114,6 +115,39 @@ PRODUCTS = [
     ("Спортивная одежда", "Adidas", "Спортивный костюм Adidas", "Adidas sport eşigi", "Adidas tracksuit", "1100", None, 9),
     ("Напитки", "Ýaşlyk", "Минеральная вода Ýaşlyk 1,5 л", "Ýaşlyk mineral suwy 1,5 l", "Ýaşlyk mineral water 1.5 L", "4", None, 200),
     ("Напитки", None, "Зелёный чай, 100 г", "Gök çaý, 100 g", "Green tea, 100 g", "35", None, 50),
+    # Новые товары добавлять только в конец: штрихкод строится по номеру строки.
+    ("Смартфоны", "Samsung", "Samsung Galaxy S24", "Samsung Galaxy S24", "Samsung Galaxy S24", "13500", "8", 7),
+    ("Смартфоны", "Samsung", "Samsung Galaxy A15", "Samsung Galaxy A15", "Samsung Galaxy A15", "2900", None, 25),
+    ("Смартфоны", "Apple", "iPhone 15 Pro 256 ГБ", "iPhone 15 Pro 256 GB", "iPhone 15 Pro 256 GB", "21900", None, 3),
+    ("Смартфоны", "Apple", "iPhone 13 128 ГБ", "iPhone 13 128 GB", "iPhone 13 128 GB", "10900", "12", 6),
+    ("Смартфоны", "Xiaomi", "Xiaomi 14T", "Xiaomi 14T", "Xiaomi 14T", "8900", None, 9),
+    ("Смартфоны", "Xiaomi", "Xiaomi Redmi 13C", "Xiaomi Redmi 13C", "Xiaomi Redmi 13C", "2300", "5", 40),
+    ("Наушники", "Samsung", "Samsung Galaxy Buds FE", "Samsung Galaxy Buds FE", "Samsung Galaxy Buds FE", "1500", None, 16),
+    ("Наушники", "Apple", "AirPods 3", "AirPods 3", "AirPods 3", "3100", "10", 11),
+    ("Наушники", "Philips", "Накладные наушники Philips TAH4205", "Philips TAH4205 gulakçyny", "Philips TAH4205 on-ear headphones", "540", None, 22),
+    ("Наушники", "Xiaomi", "Наушники Xiaomi Buds 4 Lite", "Xiaomi Buds 4 Lite gulakçyny", "Xiaomi Buds 4 Lite earbuds", "480", "15", 35),
+    ("Для кухни", "Philips", "Тостер Philips Daily", "Philips Daily tosteri", "Philips Daily toaster", "390", None, 12),
+    ("Для кухни", "Philips", "Аэрогриль Philips Airfryer 3000", "Philips Airfryer 3000", "Philips Airfryer 3000", "2400", "10", 5),
+    ("Для кухни", "Bosch", "Кофемашина Bosch Tassimo", "Bosch Tassimo kofe maşyny", "Bosch Tassimo coffee machine", "1900", None, 4),
+    ("Для кухни", "Bosch", "Микроволновая печь Bosch Serie 2", "Bosch Serie 2 mikrotolkunly peç", "Bosch Serie 2 microwave oven", "2700", "6", 3),
+    ("Для кухни", "Xiaomi", "Электрочайник Xiaomi Mi Kettle", "Xiaomi Mi Kettle çäýnegi", "Xiaomi Mi Kettle", "350", None, 28),
+    ("Уход за домом", "Xiaomi", "Робот-пылесос Xiaomi Robot Vacuum S10", "Xiaomi Robot Vacuum S10", "Xiaomi Robot Vacuum S10", "4300", "9", 6),
+    ("Уход за домом", "Philips", "Отпариватель Philips 3000", "Philips 3000 bug ütügi", "Philips 3000 garment steamer", "690", None, 13),
+    ("Уход за домом", "Bosch", "Стиральная машина Bosch Serie 6", "Bosch Serie 6 kir ýuwujy maşyn", "Bosch Serie 6 washing machine", "9800", None, 2),
+    ("Уход за домом", "Samsung", "Пылесос Samsung Jet 60", "Samsung Jet 60 tozsorujy", "Samsung Jet 60 vacuum cleaner", "3600", "11", 5),
+    ("Кроссовки", "Adidas", "Кроссовки Adidas Ultraboost Light", "Adidas Ultraboost Light krossowkasy", "Adidas Ultraboost Light sneakers", "2800", "15", 8),
+    ("Кроссовки", "Adidas", "Кеды Adidas Grand Court", "Adidas Grand Court kedasy", "Adidas Grand Court sneakers", "1050", None, 19),
+    ("Кроссовки", "Nike", "Кроссовки Nike Air Max SC", "Nike Air Max SC krossowkasy", "Nike Air Max SC sneakers", "1650", None, 12),
+    ("Кроссовки", "Nike", "Кроссовки Nike Pegasus 41", "Nike Pegasus 41 krossowkasy", "Nike Pegasus 41 sneakers", "2500", "10", 7),
+    ("Спортивная одежда", "Nike", "Футболка Nike Dri-FIT", "Nike Dri-FIT futbolkasy", "Nike Dri-FIT T-shirt", "420", None, 45),
+    ("Спортивная одежда", "Nike", "Шорты Nike Challenger", "Nike Challenger şortigi", "Nike Challenger shorts", "480", "20", 30),
+    ("Спортивная одежда", "Adidas", "Толстовка Adidas Essentials", "Adidas Essentials switşoty", "Adidas Essentials hoodie", "890", None, 17),
+    ("Спортивная одежда", "Adidas", "Ветровка Adidas Own The Run", "Adidas Own The Run kurtkasy", "Adidas Own The Run jacket", "1250", "12", 10),
+    ("Напитки", "Ýaşlyk", "Минеральная вода Ýaşlyk 0,5 л", "Ýaşlyk mineral suwy 0,5 l", "Ýaşlyk mineral water 0.5 L", "2", None, 500),
+    ("Напитки", "Ýaşlyk", "Лимонад Ýaşlyk груша 1 л", "Ýaşlyk armyt limonady 1 l", "Ýaşlyk pear lemonade 1 L", "9", None, 120),
+    ("Напитки", None, "Чёрный чай, 250 г", "Gara çaý, 250 g", "Black tea, 250 g", "60", "10", 80),
+    ("Напитки", None, "Яблочный сок, 1 л", "Alma şiresi, 1 l", "Apple juice, 1 L", "18", None, 90),
+    ("Напитки", None, "Молотый кофе, 250 г", "Üwelen kofe, 250 g", "Ground coffee, 250 g", "140", "5", 40),
 ]
 
 LANGUAGES = ("ru", "tk", "en")
@@ -251,9 +285,28 @@ async def seed_users(db) -> dict:
     return {"admin": admin, "seller": seller, "buyer": buyer}
 
 
+DEMO_LOGO_PATH = "uploads/logos/demo_shop.webp"
+
+
+def _ensure_demo_logo() -> str:
+    """Рисует логотип-заглушку, если файла ещё нет, и возвращает путь для БД."""
+    file_path = os.path.join(os.path.dirname(__file__), "..", DEMO_LOGO_PATH)
+    if not os.path.exists(file_path):
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        logo = Image.new("RGB", (256, 256), "#1E88E5")
+        ImageDraw.Draw(logo).ellipse((64, 64, 192, 192), fill="#FFFFFF")
+        logo.save(file_path, "WEBP")
+    return DEMO_LOGO_PATH
+
+
 async def seed_shop(db, seller: User, cities) -> ShopBase:
     shop = await _first(db, select(ShopBase).where(ShopBase.owner_id == seller.id))
     if shop is not None:
+        # Магазин без логотипа покупателю не виден вместе со всеми товарами
+        # (app/core/visibility.py) — чиним и магазины, созданные до этой правки.
+        profile = await _first(db, select(ShopAdditional).where(ShopAdditional.shop_base_id == shop.id))
+        if profile is not None and not profile.logo_path:
+            profile.logo_path = _ensure_demo_logo()
         return shop
     shop = ShopBase(
         owner_id=seller.id,
@@ -271,6 +324,7 @@ async def seed_shop(db, seller: User, cities) -> ShopBase:
         city_id=cities["Ашхабад"].id,
         warehouse_type=WarehouseType.fbs,
         name="Демо-магазин",
+        logo_path=_ensure_demo_logo(),
         description="Магазин с тестовыми товарами для разработки.",
         addresses=["Ашхабад, просп. Махтумкули, 25"],
         phone_numbers=["+99361000001"],
