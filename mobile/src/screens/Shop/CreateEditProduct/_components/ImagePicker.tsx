@@ -231,7 +231,7 @@ const styles = StyleSheet.create((theme) => ({
     alignItems: "center",
   },
   previewBackdropTouchable: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   previewImage: {
     width: "92%",

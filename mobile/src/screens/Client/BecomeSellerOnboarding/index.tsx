@@ -94,7 +94,7 @@ const styles = StyleSheet.create((theme) => ({
     flex: 1,
   },
   gradient: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
   },
   container: {
     flex: 1,
