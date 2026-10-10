@@ -1,13 +1,14 @@
-import { useBottomTabBarHeight as useRNBottomTabBarHeight } from "expo-router/js-tabs";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { BottomTabBarHeightContext } from 'expo-router/js-tabs'
+import { useContext } from 'react'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 const useBottomTabBarHeight = () => {
-  const insets = useSafeAreaInsets();
-  try {
-    return useRNBottomTabBarHeight();
-  } catch {
-    return insets.bottom;
-  }
-};
+  const insets = useSafeAreaInsets()
+  // Контекст читаем напрямую: готовый хук вне таб-навигатора бросает ошибку,
+  // а ловить её через try/catch значит вызывать хук условно.
+  const tabBarHeight = useContext(BottomTabBarHeightContext)
 
-export default useBottomTabBarHeight;
+  return tabBarHeight ?? insets.bottom
+}
+
+export default useBottomTabBarHeight
